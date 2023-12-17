@@ -66,7 +66,7 @@ export const serverlessConfiguration: AWS = {
                             let querystring = request.querystring;
                         
                             if (uri.startsWith('/.well-known/webfinger')) {
-                                let redirectUrl = 'https://api.${domain}/webfinger/';
+                                let redirectUrl = 'https://api.${domain}/activitypub/webfinger/';
                                 let username = '';
                         
                                 for (var key in event.request.querystring) {
@@ -87,7 +87,7 @@ export const serverlessConfiguration: AWS = {
                                 };
                             } else if (uri.startsWith('/users')) {
                                 let pathTokens = uri.split("/");
-                                let redirectUrl = 'https://api.${domain}/users/' + pathTokens[pathTokens.length-1];
+                                let redirectUrl = 'https://api.${domain}/activitypub/users/' + pathTokens[pathTokens.length-1];
                                 
                                 return {
                                     statusCode: 302,
