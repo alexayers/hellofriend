@@ -1,20 +1,19 @@
 import {Account} from "../model/account";
 import {AccountRepository} from "../repository/accountRepository";
-import NodeRSA from 'node-rsa';
 import {RegisterUser} from "../model/authenticationDtos";
 import * as process from "process";
-import { execSync } from 'child_process';
-import { generateKeyPairSync } from 'crypto';
+import {generateKeyPairSync} from 'crypto';
+
 export class AccountService {
 
     constructor(private accountRepository: AccountRepository) {
     }
 
-    async createAccount(registerUser: RegisterUser) : Promise<Account> {
+    async createAccount(registerUser: RegisterUser): Promise<Account> {
 
         let keys: { privateKey: string, publicKey: string } = this.generatedKeys();
 
-        let account : Account = {
+        let account: Account = {
             displayName: registerUser.displayName,
             followersUrl: `https://api.${process.env.DOMAIN}/${registerUser.username}/followers`,
             inboxUrl: `https://api.${process.env.DOMAIN}/${registerUser.username}/inbox`,
@@ -48,7 +47,7 @@ export class AccountService {
 
     private generatedKeys(): { privateKey: string, publicKey: string } {
 
-        const { privateKey, publicKey } = generateKeyPairSync('rsa', {
+        const {privateKey, publicKey} = generateKeyPairSync('rsa', {
             modulusLength: 2048,
             publicKeyEncoding: {
                 type: 'spki',

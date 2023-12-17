@@ -8,12 +8,12 @@ import {returnNotValid, successResponse} from "@libs/lambda/api-gateway";
 
 export const register = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
 
-    let registerUser : RegisterUser = event.body as unknown as RegisterUser;
-    let result : boolean = await authenticationService.createCognitoUser(registerUser.email, registerUser.password);
+    let registerUser: RegisterUser = event.body as unknown as RegisterUser;
+    let result: boolean = await authenticationService.createCognitoUser(registerUser.email, registerUser.password);
 
     if (result) {
 
-        let account : Account = await accountService.createAccount(registerUser);
+        let account: Account = await accountService.createAccount(registerUser);
 
         return successResponse({
             account
@@ -25,7 +25,7 @@ export const register = middyfy(async (event: APIGatewayProxyEvent): Promise<API
 
 export const login = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
 
-    let user : LoginUser = event.body as unknown as LoginUser;
+    let user: LoginUser = event.body as unknown as LoginUser;
     let response = await authenticationService.login(user.email, user.password);
 
     return successResponse({

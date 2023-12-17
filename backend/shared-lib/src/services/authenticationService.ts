@@ -2,18 +2,20 @@ import {
     AuthenticationResultType,
     AuthFlowType,
     CognitoIdentityProviderClient,
-    InitiateAuthCommand, InitiateAuthCommandOutput,
+    InitiateAuthCommand,
+    InitiateAuthCommandOutput,
     SignUpCommand,
     SignUpCommandOutput
 } from "@aws-sdk/client-cognito-identity-provider";
 
-const client = new CognitoIdentityProviderClient({ region: "us-east-1" });
+const client = new CognitoIdentityProviderClient({region: "us-east-1"});
+
 export class AuthenticationService {
 
     constructor(private cognitoUserPoolClientId) {
     }
 
-    async createCognitoUser(email: string, password: string) : Promise<boolean> {
+    async createCognitoUser(email: string, password: string): Promise<boolean> {
 
         const params = {
             ClientId: this.cognitoUserPoolClientId,
@@ -28,8 +30,8 @@ export class AuthenticationService {
         };
 
         try {
-            const command : SignUpCommand = new SignUpCommand(params);
-            const response : SignUpCommandOutput = await client.send(command);
+            const command: SignUpCommand = new SignUpCommand(params);
+            const response: SignUpCommandOutput = await client.send(command);
             console.log("User registration successful", response);
             return true;
         } catch (error) {
@@ -38,7 +40,7 @@ export class AuthenticationService {
         }
     }
 
-    async login(email: string, password : string) : Promise<AuthenticationResultType> {
+    async login(email: string, password: string): Promise<AuthenticationResultType> {
         const params = {
             AuthFlow: AuthFlowType.USER_PASSWORD_AUTH,
             ClientId: this.cognitoUserPoolClientId,

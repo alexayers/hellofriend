@@ -4,7 +4,7 @@ import {BaseRepository} from "./baseRepository";
 
 export class AccountRepository extends BaseRepository implements GenericRepository<Account> {
 
-    private _tableName : string = process.env.ACCOUNTS_TABLE;
+    private _tableName: string = process.env.ACCOUNTS_TABLE;
 
     async persist(account: Account): Promise<Account> {
         return await this.put(this._tableName, "#Account", account) as Account;
