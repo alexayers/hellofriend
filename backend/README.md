@@ -8,6 +8,12 @@ There are two stacks that will need to be deployed.
 4. activity-pub: This contains our implementation of ActivityPub
 5. api: This contains are public facing APIs.
 
+### Quickly install dependencies
+
+You can quickly install your dependencies by running the script
+
+`./backend/installDeps.sh`
+
 ### AWS Services
 
 This will make use of the following AWS Services
