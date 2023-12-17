@@ -1,0 +1,6 @@
+/backend/shared-lib/node_modules/*
+/backend/activity-pub/node_modules/*
+/backend/api/node_modules/*
+/backend/database/node_modules/*
+/backend/cloudfront/node_modules/*
+/backend/infra/node_modules/*
