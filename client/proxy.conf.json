@@ -1,0 +1,20 @@
+{
+  "/hellofriend/avatars/*": {
+    "target": "https://files.hellofriend.social",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/hellofriend/headers/*": {
+    "target": "https://files.hellofriend.social",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/hellofriend/attachments/*": {
+    "target": "https://files.hellofriend.social",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}

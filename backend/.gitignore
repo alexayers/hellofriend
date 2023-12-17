@@ -1,0 +1,5 @@
+configuration.ts
+/cloudfront/.serverless/*
+/database/.serverless/*
+/infra/.serverless/*
+.idea/*
