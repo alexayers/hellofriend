@@ -2,7 +2,7 @@ import {middyfy} from "@libs/lambda/lambda";
 import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
 import {Account} from "@libs/model/account";
 import {accountService} from "@libs/services";
-import {returnNotFound, successResponse} from "@libs/lambda/api-gateway";
+import {notFoundResponse, successResponse} from "@libs/lambda/api-gateway";
 
 
 export const getUser = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -19,7 +19,7 @@ export const getUser = middyfy(async (event: APIGatewayProxyEvent): Promise<APIG
 
     if (!account) {
         console.error(`User ${user} not found`);
-        return returnNotFound("User not found")
+        return notFoundResponse("User not found")
     }
 
     return successResponse({
@@ -62,5 +62,4 @@ export const getUser = middyfy(async (event: APIGatewayProxyEvent): Promise<APIG
             "https://w3id.org/security/v1"
         ]
     });
-
 });

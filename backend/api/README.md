@@ -4,7 +4,10 @@ This project must be deployed before the client project.
 
 ### Prerequisites
 
-1. Completed the deployment of the **infra** project
+1. Completed the deployment of the following project:
+    2. infra
+    3. database
+    4. cloudfront
 
 ### First Time setup
 

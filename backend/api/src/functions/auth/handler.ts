@@ -3,7 +3,7 @@ import {middyfy} from "@libs/lambda/lambda";
 import {LoginUser, RegisterUser} from "@libs/model/authenticationDtos";
 import {accountService, authenticationService} from "@libs/services";
 import {Account} from "@libs/model/account";
-import {returnNotValid, successResponse} from "@libs/lambda/api-gateway";
+import {notValidResponse, successResponse} from "@libs/lambda/api-gateway";
 
 
 export const register = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -19,7 +19,7 @@ export const register = middyfy(async (event: APIGatewayProxyEvent): Promise<API
             account
         });
     } else {
-        return returnNotValid("Error");
+        return notValidResponse("Error");
     }
 });
 

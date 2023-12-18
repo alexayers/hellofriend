@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy": "npx sls deploy",
     "teardown": "serverless remove",
+    "install:systemUser": "ts-node ./src/setup/systemUser.ts",
     "offline": "serverless offline"
   },
   "engines": {
@@ -20,15 +21,17 @@
     "@aws-sdk/lib-storage": "^3.474.0",
     "@middy/core": "^3.4.0",
     "@middy/http-json-body-parser": "^3.4.0",
-    "serverless-dynamodb-local": "^1.0.2"
+    "node-fetch": "^2.7.0",
+    "serverless-dynamodb-local": "^1.0.2",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@serverless/typescript": "^3.0.0",
     "@types/aws-lambda": "^8.10.71",
     "@types/node": "^14.14.25",
+    "@types/uuid": "^9.0.7",
     "esbuild": "0.14.54",
     "json-schema-to-ts": "^1.5.0",
-    "node-rsa": "^1.1.1",
     "serverless": "^3.0.0",
     "serverless-domain-manager": "^7.3.3",
     "serverless-esbuild": "^1.50.0",

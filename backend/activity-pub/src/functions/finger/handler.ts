@@ -1,8 +1,8 @@
 import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
 import {middyfy} from "@libs/lambda/lambda";
 import {Account} from "@libs/model/account";
-import {accountService} from "@libs/services";
-import {returnNotFound, successResponse} from "@libs/lambda/api-gateway";
+import {accountService, fediverseService} from "@libs/services";
+import {notFoundResponse, notValidResponse, successResponse} from "@libs/lambda/api-gateway";
 
 
 export const webFinger = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -11,7 +11,7 @@ export const webFinger = middyfy(async (event: APIGatewayProxyEvent): Promise<AP
 
     if (!account) {
         console.error("User not found");
-        return returnNotFound("User not found");
+        return notFoundResponse("User not found");
     }
 
     return successResponse({
@@ -42,6 +42,22 @@ export const webFinger = middyfy(async (event: APIGatewayProxyEvent): Promise<AP
             }
         ]
     });
-})
+});
 
+export const webFingerRemote = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+
+    let userTokens: string [] = event.pathParameters.user.split("@");
+    let filteredArray: string [] = userTokens.filter(element => element !== '');
+
+    if (filteredArray.length != 2) {
+        return notValidResponse(`Your request for ${event.pathParameters.user} isn't valid`);
+    }
+
+    let webFingerUrl: string = `https://${filteredArray[1]}/.well-known/webfinger?resource=acct:${filteredArray[0]}@${filteredArray[1]}`;
+    console.debug(`WebFinger: ${webFingerUrl}`);
+
+    let response = await fediverseService.signedRequest("get", webFingerUrl);
+
+    return successResponse(response);
+});
 

@@ -1,5 +1,5 @@
 import type {AWS} from '@serverless/typescript';
-import {webFinger} from "@functions/finger";
+import {webFinger, webFingerRemote} from "@functions/finger";
 import {getUser} from "@functions/user";
 import configuration from "../configuration";
 
@@ -71,7 +71,7 @@ export const serverlessConfiguration: AWS = {
         }
     },
     // import the function via paths
-    functions: {webFinger, getUser},
+    functions: {webFinger, getUser, webFingerRemote},
     package: {individually: true},
     custom: {
         certificateName: `${domain}`,

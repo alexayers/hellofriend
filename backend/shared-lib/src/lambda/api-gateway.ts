@@ -11,23 +11,29 @@ export const successResponse = (response: Record<string, unknown>) => {
     }
 }
 
-export const returnNotValid = (errorMessage: string) => {
+export const notValidResponse = (errorMessage: string) => {
     return {
         statusCode: 400,
-        body: errorMessage
+        body: JSON.stringify({
+            "errorMessage": errorMessage
+        })
     }
 }
 
-export const returnNotFound = (errorMessage: string) => {
+export const notFoundResponse = (errorMessage: string) => {
     return {
         statusCode: 404,
-        body: errorMessage
+        body: JSON.stringify({
+            "errorMessage": errorMessage
+        })
     }
 }
 
-export const returnNotAuthenticated = (errorMessage: string) => {
+export const notAuthenticatedResponse = (errorMessage: string) => {
     return {
         statusCode: 401,
-        body: errorMessage
+        body: JSON.stringify({
+            "errorMessage": errorMessage
+        })
     }
 }

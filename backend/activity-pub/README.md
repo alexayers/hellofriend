@@ -4,7 +4,10 @@ This project must be deployed before the client project.
 
 ### Prerequisites
 
-1. Completed the deployment of the **infra** project
+1. Completed the deployment of the following project:
+   2. infra
+   3. database
+   4. cloudfront
 
 ### First Time setup
 
@@ -12,6 +15,7 @@ This project must be deployed before the client project.
 
 1. Run `npm i` to install your dependencies
 2. Run `npm run deploy` to deploy the stack
+3. Run `npm run install:systemUser` to create the system user
 
 ### Updates
 
