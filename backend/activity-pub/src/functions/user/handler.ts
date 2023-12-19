@@ -71,6 +71,7 @@ export const getUser = middyfy(async (event: APIGatewayProxyEvent): Promise<APIG
 
 export const personalInbox = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
 
+    console.log(event);
     let account : Account = await accountService.getByNormalizedUsernameDomain(event.pathParameters.user);
 
     if (!account) {

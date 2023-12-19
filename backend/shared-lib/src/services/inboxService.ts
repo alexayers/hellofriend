@@ -23,6 +23,21 @@ export class InboxService {
             return ValidationStatus.NO_RETRY;
         }
 
+        let date: string = headers["Date"];
+
+        if (!date) {
+            console.error("Header missing Date");
+            return ValidationStatus.NO_RETRY;
+        }
+
+        let incomingDate : Date = new Date(date);
+        const oneMinuteAgo: Date = new Date(incomingDate.getTime() - 60000);
+
+        if (incomingDate < oneMinuteAgo) {
+            console.error(`Date ${incomingDate} is older than 60 seconds ${oneMinuteAgo}.`);
+            return ValidationStatus.NO_RETRY;
+        }
+
         let signatureMap: Map<string, string> = this.extractSignature(signature);
         let expectedHeaders: string = this.extractExpectedHeaders(signatureMap, inboxUrl, headers);
 
