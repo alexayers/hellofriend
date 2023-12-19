@@ -13,3 +13,16 @@ export const getUser = {
         },
     ],
 };
+
+export const postPersonalInbox = {
+    handler: `${handlerPath(__dirname)}/handler.personalInbox`,
+    memorySize: 512,
+    events: [
+        {
+            http: {
+                method: 'post',
+                path: '/users/{user}/inbox',
+            },
+        },
+    ],
+};

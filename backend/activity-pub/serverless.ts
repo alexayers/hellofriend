@@ -1,7 +1,8 @@
 import type {AWS} from '@serverless/typescript';
 import {webFinger, webFingerRemote} from "@functions/finger";
-import {getUser} from "@functions/user";
+import {getUser, postPersonalInbox} from "@functions/user";
 import configuration from "../configuration";
+import {postSharedInbox} from "@functions/inbox";
 
 
 // We'll use this resourcePrefix for all our resources: dynamoDB, Cognito, etc
@@ -71,7 +72,7 @@ export const serverlessConfiguration: AWS = {
         }
     },
     // import the function via paths
-    functions: {webFinger, getUser, webFingerRemote},
+    functions: {webFinger, getUser, webFingerRemote, postSharedInbox, postPersonalInbox},
     package: {individually: true},
     custom: {
         certificateName: `${domain}`,

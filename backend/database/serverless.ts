@@ -134,6 +134,35 @@ export const serverlessConfiguration: AWS = {
                     },
                 }
             },
+            FollowTable: {
+                Type: "AWS::DynamoDB::Table",
+                Properties: {
+                    TableName: `${resourcePrefix}-follows`,
+                    AttributeDefinitions: [
+                        {
+                            AttributeName: "pkey",
+                            AttributeType: "S",
+                        },
+                        {
+                            AttributeName: "skey",
+                            AttributeType: "S",
+                        }
+                    ],
+                    KeySchema: [
+                        {
+                            AttributeName: "pkey",
+                            KeyType: "HASH"
+                        },
+                        {
+                            AttributeName: "skey",
+                            KeyType: "RANGE"
+                        }],
+                    ProvisionedThroughput: {
+                        ReadCapacityUnits: 1,
+                        WriteCapacityUnits: 1
+                    },
+                }
+            },
         },
         Outputs: {
             AccountsTableArn: {
@@ -146,6 +175,18 @@ export const serverlessConfiguration: AWS = {
                 Value: { Ref: 'AccountsTable' },
                 Export: {
                     Name: `${resourcePrefix}-AccountsTableName`
+                }
+            },
+            FollowsTableArn: {
+                Value: { 'Fn::GetAtt': ['FollowsTable', 'Arn'] },
+                Export: {
+                    Name: `${resourcePrefix}-FollowsTableArn`
+                }
+            },
+            FollowsTableName: {
+                Value: { Ref: 'FollowsTable' },
+                Export: {
+                    Name: `${resourcePrefix}-FollowsTableName`
                 }
             }
         }

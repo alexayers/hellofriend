@@ -10,7 +10,7 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 
 const client: DynamoDBClient = new DynamoDBClient({region: "us-east-1"});
-const documentClient: DynamoDBDocumentClient = DynamoDBDocumentClient.from(client);
+export const documentClient: DynamoDBDocumentClient = DynamoDBDocumentClient.from(client);
 
 export class BaseRepository {
 

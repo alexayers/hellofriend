@@ -7,6 +7,7 @@ import {notFoundResponse, notValidResponse, successResponse} from "@libs/lambda/
 
 export const webFinger = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
 
+    console.log(event);
     let account: Account = await accountService.getByNormalizedUsernameDomain(event.pathParameters.user);
 
     if (!account) {
@@ -15,7 +16,7 @@ export const webFinger = middyfy(async (event: APIGatewayProxyEvent): Promise<AP
     }
 
     return successResponse({
-        subject: `acct:${account.username}@www.${process.env.DOMAIN}`,
+        subject: `acct:${account.username}@${process.env.DOMAIN}`,
         aliases: [
             `https://www.${process.env.DOMAIN}/@${account.username}`,
             `https://www.${process.env.DOMAIN}/users/${account.username}`

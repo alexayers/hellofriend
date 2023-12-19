@@ -109,7 +109,7 @@ export const serverlessConfiguration: AWS = {
                         }],
                         Enabled: true,
                         DefaultRootObject: 'index.html',
-                        Aliases: [`www.${domain}`],
+                        Aliases: [`www.${domain}`, `${domain}`],
                         DefaultCacheBehavior: {
                             TargetOriginId: 'S3-Website-Origin',
                             ViewerProtocolPolicy: 'redirect-to-https',
@@ -178,6 +178,21 @@ export const serverlessConfiguration: AWS = {
                 Properties: {
                     HostedZoneName: `${domain}.`,
                     Name: `www.${domain}.`,
+                    Type: 'A',
+                    AliasTarget: {
+                        HostedZoneId: 'Z2FDTNDATAQYW2',
+                        DNSName: {
+                            'Fn::GetAtt': ['CloudFrontWebSiteDistribution', 'DomainName'],
+                        },
+                    },
+                }
+            },
+
+            Route53WebSiteNoWWWRecordSet: {
+                Type: 'AWS::Route53::RecordSet',
+                Properties: {
+                    HostedZoneName: `${domain}.`,
+                    Name: `${domain}.`,
                     Type: 'A',
                     AliasTarget: {
                         HostedZoneId: 'Z2FDTNDATAQYW2',
