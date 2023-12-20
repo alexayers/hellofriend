@@ -11,9 +11,13 @@ export interface Account extends BaseModel {
     uri?: string
     avatarFilename?: string
     avatarFileSize?: number
+    avatarFileType?: string
+    avatarRemotePath?: string
     headerFilename?: string
     headerFileSize?: number
-    privateKey: string
+    headerFileType?: string
+    headerRemotePath?: string
+    privateKey?: string
     publicKey?: string
     inboxUrl: string
     outboxUrl: string

@@ -61,7 +61,7 @@ export class FediverseService {
         let account = await accountService.getByNormalizedUsernameDomain(sendingUsername);
 
         if (!account) {
-            console.error("Unable to find user");
+            console.error(`Unable to find user ${sendingUsername}`);
             return;
         }
 

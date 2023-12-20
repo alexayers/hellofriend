@@ -1,6 +1,6 @@
 
 
-export interface Tag {
+export interface ActivityTag {
     id?: number
     type?: TagType
     href?: string

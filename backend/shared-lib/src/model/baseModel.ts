@@ -1,5 +1,6 @@
 export interface BaseModel {
-    id?: string
+    pkey: string
+    skey?: string
     createdAt?: Date
     modifiedAt?: Date
 }

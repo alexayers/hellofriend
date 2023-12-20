@@ -1,7 +1,7 @@
 import {middyfy} from "@libs/lambda/lambda";
 import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
 import {Account} from "@libs/model/account";
-import {accountService, followService, inboxSerivce} from "@libs/services";
+import {accountService, inboxSerivce, inboundQueueService} from "@libs/services";
 import {notAuthenticatedResponse, notFoundResponse, successResponse} from "@libs/lambda/api-gateway";
 import {ValidationStatus} from "@libs/services/inboxService";
 import {Activity, ActivityType, FollowActivity} from "@libs/activityPub/activity/activities";
@@ -71,7 +71,6 @@ export const getUser = middyfy(async (event: APIGatewayProxyEvent): Promise<APIG
 
 export const personalInbox = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
 
-    console.log(event);
     let account : Account = await accountService.getByNormalizedUsernameDomain(event.pathParameters.user);
 
     if (!account) {
@@ -84,15 +83,7 @@ export const personalInbox = middyfy(async (event: APIGatewayProxyEvent): Promis
         return notAuthenticatedResponse("Unable to validate request")
     }
 
-    let activity : Activity = event.body as unknown as Activity;
-
-    switch (activity.type) {
-        case ActivityType.Follow:
-            await followService.acceptRequest(event.body as unknown as FollowActivity)
-            break;
-        default:
-            console.warn(`I don't know what to do with Activity Type: ${activity.type}`)
-    }
+    await inboundQueueService.queue(event.body as unknown as Activity);
 
     return successResponse({"Success": true});
 

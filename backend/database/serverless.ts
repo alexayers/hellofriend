@@ -134,7 +134,7 @@ export const serverlessConfiguration: AWS = {
                     },
                 }
             },
-            FollowTable: {
+            FollowsTable: {
                 Type: "AWS::DynamoDB::Table",
                 Properties: {
                     TableName: `${resourcePrefix}-follows`,
@@ -163,30 +163,164 @@ export const serverlessConfiguration: AWS = {
                     },
                 }
             },
+            TagsTable: {
+                Type: "AWS::DynamoDB::Table",
+                Properties: {
+                    TableName: `${resourcePrefix}-tags`,
+                    AttributeDefinitions: [
+                        {
+                            AttributeName: "pkey",
+                            AttributeType: "S",
+                        },
+                        {
+                            AttributeName: "skey",
+                            AttributeType: "S",
+                        }
+                    ],
+                    KeySchema: [
+                        {
+                            AttributeName: "pkey",
+                            KeyType: "HASH"
+                        },
+                        {
+                            AttributeName: "skey",
+                            KeyType: "RANGE"
+                        }],
+                    ProvisionedThroughput: {
+                        ReadCapacityUnits: 1,
+                        WriteCapacityUnits: 1
+                    },
+                }
+            },
+            StatusesTable: {
+                Type: "AWS::DynamoDB::Table",
+                Properties: {
+                    TableName: `${resourcePrefix}-statuses`,
+                    AttributeDefinitions: [
+                        {
+                            AttributeName: "pkey",
+                            AttributeType: "S",
+                        },
+                        {
+                            AttributeName: "skey",
+                            AttributeType: "S",
+                        },
+                        {AttributeName: 'uri', AttributeType: 'S'},
+                        {AttributeName: 'inReplyToAccountId', AttributeType: 'S'},
+                        {AttributeName: 'inReplyToId', AttributeType: 'S'},
+                        {AttributeName: 'conversationId', AttributeType: 'S'},
+                        {AttributeName: 'accountId', AttributeType: 'S'},
+                    ],
+                    KeySchema: [
+                        {
+                            AttributeName: "pkey",
+                            KeyType: "HASH"
+                        },
+                        {
+                            AttributeName: "skey",
+                            KeyType: "RANGE"
+                        }],
+                    GlobalSecondaryIndexes: [
+                        {
+                            IndexName: 'url-index',
+                            KeySchema: [{AttributeName: 'uri', KeyType: 'HASH'}],
+                            Projection: {ProjectionType: 'ALL'},
+                            ProvisionedThroughput: {
+                                ReadCapacityUnits: 1,
+                                WriteCapacityUnits: 1
+                            }
+                        },
+                        {
+                            IndexName: 'in-reply-to-account-index',
+                            KeySchema: [{AttributeName: 'inReplyToAccountId', KeyType: 'HASH'}],
+                            Projection: {ProjectionType: 'ALL'},
+                            ProvisionedThroughput: {
+                                ReadCapacityUnits: 1,
+                                WriteCapacityUnits: 1
+                            }
+                        },
+                        {
+                            IndexName: 'in-reply-to-index',
+                            KeySchema: [{AttributeName: 'inReplyToId', KeyType: 'HASH'}],
+                            Projection: {ProjectionType: 'ALL'},
+                            ProvisionedThroughput: {
+                                ReadCapacityUnits: 1,
+                                WriteCapacityUnits: 1
+                            }
+                        },
+                        {
+                            IndexName: 'conversation-index',
+                            KeySchema: [{AttributeName: 'conversationId', KeyType: 'HASH'}],
+                            Projection: {ProjectionType: 'ALL'},
+                            ProvisionedThroughput: {
+                                ReadCapacityUnits: 1,
+                                WriteCapacityUnits: 1
+                            }
+                        },
+                        {
+                            IndexName: 'account-index',
+                            KeySchema: [{AttributeName: 'accountId', KeyType: 'HASH'}],
+                            Projection: {ProjectionType: 'ALL'},
+                            ProvisionedThroughput: {
+                                ReadCapacityUnits: 1,
+                                WriteCapacityUnits: 1
+                            }
+                        },
+                    ],
+                    ProvisionedThroughput: {
+                        ReadCapacityUnits: 1,
+                        WriteCapacityUnits: 1
+                    },
+                }
+            },
         },
         Outputs: {
             AccountsTableArn: {
-                Value: { 'Fn::GetAtt': ['AccountsTable', 'Arn'] },
+                Value: {'Fn::GetAtt': ['AccountsTable', 'Arn']},
                 Export: {
                     Name: `${resourcePrefix}-AccountsTableArn`
                 }
             },
             AccountsTableName: {
-                Value: { Ref: 'AccountsTable' },
+                Value: {Ref: 'AccountsTable'},
                 Export: {
                     Name: `${resourcePrefix}-AccountsTableName`
                 }
             },
             FollowsTableArn: {
-                Value: { 'Fn::GetAtt': ['FollowsTable', 'Arn'] },
+                Value: {'Fn::GetAtt': ['FollowsTable', 'Arn']},
                 Export: {
                     Name: `${resourcePrefix}-FollowsTableArn`
                 }
             },
             FollowsTableName: {
-                Value: { Ref: 'FollowsTable' },
+                Value: {Ref: 'FollowsTable'},
                 Export: {
                     Name: `${resourcePrefix}-FollowsTableName`
+                }
+            },
+            TagsTableArn: {
+                Value: {'Fn::GetAtt': ['TagsTable', 'Arn']},
+                Export: {
+                    Name: `${resourcePrefix}-TagsTableArn`
+                }
+            },
+            TagsTableName: {
+                Value: {Ref: 'TagsTable'},
+                Export: {
+                    Name: `${resourcePrefix}-TagsTableName`
+                }
+            },
+            StatusesTableArn: {
+                Value: {'Fn::GetAtt': ['StatusesTable', 'Arn']},
+                Export: {
+                    Name: `${resourcePrefix}-StatusesTableArn`
+                }
+            },
+            StatusesTableName: {
+                Value: {Ref: 'StatusesTable'},
+                Export: {
+                    Name: `${resourcePrefix}-StatusesTableName`
                 }
             }
         }

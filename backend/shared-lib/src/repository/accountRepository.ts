@@ -7,9 +7,12 @@ export class AccountRepository extends BaseRepository implements GenericReposito
     private _tableName: string = process.env.ACCOUNTS_TABLE;
 
     async persist(account: Account): Promise<Account> {
-        return await this.put(this._tableName, "#Account", account) as Account;
+        return await this.put(this._tableName, account) as Account;
     }
 
+    async getByPkey(pkey: string) : Promise<Account> {
+        return await super.byPkey(this._tableName, pkey) as Account;
+    }
 
     async getByNormalizedUsernameDomain(search: string): Promise<Account> {
 

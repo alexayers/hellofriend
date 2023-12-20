@@ -1,20 +1,24 @@
 import {Account} from "../model/account";
-import {AccountRepository} from "../repository/accountRepository";
 import {RegisterUser} from "../model/authenticationDtos";
 import * as process from "process";
 import {generateKeyPairSync} from 'crypto';
+import {PersonActor} from "../activityPub/actors/personActor";
+import {accountRepository} from "../repository";
+import {v4 as uuidv4} from 'uuid';
 
 export class AccountService {
 
-    constructor(private accountRepository: AccountRepository) {
-    }
+
 
     async createAccount(registerUser: RegisterUser): Promise<Account> {
 
         let keys: { privateKey: string, publicKey: string } = this.generatedKeys();
 
         let account: Account = {
+            pkey: uuidv4(),
+            skey: `Account#${registerUser.username.toLowerCase()}`,
             displayName: registerUser.displayName,
+            summary: "",
             followersUrl: `https://api.${process.env.DOMAIN}/${registerUser.username}/followers`,
             inboxUrl: `https://api.${process.env.DOMAIN}/${registerUser.username}/inbox`,
             outboxUrl: `https://api.${process.env.DOMAIN}/${registerUser.username}/outbox`,
@@ -30,7 +34,34 @@ export class AccountService {
             normalizedUserDomain: `${registerUser.username.toLowerCase()}`
         }
 
-        await this.accountRepository.persist(account);
+        await accountRepository.persist(account);
+        delete account.privateKey;
+        return account;
+    }
+
+    async persistPerson(person: PersonActor, domain: string) : Promise<Account> {
+        let account: Account = {
+            pkey: uuidv4(),
+            skey: `Account#${person.preferredUsername.toLowerCase()}:${domain}`,
+            displayName: person.name,
+            followersUrl: `https://${domain}/${person.preferredUsername}/followers`,
+            inboxUrl: `https://${domain}/${person.preferredUsername}/inbox`,
+            outboxUrl: `https://${domain}/${person.preferredUsername}/outbox`,
+            sharedInboxUrl: `https://${domain}/${person.preferredUsername}/shared-inbox`,
+            summary: person.summary,
+            headerRemotePath: person.image.url,
+            headerFileType: person.image.mediaType,
+            avatarRemotePath: person.icon.url,
+            avatarFileType: person.icon.mediaType,
+            username: person.preferredUsername,
+            publicKey: person.publicKey.publicKeyPem,
+            indexable: true,
+            discoverable: true,
+            memorial: false,
+            normalizedUserDomain: `${person.preferredUsername.toLowerCase()}:${domain}`
+        }
+
+        await accountRepository.persist(account);
         delete account.privateKey;
         return account;
     }
@@ -39,9 +70,9 @@ export class AccountService {
     async getByNormalizedUsernameDomain(username: string, domain: string | null = null): Promise<Account> {
 
         if (!domain) {
-            return await this.accountRepository.getByNormalizedUsernameDomain(`${username.toLowerCase()}`);
+            return await accountRepository.getByNormalizedUsernameDomain(`${username.toLowerCase()}`);
         } else {
-            return await this.accountRepository.getByNormalizedUsernameDomain(`${username.toLowerCase()}:${domain.toLowerCase()}`);
+            return await accountRepository.getByNormalizedUsernameDomain(`${username.toLowerCase()}:${domain.toLowerCase()}`);
         }
     }
 
@@ -64,4 +95,6 @@ export class AccountService {
             publicKey: publicKey.toString()
         };
     }
+
+
 }

@@ -1,5 +1,3 @@
-import {v4 as uuidv4} from 'uuid';
-
 import {DynamoDBClient} from "@aws-sdk/client-dynamodb";
 import {
     DynamoDBDocumentClient,
@@ -8,6 +6,7 @@ import {
     QueryCommandInput,
     QueryCommandOutput
 } from "@aws-sdk/lib-dynamodb";
+import console from "console";
 
 const client: DynamoDBClient = new DynamoDBClient({region: "us-east-1"});
 export const documentClient: DynamoDBDocumentClient = DynamoDBDocumentClient.from(client);
@@ -15,11 +14,9 @@ export const documentClient: DynamoDBDocumentClient = DynamoDBDocumentClient.fro
 export class BaseRepository {
 
 
-    async put(tableName: string, skey: string, object: Object): Promise<Object> {
+    async put(tableName: string, object: Object): Promise<Object> {
 
         object = {
-            pkey: uuidv4(),
-            skey: skey,
             createdAt: Date.now(),
             modifiedAt: Date.now(),
             ...object
@@ -30,15 +27,46 @@ export class BaseRepository {
             Item: object
         });
 
-        const command: PutCommand = new PutCommand({
-            TableName: tableName,
-            Item: object
-        });
+        try {
+            const command: PutCommand = new PutCommand({
+                TableName: tableName,
+                Item: object
+            });
 
-        await documentClient.send(command);
+            await documentClient.send(command);
+        } catch (e) {
+            console.error(e);
+        }
+
         return object;
     }
 
+    async byPkey(tableName: string, pkey: string) : Promise<Object> {
+        const params = {
+            TableName: tableName,
+            KeyConditionExpression: "#pkey = :pkey",
+            ExpressionAttributeNames: {
+                "#pkey": "pkey"
+            },
+            ExpressionAttributeValues: {
+                ":pkey": pkey
+            }
+        };
+
+        try {
+            const data = await client.send(new QueryCommand(params));
+
+            if (data.Items.length == 1) {
+                return data.Items[0];
+            } else {
+                return undefined
+            }
+
+        } catch (error) {
+            console.error("Error:", error);
+            throw error;
+        }
+    }
 
     async query(params: QueryCommandInput): Promise<Object> {
         try {

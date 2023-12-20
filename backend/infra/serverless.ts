@@ -7,8 +7,7 @@ const resourcePrefix: string = configuration.resourcePrefix;
 // Domain name you're using for this project
 const domain: string = configuration.domain;
 
-// @ts-ignore
-// @ts-ignore
+
 export const serverlessConfiguration: AWS = {
     service: 'hello-friend-infra',
     frameworkVersion: '3',
@@ -238,16 +237,16 @@ export const serverlessConfiguration: AWS = {
             -=-=-=-=-=-=-=-=-=-=-=-=-=-
              */
 
-            PostQueue: {
+            OutboundQueue: {
                 Type: 'AWS::SQS::Queue',
                 Properties: {
-                    QueueName: `${resourcePrefix}-post-queue`,
+                    QueueName: `${resourcePrefix}-outbound-queue`,
                 },
             },
-            ActivityQueue: {
+            InboundQueue: {
                 Type: 'AWS::SQS::Queue',
                 Properties: {
-                    QueueName: `${resourcePrefix}-activity-queue`
+                    QueueName: `${resourcePrefix}-inbound-queue`
                 },
             },
         },
@@ -257,7 +256,31 @@ export const serverlessConfiguration: AWS = {
                 Export: {
                     Name: `${resourcePrefix}-CognitoUserPoolClientId`
                 }
-            }
+            },
+            OutboundQueueUrl: {
+                Value: { 'Fn::GetAtt': ['OutboundQueue', 'QueueName'] },
+                Export: {
+                    Name: `${resourcePrefix}-OutboundQueueUrl`,
+                },
+            },
+            OutboundQueueArn: {
+                Value: { 'Fn::GetAtt': ['OutboundQueue', 'Arn'] },
+                Export: {
+                    Name: `${resourcePrefix}-OutboundQueueArn`,
+                },
+            },
+            InboundQueueUrl: {
+                Value: { 'Fn::GetAtt': ['InboundQueue', 'QueueName'] },
+                Export: {
+                    Name: `${resourcePrefix}-InboundQueueUrl`,
+                },
+            },
+            InboundQueueArn: {
+                Value: { 'Fn::GetAtt': ['InboundQueue', 'Arn'] },
+                Export: {
+                    Name: `${resourcePrefix}-InboundQueueArn`,
+                },
+            },
         }
     },
 };

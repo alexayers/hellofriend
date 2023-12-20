@@ -3,6 +3,8 @@ import {webFinger, webFingerRemote} from "@functions/finger";
 import {getUser, postPersonalInbox} from "@functions/user";
 import configuration from "../configuration";
 import {postSharedInbox} from "@functions/inbox";
+import {inboundQueueProcessor} from "src/functions/inboundQueue";
+import {outboundQueueProcessor} from "@functions/outboundQueue";
 
 
 // We'll use this resourcePrefix for all our resources: dynamoDB, Cognito, etc
@@ -15,6 +17,7 @@ export const serverlessConfiguration: AWS = {
     service: 'hello-friend-activity-pub',
     frameworkVersion: '3',
     plugins: ['serverless-esbuild', 'serverless-offline', 'serverless-dynamodb-local', 'serverless-domain-manager'],
+
     provider: {
         name: 'aws',
         runtime: 'nodejs20.x',
@@ -23,12 +26,22 @@ export const serverlessConfiguration: AWS = {
             minimumCompressionSize: 1024,
             shouldStartNameWithService: true,
         },
+        logs: {
+            lambda: {
+                retentionInDays: 3
+            }
+        },
         environment: {
             AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
             NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
             COGNITO_CLIENT_ID: { "Fn::ImportValue": `${resourcePrefix}-CognitoUserPoolClientId` },
             ACCOUNTS_TABLE: { "Fn::ImportValue": `${resourcePrefix}-AccountsTableName` },
-            DOMAIN: '${self:custom.certificateName}'
+            FOLLOWS_TABLE: { "Fn::ImportValue": `${resourcePrefix}-FollowsTableName` },
+            STATUSES_TABLE: { "Fn::ImportValue": `${resourcePrefix}-StatusesTableName` },
+            TAGS_TABLE: { "Fn::ImportValue": `${resourcePrefix}-TagsTableName` },
+            DOMAIN: '${self:custom.certificateName}',
+            INBOUND_QUEUE: { 'Fn::ImportValue': `${resourcePrefix}-InboundQueueUrl` },
+            OUTBOUND_QUEUE: { 'Fn::ImportValue': `${resourcePrefix}-OutboundQueueUrl` },
         },
         iam: {
             role: {
@@ -49,6 +62,16 @@ export const serverlessConfiguration: AWS = {
                         ],
                     },
                     {
+                        Effect: 'Allow',
+                        Action: [
+                            'sqs:SendMessage'
+                        ],
+                        Resource: [
+                            { "Fn::ImportValue": {"Fn::Sub": `${resourcePrefix}-InboundQueueArn`} },
+                            { "Fn::ImportValue": {"Fn::Sub": `${resourcePrefix}-OutboundQueueArn`} }
+                        ]
+                    },
+                    {
                         Effect: "Allow",
                         Action: [
                             "dynamodb:DescribeTable",
@@ -66,13 +89,31 @@ export const serverlessConfiguration: AWS = {
                                     '/index/*'
                                 ]]
                             },
+                            { "Fn::ImportValue": `${resourcePrefix}-StatusesTableArn` },
+                            { "Fn::Join": ['', [
+                                    { "Fn::ImportValue": `${resourcePrefix}-StatusesTableArn` },
+                                    '/index/*'
+                                ]]
+                            },
+                            { "Fn::ImportValue": `${resourcePrefix}-FollowsTableArn` },
+                            { "Fn::Join": ['', [
+                                    { "Fn::ImportValue": `${resourcePrefix}-FollowsTableArn` },
+                                    '/index/*'
+                                ]]
+                            },
+                            { "Fn::ImportValue": `${resourcePrefix}-TagsTableArn` },
+                            { "Fn::Join": ['', [
+                                    { "Fn::ImportValue": `${resourcePrefix}-TagsTableArn` },
+                                    '/index/*'
+                                ]]
+                            },
                         ]
                     }],
             },
         }
     },
     // import the function via paths
-    functions: {webFinger, getUser, webFingerRemote, postSharedInbox, postPersonalInbox},
+    functions: {webFinger, getUser, webFingerRemote, postSharedInbox, postPersonalInbox, inboundQueueProcessor, outboundQueueProcessor},
     package: {individually: true},
     custom: {
         certificateName: `${domain}`,
