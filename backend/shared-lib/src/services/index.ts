@@ -16,7 +16,7 @@ const fediverseService : FediverseService = new FediverseService(process.env.DOM
 const inboxSerivce : InboxService = new InboxService();
 const webFingerService : WebFingerService = new WebFingerService();
 const followService: FollowService = new FollowService(process.env.DOMAIN);
-const statusService: StatusService = new StatusService();
+const statusService: StatusService = new StatusService(process.env.DOMAIN);
 
 const inboundQueueService : QueueService = new QueueService(process.env.INBOUND_QUEUE);
 const outboundQueueService : QueueService = new QueueService(process.env.OUTBOUND_QUEUE);

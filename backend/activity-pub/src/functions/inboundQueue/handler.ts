@@ -1,5 +1,11 @@
 import {SQSEvent} from "aws-lambda";
-import {Activity, ActivityType, CreateActivity, FollowActivity} from "@libs/activityPub/activity/activities";
+import {
+    AcceptActivity,
+    Activity,
+    ActivityType, AnnounceActivity,
+    CreateActivity, DeleteActivity,
+    FollowActivity
+} from "@libs/activityPub/activity/activities";
 import {followService, statusService} from "@libs/services";
 
 /*
@@ -14,10 +20,21 @@ export const inboundQueueProcessor = async (event: SQSEvent) => {
 
             switch (activity.type) {
                 case ActivityType.Follow:
-                        await followService.acceptRequest(activity as FollowActivity);
+                    await followService.acceptRequest(activity as FollowActivity);
                     break;
                 case ActivityType.Create:
-                        await statusService.storeCreate(activity as CreateActivity);
+                    await statusService.storeCreate(activity as CreateActivity);
+                    break;
+                case ActivityType.Delete:
+                    await statusService.deleteStatus(activity as DeleteActivity)
+                    break;
+                case ActivityType.Accept:
+                    await followService.processAccept(activity as AcceptActivity);
+                    break;
+                case ActivityType.Announce:
+
+                    await statusService.boostRequest(activity as AnnounceActivity)
+
                     break;
                 default:
                     console.warn(`I don't know how to handle ${activity.type}`);

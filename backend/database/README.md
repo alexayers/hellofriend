@@ -12,8 +12,4 @@ This project will setup the follow prerequisites.
 
 ### Known Issues
 
-**Issue 1**
-If you see an error like:
-Error: ENOENT: no such file or directory, lstat '/Users/<user>/github/hellofriend/backend/database/.esbuild/.serverless'
 
-You can just create it, and it will stop complaining.

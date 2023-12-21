@@ -19,8 +19,11 @@ export const outboundQueueProcessor = async (event: SQSEvent) => {
                         await followService.sendFollowRequest(activity as FollowActivity);
                         break;
                     case ActivityType.Undo:
+
                         await followService.sendUnFollowRequest(activity as UndoFollowActivity);
+
                         break;
+
                     default:
                         console.warn(`I don't know how to handle ${activity.type}`);
                         break;

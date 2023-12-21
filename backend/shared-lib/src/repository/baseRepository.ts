@@ -7,6 +7,7 @@ import {
     QueryCommandOutput
 } from "@aws-sdk/lib-dynamodb";
 import console from "console";
+import {BaseModel} from "../model/baseModel";
 
 const client: DynamoDBClient = new DynamoDBClient({region: "us-east-1"});
 export const documentClient: DynamoDBDocumentClient = DynamoDBDocumentClient.from(client);
@@ -14,13 +15,17 @@ export const documentClient: DynamoDBDocumentClient = DynamoDBDocumentClient.fro
 export class BaseRepository {
 
 
-    async put(tableName: string, object: Object): Promise<Object> {
+    async put(tableName: string, object: any): Promise<Object> {
 
-        object = {
-            createdAt: Date.now(),
-            modifiedAt: Date.now(),
-            ...object
-        };
+        if (!object.createdAt) {
+            object = {
+                createdAt: Date.now(),
+                modifiedAt: Date.now(),
+                ...object
+            };
+        } else {
+            object.modifiedAt = Date.now();
+        }
 
         console.log({
             TableName: tableName,

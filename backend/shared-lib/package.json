@@ -19,7 +19,8 @@
     "@middy/core": "^3.4.0",
     "@middy/http-json-body-parser": "^3.4.0",
     "node-fetch": "^2.7.0",
-    "serverless-dynamodb-local": "^1.0.2"
+    "serverless-dynamodb-local": "^1.0.2",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@serverless/typescript": "^3.0.0",

@@ -8,11 +8,11 @@ const resourcePrefix: string = configuration.resourcePrefix;
 export const serverlessConfiguration: AWS = {
     service: 'hello-friend-database',
     frameworkVersion: '3',
-    plugins: ['serverless-esbuild'],
     provider: {
         name: 'aws',
         runtime: 'nodejs20.x',
         stage: 'dev',
+        logRetentionInDays: 3,
         apiGateway: {
             minimumCompressionSize: 1024,
             shouldStartNameWithService: true,
@@ -24,16 +24,7 @@ export const serverlessConfiguration: AWS = {
     },
     package: {individually: true},
     custom: {
-        esbuild: {
-            bundle: true,
-            minify: false,
-            sourcemap: true,
-            exclude: ['aws-sdk'],
-            target: 'node20',
-            define: {'require.resolve': undefined},
-            platform: 'node',
-            concurrency: 10,
-        },
+
     },
     resources: {
         Resources: {
@@ -139,14 +130,9 @@ export const serverlessConfiguration: AWS = {
                 Properties: {
                     TableName: `${resourcePrefix}-follows`,
                     AttributeDefinitions: [
-                        {
-                            AttributeName: "pkey",
-                            AttributeType: "S",
-                        },
-                        {
-                            AttributeName: "skey",
-                            AttributeType: "S",
-                        }
+                        {AttributeName: "pkey", AttributeType: "S"},
+                        {AttributeName: "skey", AttributeType: "S"},
+                        {AttributeName: 'uri', AttributeType: 'S'},
                     ],
                     KeySchema: [
                         {
@@ -161,7 +147,19 @@ export const serverlessConfiguration: AWS = {
                         ReadCapacityUnits: 1,
                         WriteCapacityUnits: 1
                     },
-                }
+                    GlobalSecondaryIndexes: [
+                        {
+                            IndexName: 'uri-index',
+                            KeySchema: [{AttributeName: 'uri', KeyType: 'HASH'}],
+                            Projection: {ProjectionType: 'ALL'},
+                            ProvisionedThroughput: {
+                                ReadCapacityUnits: 1,
+                                WriteCapacityUnits: 1
+                            }
+                        },
+                    ],
+                },
+
             },
             TagsTable: {
                 Type: "AWS::DynamoDB::Table",
@@ -205,6 +203,7 @@ export const serverlessConfiguration: AWS = {
                             AttributeName: "skey",
                             AttributeType: "S",
                         },
+                        {AttributeName: 'url', AttributeType: 'S'},
                         {AttributeName: 'uri', AttributeType: 'S'},
                         {AttributeName: 'inReplyToAccountId', AttributeType: 'S'},
                         {AttributeName: 'inReplyToId', AttributeType: 'S'},
@@ -223,6 +222,15 @@ export const serverlessConfiguration: AWS = {
                     GlobalSecondaryIndexes: [
                         {
                             IndexName: 'url-index',
+                            KeySchema: [{AttributeName: 'url', KeyType: 'HASH'}],
+                            Projection: {ProjectionType: 'ALL'},
+                            ProvisionedThroughput: {
+                                ReadCapacityUnits: 1,
+                                WriteCapacityUnits: 1
+                            }
+                        },
+                        {
+                            IndexName: 'uri-index',
                             KeySchema: [{AttributeName: 'uri', KeyType: 'HASH'}],
                             Projection: {ProjectionType: 'ALL'},
                             ProvisionedThroughput: {

@@ -1,9 +1,10 @@
 import {AcceptActivity, ActivityType, FollowActivity, UndoFollowActivity} from "../activityPub/activity/activities";
-import {accountService, fediverseService, webFingerService} from "./index";
+import {accountService, fediverseService, followService, webFingerService} from "./index";
 import {v4 as uuidv4} from 'uuid';
 import {Account} from "../model/account";
-import * as domain from "domain";
 import {actorFromUrl} from "../helpers/actorFromUrl";
+import {followerRepository} from "../repository";
+import {Follow} from "../model/follow";
 
 export class FollowService {
 
@@ -22,18 +23,27 @@ export class FollowService {
 
         console.debug(acceptActivity);
 
+        let you: { username: string, domain: string } = actorFromUrl(followActivity.object);
+        let yourAccount : Account = await accountService.getByNormalizedUsernameDomain(you.username);
 
-        let actor: { username: string, domain: string } = actorFromUrl(followActivity.actor);
-        let account : Account = await accountService.getByNormalizedUsernameDomain(actor.username, actor.domain);
+        let followerActor: { username: string, domain: string } = actorFromUrl(followActivity.actor);
+        let followerAccount : Account = await accountService.getByNormalizedUsernameDomain(followerActor.username, followerActor.domain);
 
         /*
             We've never seen this person. We need to fetch them from the remote server and store them locally.
          */
 
-        if (!account) {
-            console.info(`I don't have an account for @${actor.username}@${actor.domain}, fetching`);
-            await webFingerService.finger(actor.username,actor.domain);
+        if (!followerAccount) {
+            console.info(`I don't have an account for @${followerActor.username}@${followerActor.domain}, fetching`);
+            followerAccount = await webFingerService.finger(followerActor.username,followerActor.domain);
         }
+
+        await followerRepository.persist({
+            pkey: yourAccount.pkey,
+            skey: `Follower#${followerAccount.pkey}`,
+            uri: acceptActivity.id,
+            accepted: true
+        });
 
         await fediverseService.signedDelivery(acceptActivity, acceptActivity.object.actor);
     }
@@ -41,8 +51,8 @@ export class FollowService {
     async generateFollowRequest(fromUsername: string, destination: string) : Promise<FollowActivity> {
         let followActivity = {
             '@context': "https://www.w3.org/ns/activitystreams",
-            actor: `https://www.${domain}/users/${fromUsername}`,
-            id: `https://www.${domain}/${uuidv4()}`,
+            actor: `https://www.${this.domain}/users/${fromUsername}`,
+            id: `https://www.${this.domain}/${uuidv4()}`,
             object: destination,
             type: ActivityType.Follow
         }
@@ -53,13 +63,13 @@ export class FollowService {
     async generateUnFollowRequest(fromUsername: string, destination: string) : Promise<UndoFollowActivity> {
         let unfollowActivity = {
             '@context': "https://www.w3.org/ns/activitystreams",
-            id: `https://www.${domain}/users/${fromUsername}#follows/${uuidv4()}/undo`,
+            id: `https://www.${this.domain}/users/${fromUsername}#follows/${uuidv4()}/undo`,
             type: ActivityType.Undo,
-            actor: `https://www.${domain}/users/${fromUsername}`,
+            actor: `https://www.${this.domain}/users/${fromUsername}`,
             object: {
                 '@context': "https://www.w3.org/ns/activitystreams",
-                actor: `https://www.${domain}/users/${fromUsername}`,
-                id: `https://www.${domain}/${uuidv4()}`,
+                actor: `https://www.${this.domain}/users/${fromUsername}`,
+                id: `https://www.${this.domain}/${uuidv4()}`,
                 object: destination,
                 type: ActivityType.Follow
             }
@@ -73,6 +83,40 @@ export class FollowService {
     }
 
     async sendFollowRequest(followActivity: FollowActivity) : Promise<void> {
+
+        let you: { username: string, domain: string } = actorFromUrl(followActivity.actor);
+        let yourAccount : Account = await accountService.getByNormalizedUsernameDomain(you.username);
+
+        let followingActor: { username: string, domain: string } = actorFromUrl(followActivity.object);
+        let followingAccount : Account = await accountService.getByNormalizedUsernameDomain(followingActor.username, followingActor.domain);
+
+        /*
+            We've never seen this person. We need to fetch them from the remote server and store them locally.
+         */
+
+        if (!followingAccount) {
+            console.info(`I don't have an account for @${followingActor.username}@${followingActor.domain}, fetching`);
+            followingAccount = await webFingerService.finger(followingActor.username,followingActor.domain);
+        }
+
+        await followerRepository.persist({
+            pkey: yourAccount.pkey,
+            skey: `Following#${followingAccount.pkey}`,
+            uri: followActivity.id,
+            accepted: false
+        });
+
         await fediverseService.signedDelivery(followActivity, followActivity.object);
+    }
+
+    async processAccept(acceptActivity: AcceptActivity) {
+
+        let follow : Follow = await followerRepository.getByUri(acceptActivity.object.id);
+
+        if (follow) {
+            follow.accepted = true;
+            await followerRepository.persist(follow);
+        }
+
     }
 }

@@ -9,9 +9,9 @@ const certificateID: string = configuration.certificateID;
 export const serverlessConfiguration: AWS = {
     service: 'hello-friend-cloudfront',
     frameworkVersion: '3',
-    plugins: ['serverless-esbuild'],
     provider: {
         name: 'aws',
+        logRetentionInDays: 3,
         runtime: 'nodejs20.x',
         stage: 'dev',
         apiGateway: {
@@ -24,18 +24,6 @@ export const serverlessConfiguration: AWS = {
         },
     },
     package: {individually: true},
-    custom: {
-        esbuild: {
-            bundle: true,
-            minify: false,
-            sourcemap: true,
-            exclude: ['aws-sdk'],
-            target: 'node20',
-            define: {'require.resolve': undefined},
-            platform: 'node',
-            concurrency: 10,
-        },
-    },
     resources: {
         Resources: {
             /*

@@ -16,6 +16,7 @@ export const serverlessConfiguration: AWS = {
         name: 'aws',
         runtime: 'nodejs20.x',
         stage: 'dev',
+        logRetentionInDays: 3,
         apiGateway: {
             minimumCompressionSize: 1024,
             shouldStartNameWithService: true,

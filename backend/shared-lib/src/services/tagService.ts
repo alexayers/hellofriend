@@ -15,7 +15,6 @@ export class TagService {
 
         for (let i: number = 0; i < activityNote.tag.length; i++) {
 
-
             if (!activityNote.tag[i].name) {
                 continue;
             }

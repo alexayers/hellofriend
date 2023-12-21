@@ -4,7 +4,9 @@ export enum ActivityType {
     Follow = "Follow",
     Accept = "Accept",
     Undo = "Undo",
-    Create = "Create"
+    Create = "Create",
+    Delete = "Delete",
+    Announce = "Announce"
 }
 
 export enum CoreType {
@@ -25,6 +27,10 @@ export interface FollowActivity extends Activity {
 
 export interface AcceptActivity extends Activity {
     object: FollowActivity
+}
+
+export interface AnnounceActivity extends Activity {
+
 }
 
 export interface UndoFollowActivity extends Activity {
@@ -72,9 +78,28 @@ export interface CreateActivity extends Activity {
     signature: Signature
 }
 
+export interface Tombstone {
+    id: string
+    type: ActivityType
+    atomUri: string
+}
+
+export interface DeleteActivity extends Activity {
+    to: Array<string>
+    object: Tombstone
+    signature: Signature
+}
+
 export interface Signature {
     type: string
     creator: string
     created: string
     signatureValue: string
+}
+
+export interface AnnounceActivity extends Activity {
+    published: string
+    to: Array<string>
+    cc: Array<string>
+    object: string
 }

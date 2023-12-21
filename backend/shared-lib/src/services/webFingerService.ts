@@ -1,5 +1,6 @@
 import {accountService, fediverseService, tagService} from "./index";
 import {PersonActor} from "../activityPub/actors/personActor";
+import {Account} from "../model/account";
 
 export interface FingerResponse {
     subject: string,
@@ -16,7 +17,7 @@ export interface FingerLinkResponse {
 
 export class WebFingerService {
 
-    async finger(username: string, domain: string) : Promise<void> {
+    async finger(username: string, domain: string) : Promise<Account> {
         let webFingerUrl: string = `https://${domain}/.well-known/webfinger?resource=acct:${username}@${domain}`;
         console.debug(`WebFinger: ${webFingerUrl}`);
         let response = await fediverseService.signedRequest("get", webFingerUrl);
@@ -24,6 +25,8 @@ export class WebFingerService {
 
         if (!response) {
             return undefined;
+        } else {
+            console.log(person);
         }
 
         let fingerResponse: FingerResponse = response as FingerResponse;
@@ -36,12 +39,16 @@ export class WebFingerService {
             }
         }
 
+        let account: Account;
+
         if (accountUrl) {
             response = await fediverseService.signedRequest("get", accountUrl);
             person = response as PersonActor;
-            await accountService.persistPerson(person, domain);
+            account = await accountService.persistPerson(person, domain);
             await tagService.saveAccountTags(person);
         }
+
+        return account;
     }
 
 }
