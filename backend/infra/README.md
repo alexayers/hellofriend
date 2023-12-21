@@ -24,11 +24,5 @@ This project will setup the follow prerequisites.
 ### Known Issues
 
 **Issue 1**
-If you see an error like:
-Error: ENOENT: no such file or directory, lstat '/Users/<user>/github/hellofriend/backend/infra/.esbuild/.serverless'
-
-You can just create it, and it will stop complaining.
-
-**Issue 2**
-You can ignore this failure on first time deployments:
+You can ignore this failure on deployments:
 Error: Failed to find a stack hello-friend-infra-dev

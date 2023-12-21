@@ -11,7 +11,7 @@ const domain: string = configuration.domain;
 export const serverlessConfiguration: AWS = {
     service: 'hello-friend-infra',
     frameworkVersion: '3',
-    plugins: ['serverless-esbuild', 'serverless-domain-manager'],
+    plugins: ['serverless-domain-manager'],
     provider: {
         name: 'aws',
         runtime: 'nodejs20.x',
@@ -35,16 +35,6 @@ export const serverlessConfiguration: AWS = {
             stage: '${self:provider.stage}',
             createRoute53Record: true,
             certificateName: '${self:custom.certificateName}',
-        },
-        esbuild: {
-            bundle: true,
-            minify: false,
-            sourcemap: true,
-            exclude: ['aws-sdk'],
-            target: 'node20',
-            define: {'require.resolve': undefined},
-            platform: 'node',
-            concurrency: 10,
         },
     },
     resources: {
@@ -253,33 +243,52 @@ export const serverlessConfiguration: AWS = {
         },
         Outputs: {
             CognitoUserPoolClientId: {
+                Description: "The HelloFriend Cognito User Pool Client ID",
                 Value: { "Fn::GetAtt": ["CognitoUserPoolClient", "ClientId"] },
                 Export: {
                     Name: `${resourcePrefix}-CognitoUserPoolClientId`
                 }
             },
             OutboundQueueUrl: {
+                Description: "The URL of the Fediverse Outbound Queue",
                 Value: { 'Fn::GetAtt': ['OutboundQueue', 'QueueName'] },
                 Export: {
                     Name: `${resourcePrefix}-OutboundQueueUrl`,
                 },
             },
             OutboundQueueArn: {
+                Description: "The ARN of the Fediverse Outbound Queue",
                 Value: { 'Fn::GetAtt': ['OutboundQueue', 'Arn'] },
                 Export: {
                     Name: `${resourcePrefix}-OutboundQueueArn`,
                 },
             },
             InboundQueueUrl: {
+                Description: "The URL of the Fediverse Inbound Queue",
                 Value: { 'Fn::GetAtt': ['InboundQueue', 'QueueName'] },
                 Export: {
                     Name: `${resourcePrefix}-InboundQueueUrl`,
                 },
             },
             InboundQueueArn: {
+                Description: "The ARN of the Fediverse Inbound Queue",
                 Value: { 'Fn::GetAtt': ['InboundQueue', 'Arn'] },
                 Export: {
                     Name: `${resourcePrefix}-InboundQueueArn`,
+                },
+            },
+            FilesBucketName: {
+                Description: "The name of the files bucket",
+                Value: { "Ref": "FilesBucket" },
+                Export: {
+                    Name: `${resourcePrefix}-FilesBucketName`,
+                },
+            },
+            FilesBucketArn: {
+                Description: "The ARN of the files bucket",
+                Value: { "Fn::GetAtt": ["FilesBucket", "Arn"] },
+                Export: {
+                    Name: `${resourcePrefix}-FilesBucketArn`,
                 },
             },
         }

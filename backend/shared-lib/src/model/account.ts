@@ -2,7 +2,7 @@ import {BaseModel} from "./baseModel";
 
 
 export interface Account extends BaseModel {
-    webFingeredAt?: Date
+    webFingeredAt?: number
     summary?: string
     displayName: string
     username: string
