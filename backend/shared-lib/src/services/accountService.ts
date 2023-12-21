@@ -39,6 +39,34 @@ export class AccountService {
         return account;
     }
 
+    async updatePerson(account: Account, person: PersonActor, domain: string) {
+        account = {
+            ...account,
+            displayName: person.name,
+            followersUrl: `https://${domain}/${person.preferredUsername}/followers`,
+            inboxUrl: `https://${domain}/${person.preferredUsername}/inbox`,
+            outboxUrl: `https://${domain}/${person.preferredUsername}/outbox`,
+            sharedInboxUrl: `https://${domain}/${person.preferredUsername}/shared-inbox`,
+            summary: person.summary,
+            webFingeredAt: Date.now(),
+            headerFilename: person.image.filename,
+            headerRemotePath: person.image.url,
+            headerFileType: person.image.mediaType,
+            avatarFilename: person.icon.filename,
+            avatarRemotePath: person.icon.url,
+            avatarFileType: person.icon.mediaType,
+            username: person.preferredUsername,
+            publicKey: person.publicKey.publicKeyPem,
+            indexable: true,
+            discoverable: true,
+            memorial: false
+        }
+
+        await accountRepository.persist(account);
+        delete account.privateKey;
+        return account;
+    }
+
     async persistPerson(person: PersonActor, domain: string) : Promise<Account> {
         let account: Account = {
             pkey: uuidv4(),
@@ -49,8 +77,11 @@ export class AccountService {
             outboxUrl: `https://${domain}/${person.preferredUsername}/outbox`,
             sharedInboxUrl: `https://${domain}/${person.preferredUsername}/shared-inbox`,
             summary: person.summary,
+            webFingeredAt: Date.now(),
+            headerFilename: person.image.filename,
             headerRemotePath: person.image.url,
             headerFileType: person.image.mediaType,
+            avatarFilename: person.icon.filename,
             avatarRemotePath: person.icon.url,
             avatarFileType: person.icon.mediaType,
             username: person.preferredUsername,
@@ -95,6 +126,7 @@ export class AccountService {
             publicKey: publicKey.toString()
         };
     }
+
 
 
 }

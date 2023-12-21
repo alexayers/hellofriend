@@ -1,7 +1,7 @@
 import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
 import {middyfy} from "@libs/lambda/lambda";
 import {Account} from "@libs/model/account";
-import {accountService, fediverseService} from "@libs/services";
+import {accountService, fediverseService, webFingerService} from "@libs/services";
 import {notFoundResponse, notValidResponse, successResponse} from "@libs/lambda/api-gateway";
 
 
@@ -54,11 +54,9 @@ export const webFingerRemote = middyfy(async (event: APIGatewayProxyEvent): Prom
         return notValidResponse(`Your request for ${event.pathParameters.user} isn't valid`);
     }
 
-    let webFingerUrl: string = `https://${filteredArray[1]}/.well-known/webfinger?resource=acct:${filteredArray[0]}@${filteredArray[1]}`;
-    console.debug(`WebFinger: ${webFingerUrl}`);
-
-    let response = await fediverseService.signedRequest("get", webFingerUrl);
-
-    return successResponse(response);
+    let account: Account = await webFingerService.finger(filteredArray[0],filteredArray[1]);
+    return successResponse({
+        account: account
+    });
 });
 

@@ -8,7 +8,8 @@
     "deploy": "npx sls deploy",
     "teardown": "serverless remove",
     "install:systemUser": "ts-node ./src/setup/systemUser.ts",
-    "offline": "serverless offline"
+    "offline": "serverless offline",
+    "aws:login": "aws sso login --profile default"
   },
   "engines": {
     "node": ">=20.0.0"

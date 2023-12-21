@@ -43,6 +43,7 @@ export const serverlessConfiguration: AWS = {
             DOMAIN: '${self:custom.certificateName}',
             INBOUND_QUEUE: { 'Fn::ImportValue': `${resourcePrefix}-InboundQueueUrl` },
             OUTBOUND_QUEUE: { 'Fn::ImportValue': `${resourcePrefix}-OutboundQueueUrl` },
+            FILES_BUCKET: { 'Fn::ImportValue': `${resourcePrefix}-FilesBucketName` },
         },
         iam: {
             role: {
