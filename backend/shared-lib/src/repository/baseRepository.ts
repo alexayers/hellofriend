@@ -1,4 +1,9 @@
-import {DynamoDBClient} from "@aws-sdk/client-dynamodb";
+import {
+    DeleteItemCommand,
+    DeleteItemCommandInput,
+    DeleteItemCommandOutput,
+    DynamoDBClient
+} from "@aws-sdk/client-dynamodb";
 import {
     DynamoDBDocumentClient,
     PutCommand,
@@ -7,7 +12,6 @@ import {
     QueryCommandOutput
 } from "@aws-sdk/lib-dynamodb";
 import console from "console";
-import {BaseModel} from "../model/baseModel";
 
 const client: DynamoDBClient = new DynamoDBClient({region: "us-east-1"});
 export const documentClient: DynamoDBDocumentClient = DynamoDBDocumentClient.from(client);
@@ -46,7 +50,7 @@ export class BaseRepository {
         return object;
     }
 
-    async byPkey(tableName: string, pkey: string) : Promise<Object> {
+    async byPkey(tableName: string, pkey: string): Promise<Object> {
         const params = {
             TableName: tableName,
             KeyConditionExpression: "#pkey = :pkey",
@@ -89,6 +93,25 @@ export class BaseRepository {
         } catch (e) {
             console.error(e);
             throw new Error(e);
+        }
+    }
+
+    async deleteItemByPkeyAndSkey(tableName: string, pkey: string, skey: string) : Promise<boolean> {
+        try {
+            const command: DeleteItemCommand = new DeleteItemCommand(
+           {
+                TableName: tableName,
+                Key: {
+                    "pkey": { S: pkey },
+                    "skey": { S: skey }
+                }
+            });
+            const response: DeleteItemCommandOutput = await client.send(command);
+            console.log("Item deleted successfully", response);
+            return true;
+        } catch (error) {
+            console.error("Error deleting item:", error);
+            return false;
         }
     }
 }

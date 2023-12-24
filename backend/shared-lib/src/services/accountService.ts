@@ -10,12 +10,12 @@ export class AccountService {
 
 
 
-    async createAccount(registerUser: RegisterUser): Promise<Account> {
+    async createAccount(registerUser: RegisterUser, sub: string): Promise<Account> {
 
         let keys: { privateKey: string, publicKey: string } = this.generatedKeys();
 
         let account: Account = {
-            pkey: uuidv4(),
+            pkey: sub,
             skey: `Account#${registerUser.username.toLowerCase()}`,
             displayName: registerUser.displayName,
             summary: "",

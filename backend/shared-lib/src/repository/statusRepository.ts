@@ -2,7 +2,6 @@ import {BaseRepository} from "./baseRepository";
 import {GenericRepository} from "./genericRepository";
 import {Status} from "../model/status";
 import {StatusTag} from "../model/statusTag";
-import {Follow} from "../model/follow";
 
 
 export class StatusRepository extends BaseRepository implements GenericRepository<Status> {
@@ -26,15 +25,15 @@ export class StatusRepository extends BaseRepository implements GenericRepositor
         return await this.put(this._tableName, status) as Status;
     }
 
-    async getByPkey(pkey: string) : Promise<Status> {
+    async getByPkey(pkey: string): Promise<Status> {
         return await super.byPkey(this._tableName, pkey) as Status;
     }
 
-    async tagStatus(statusTag: StatusTag) : Promise<StatusTag> {
+    async tagStatus(statusTag: StatusTag): Promise<StatusTag> {
         return await this.put(this._tableName, statusTag) as StatusTag;
     }
 
-    async getByUri(uri: string) : Promise<Status> {
+    async getByUri(uri: string): Promise<Status> {
         const params = {
             TableName: this._tableName,
             IndexName: 'uri-index',

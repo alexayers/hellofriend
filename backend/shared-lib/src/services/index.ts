@@ -9,6 +9,10 @@ import {StatusService} from "./statusService";
 import {WebFingerService} from "./webFingerService";
 import {TagService} from "./tagService";
 import {FileSystemService} from "./fileSystemService";
+import {FavoriteService} from "./favoriteService";
+import {BookmarkService} from "./bookmarkService";
+import {SearchService} from "./searchService";
+import {TimelineService} from "./timelineService";
 
 
 const accountService: AccountService = new AccountService();
@@ -24,6 +28,13 @@ const outboundQueueService : QueueService = new QueueService(process.env.OUTBOUN
 
 const fileSystemService : FileSystemService = new FileSystemService(process.env.FILES_BUCKET);
 
+const favoriteService: FavoriteService = new FavoriteService();
+const bookmarkService: BookmarkService = new BookmarkService();
+
+const searchService : SearchService = new SearchService();
+
+const timelineService : TimelineService = new TimelineService();
+
 const tagService : TagService = new TagService();
 
 export {accountService,
@@ -36,5 +47,9 @@ export {accountService,
     statusService,
     outboundQueueService,
     tagService,
-    fileSystemService
+    fileSystemService,
+    favoriteService,
+    bookmarkService,
+    searchService,
+    timelineService
 };

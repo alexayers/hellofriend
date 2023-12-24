@@ -10,7 +10,7 @@ export class AccountRepository extends BaseRepository implements GenericReposito
         return await this.put(this._tableName, account) as Account;
     }
 
-    async getByPkey(pkey: string) : Promise<Account> {
+    async getByPkey(pkey: string): Promise<Account> {
         return await super.byPkey(this._tableName, pkey) as Account;
     }
 

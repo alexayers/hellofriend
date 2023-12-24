@@ -2,7 +2,6 @@ import {BaseRepository} from "./baseRepository";
 import {GenericRepository} from "./genericRepository";
 import {Follow} from "../model/follow";
 import * as process from "process";
-import {Account} from "../model/account";
 
 
 export class FollowerRepository extends BaseRepository implements GenericRepository<Follow> {
@@ -13,11 +12,11 @@ export class FollowerRepository extends BaseRepository implements GenericReposit
         return await this.put(this._tableName, follow) as Follow;
     }
 
-    async getByPkey(pkey: string) : Promise<Follow> {
+    async getByPkey(pkey: string): Promise<Follow> {
         return await super.byPkey(this._tableName, pkey) as Follow;
     }
 
-    async getByUri(uri: string) : Promise<Follow> {
+    async getByUri(uri: string): Promise<Follow> {
         const params = {
             TableName: this._tableName,
             IndexName: 'uri-index',
