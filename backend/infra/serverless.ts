@@ -118,6 +118,8 @@ export const serverlessConfiguration: AWS = {
                 },
             },
 
+
+
             /*
             -=-=-=-=-=-=-=-=-=-=-=-
                 S3
@@ -247,6 +249,13 @@ export const serverlessConfiguration: AWS = {
                 Value: { "Fn::GetAtt": ["CognitoUserPoolClient", "ClientId"] },
                 Export: {
                     Name: `${resourcePrefix}-CognitoUserPoolClientId`
+                }
+            },
+            CognitoUserPoolClientArn: {
+                Description: "The HelloFriend Cognito User Pool Client Arn",
+                Value: { "Fn::GetAtt": ["CognitoUserPool", "Arn"] },
+                Export: {
+                    Name: `${resourcePrefix}-CognitoUserPoolArn`
                 }
             },
             OutboundQueueUrl: {

@@ -1,6 +1,26 @@
 import type {AWS} from '@serverless/typescript';
 import {login, register} from "@functions/auth";
 import configuration from "../configuration";
+import {
+  followAccount,
+  getAccount,
+  getBookmarks,
+  getFavorites, getStatuses,
+  unFollowAccount,
+  updateAccount
+} from "@functions/account";
+import {exploreAccounts, explorePosts, exploreTags} from "@functions/explore";
+import {search} from "@functions/search";
+import {
+  bookmarkStatus,
+  deleteStatus,
+  favoriteStatus,
+  getStatus, pinStatus,
+  postStatus, removeBookmark, removeFavorite,
+  replyToStatus, unPinStatus,
+  updateStatus
+} from "@functions/status";
+import {getTimeline, getTimelineByTag} from "@functions/timeline";
 
 
 // We'll use this resourcePrefix for all our resources: dynamoDB, Cognito, etc
@@ -71,7 +91,33 @@ export const serverlessConfiguration: AWS = {
     }
   },
   // import the function via paths
-  functions: {login, register},
+  functions: {login,
+    register,
+    updateAccount,
+    getBookmarks,
+    getFavorites,
+    followAccount,
+    unFollowAccount,
+    getAccount,
+    getStatuses,
+    explorePosts,
+    exploreTags,
+    exploreAccounts,
+    search,
+    postStatus,
+    getStatus,
+    updateStatus,
+    deleteStatus,
+    replyToStatus,
+    favoriteStatus,
+    removeFavorite,
+    bookmarkStatus,
+    removeBookmark,
+    pinStatus,
+    unPinStatus,
+    getTimeline,
+    getTimelineByTag
+  },
   package: {individually: true},
   custom: {
     certificateName: `${domain}`,
@@ -102,7 +148,22 @@ export const serverlessConfiguration: AWS = {
     }
   },
   resources: {
-    Resources: {}
+    Resources: {
+      CognitoUserPoolAuthorizer: {
+        Type: 'AWS::ApiGateway::Authorizer',
+        Properties: {
+          Name: `${resourcePrefix}-cognito-authorizer`,
+          Type: 'COGNITO_USER_POOLS',
+          IdentitySource: 'method.request.header.Authorization',
+          RestApiId: {
+            Ref: 'ApiGatewayRestApi',
+          },
+          ProviderARNs: [
+            { "Fn::ImportValue": `${resourcePrefix}-CognitoUserPoolArn` }
+          ],
+        },
+      },
+    }
   },
 };
 
