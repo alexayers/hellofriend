@@ -1,0 +1,1101 @@
+openapi: 3.0.0
+servers: [
+  {
+    "description": "production",
+    "url": "https://www.hellofriend.social/public"
+  }
+]
+info:
+  version: "1.0.0"
+  title: HelloFriend.Social
+  description: >-
+    This is the public API for HelloFriend.social
+security:
+  - password:
+      - read
+      - write
+paths:
+  /auth/register:
+    post:
+      summary: Register a new user
+      tags:
+        - Authentication
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - username
+                - displayName
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                username:
+                  type: string
+                displayName:
+                  type: string
+                password:
+                  type: string
+            examples:
+              registerRequest:
+                summary: Registration Request
+                value:
+                  email: "tpizza@example.com"
+                  username: "tonypizzza"
+                  displayName: "Tony Pizza"
+                  password: "SecureP@ssw0rd1"            
+      responses:
+        '201':
+          description: User registered successfully
+        '400':
+          description: Invalid request
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+            examples:
+              registerRequest:
+                summary: Login Request
+                value:
+                  email: "tpizza@example.com"
+                  password: "SecureP@ssw0rd1"                  
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: Auth token provided upon successful authentication
+        '401':
+          description: Unauthorized, invalid login credentials
+          
+  /account:
+    put:
+      tags:
+        - Account
+      summary: Update account
+      description: Update account display name and summary.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                displayName:
+                  type: string
+                summary:
+                  type: string
+            examples:
+              registerRequest:
+                summary: Update Account
+                value:
+                  displayName: "Tony Pizza"
+                  summary: "I live in #Boston"                  
+      responses:
+        '200':
+          description: Account updated successfully
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+          
+  /accounts/{accountId}/follow:
+    post:
+      tags:
+        - Account
+      summary: Follow account
+      description: Follow a specific account by accountId.
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          example: 95bb63ae-0f61-4df4-8025-557ea0a4c3d7
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Account followed successfully
+        '404':
+          description: Account not found
+        '401':
+          description: Unauthorized
+
+    delete:
+      tags:
+        - Account
+      summary: Stop following account
+      description: Stop following a specific account by accountId.
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          example: 95bb63ae-0f61-4df4-8025-557ea0a4c3d7
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully unfollowed the account
+        '404':
+          description: Account not found
+        '401':
+          description: Unauthorized
+
+  /accounts/{username}:
+    get:
+      tags:
+        - Account
+      summary: Get account details
+      description: Retrieve the details of an account by username.
+      parameters:
+        - name: username
+          in: path
+          required: true
+          example: 95bb63ae-0f61-4df4-8025-557ea0a4c3d7
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Account details retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  avatarImage:
+                    type: string
+                  headerImage:
+                    type: string
+                  accountId:
+                    type: string
+                  displayName:
+                    type: string
+                  joinDate:
+                    type: string
+                    format: date
+                  domain:
+                    type: string
+                  summary:
+                    type: string
+                  totalFollowers:
+                    type: integer
+                  totalFollows:
+                    type: integer
+                  totalPosts:
+                    type: integer
+                  username:
+                    type: string
+                  isFollower:
+                    type: boolean
+                  isFollowing:
+                    type: boolean
+              examples:
+                accountDetails:
+                  summary: Account details response
+                  value:
+                    avatarImage: "/avatars/b244a93d-8248-4516-b14d-c512c0192142.jpg"
+                    headerImage: "/headers/618fde1c-686d-42ca-9696-bd7c667dca7a.jpg"
+                    accountId: "159cbfe0-6fa6-4aec-8d43-0f5439e641db"
+                    displayName: "Tony Pizza"
+                    joinDate: "2021-01-01"
+                    domain: "hellofriend.social"
+                    summary: "This is a summary about Tony Pizza."
+                    totalFollowers: 100
+                    totalFollows: 50
+                    totalPosts: 20
+                    username: "tonypizza"
+                    isFollower: true
+                    isFollowing: false                    
+        '404':
+          description: Account not found
+        '401':
+          description: Unauthorized          
+
+  /accounts/{accountId}/statuses:
+    get:
+      tags:
+        - Account
+      summary: Get account statuses
+      description: Retrieve all statuses posted by a specific account.
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          example: 95bb63ae-0f61-4df4-8025-557ea0a4c3d7
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Statuses retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Status'
+        '404':
+          description: Account not found
+        '401':
+          description: Unauthorized          
+  /account/{accountId}/bookmarks:
+    get:
+      tags:
+        - Account
+      summary: Get bookmarked statuses
+      description: Retrieve all statuses bookmarked by a specific account.
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          example: 95bb63ae-0f61-4df4-8025-557ea0a4c3d7
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Bookmarked statuses retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Status'
+        '404':
+          description: Account not found
+        '401':
+          description: Unauthorized
+
+  /account/{accountId}/favorites:
+    get:
+      tags:
+        - Account
+      summary: Get favorited statuses
+      description: Retrieve all statuses favorited by a specific account.
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          example: 95bb63ae-0f61-4df4-8025-557ea0a4c3d7
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Favorited statuses retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Status'
+        '404':
+          description: Account not found
+        '401':
+          description: Unauthorized          
+
+  /search:
+    post:
+      tags:
+        - Search
+      summary: Search for people, tags, or posts
+      description: Search across the platform for people, tags, or posts.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                  example: pizza
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResults'
+              examples:    
+                SearchResultsExample:
+                  $ref: '#/components/examples/SearchResultsExample'  
+        '400':
+          description: Invalid request
+       
+  /status:
+    post:
+      tags:
+        - Status
+      summary: Post a status
+      description: Create a new status post.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: "Today was a nice day."
+                  
+      responses:
+        '201':
+          description: Status posted successfully
+        '400':
+          description: Invalid request
+
+  /statuses/{statusId}:
+    get:
+      tags:
+        - Status
+      summary: Get a status by ID
+      description: Retrieve a status post by its ID.
+      parameters:
+        - name: statusId
+          in: path
+          required: true
+          example: 7f4d99bd-d62e-4325-bba7-29afaa7f8aa7
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+                
+              examples:
+                noRepliesStatus:
+                  summary: A status with no replies
+                  value:
+                    id: "9b8a3c45-82f5-4dca-8b8b-8a3340c74fb4"
+                    account:
+                      id: "a0512a7f-ad79-441e-a984-4b39d13748d6"
+                      displayName: "Tony Pizza"
+                      avatarImage: "avatars/avatar1.jpg"
+                      domain: "example.com"
+                      username: "tpizza"
+                    uri: "https://hellofriend.social/status/9b8a3c45-82f5-4dca-8b8b-8a3340c74fb4"
+                    boost: null
+                    replies: []
+                    attachments: []
+                    text: "This is a status update with no replies."
+                    pinned: false
+                    published: "2023-01-01T12:00:00Z"
+                    isBookmarked: false
+                    isFavored: false
+                    isBoosted: false
+                    totalLikes: 5
+                statusWithReplies:
+                  summary: A status with replies
+                  value:
+                    id: "6414a48a-fd24-4887-ac55-528b90f0ff20"
+                    account:
+                      id: "3ae2ddea-87f0-473b-9422-8f3437cb67eb"
+                      displayName: "Bob Smith"
+                      avatarImage: "avatars/avatar2.jpg"
+                      domain: "example.com"
+                      username: "bobs"
+                    uri: "https://hellofriend.social/status/6414a48a-fd24-4887-ac55-528b90f0ff20"
+                    boost: null
+                    replies:
+                      - id: "8c340994-72b2-41a5-984b-46490874d670"
+                        account:
+                          id: "8c340994-72b2-41a5-984b-46490874d670"
+                          displayName: "Charlie Adams"
+                          avatarImage: "avatars/avatar3.jpg"
+                          domain: "example.com"
+                          username: "charliea"
+                        uri: "https://hellofriend.social/status/8c340994-72b2-41a5-984b-46490874d670"
+                        boost: null
+                        replies: []
+                        attachments: []
+                        text: "This is a reply to the main status."
+                        pinned: false
+                        published: "2023-01-03T11:00:00Z"
+                        isBookmarked: false
+                        isFavored: false
+                        isBoosted: false
+                        totalLikes: 3
+                    attachments: []
+                    text: "This is a status update with replies."
+                    pinned: false
+                    published: "2023-01-02T12:00:00Z"
+                    isBookmarked: false
+                    isFavored: true
+                    isBoosted: false
+                    totalLikes: 10   
+                boostingStatus:
+                  summary: A status boosting another status
+                  value:
+                    id: "18e51b52-fbfb-4d5f-ac22-abd132ba19c5"
+                    account:
+                      id: "fc71cd38-862f-412d-9d12-dd75f13abe9b"
+                      displayName: "Diana Prince"
+                      avatarImage: "avatars/avatar4.jpg"
+                      domain: "example.com"
+                      username: "dianap"
+                    uri: "https://hellofriend.social/status/18e51b52-fbfb-4d5f-ac22-abd132ba19c5"
+                    boost:
+                      id: "62a81120-38ef-4f47-ae67-535711cb896c"
+                      account:
+                        id: "c1d8d9be-5b37-46c9-97cf-883ebca819d8"
+                        displayName: "Ethan Hunt"
+                        avatarImage: null
+                        domain: "example.com"
+                        username: "ethanh"
+                      uri: "https://hellofriend.social/status/62a81120-38ef-4f47-ae67-535711cb896c"
+                      boost: null
+                      replies: []
+                      attachments: []
+                      text: "This is the status being #boosted."
+                      pinned: false
+                      published: "2023-01-04T10:00:00Z"
+                      isBookmarked: false
+                      isFavored: false
+                      isBoosted: true
+                      totalLikes: 8
+                    replies: []
+                    attachments: []
+                    text: "This is a status update that boosts another status."
+                    pinned: false
+                    published: "2023-01-03T12:00:00Z"
+                    isBookmarked: false
+                    isFavored: false
+                    isBoosted: true
+                    totalLikes: 15                    
+        '404':
+          description: Status not found
+
+    put:
+      tags:
+        - Status
+      summary: Update a status
+      description: Update an existing status post.
+      parameters:
+        - name: statusId
+          in: path
+          required: true
+          example: 7f4d99bd-d62e-4325-bba7-29afaa7f8aa7
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: "Today was a nice day."
+      responses:
+        '200':
+          description: Status updated successfully
+        '400':
+          description: Invalid request
+        '404':
+          description: Status not found
+
+    delete:
+      tags:
+        - Status
+      summary: Delete a status by ID
+      description: Delete a status post by its ID.
+      parameters:
+        - name: statusId
+          in: path
+          required: true
+          example: 7f4d99bd-d62e-4325-bba7-29afaa7f8aa7
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Status deleted successfully
+        '404':
+          description: Status not found
+
+  /statuses/{statusId}/reply:
+    post:
+      tags:
+        - Status
+      summary: Reply to a status
+      description: Post a reply to an existing status.
+      parameters:
+        - name: statusId
+          in: path
+          required: true
+          example: 7f4d99bd-d62e-4325-bba7-29afaa7f8aa7
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: "Cool update!"
+      responses:
+        '201':
+          description: Reply posted successfully
+        '400':
+          description: Invalid request
+        '404':
+          description: Original status not found       
+
+  /statuses/{statusId}/favorite:
+    post:
+      tags:
+        - Status
+      summary: Mark a status as a favorite
+      description: Favorite a specific status post.
+      parameters:
+        - name: statusId
+          in: path
+          required: true
+          example: 7f4d99bd-d62e-4325-bba7-29afaa7f8aa7
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Status marked as favorite successfully
+        '404':
+          description: Status not found
+        '401':
+          description: Unauthorized
+
+    delete:
+      tags:
+        - Status
+      summary: Remove favorite from status
+      description: Remove a status from favorites.
+      parameters:
+        - name: statusId
+          in: path
+          required: true
+          example: 7f4d99bd-d62e-4325-bba7-29afaa7f8aa7
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Favorite removed from status successfully
+        '404':
+          description: Status not found
+        '401':
+          description: Unauthorized
+
+  /statuses/{statusId}/bookmark:
+    post:
+      tags:
+        - Status
+      summary: Bookmark a status
+      description: Bookmark a specific status post.
+      parameters:
+        - name: statusId
+          in: path
+          required: true
+          example: 7f4d99bd-d62e-4325-bba7-29afaa7f8aa7
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Status bookmarked successfully
+        '404':
+          description: Status not found
+        '401':
+          description: Unauthorized
+
+    delete:
+      tags:
+        - Status
+      summary: Remove status from bookmarks
+      description: Remove a status from bookmarks.
+      parameters:
+        - name: statusId
+          in: path
+          required: true
+          example: 7f4d99bd-d62e-4325-bba7-29afaa7f8aa7
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Bookmark removed from status successfully
+        '404':
+          description: Status not found
+        '401':
+          description: Unauthorized
+
+  /statuses/{statusId}/pin:
+    post:
+      tags:
+        - Status
+      summary: Pin a status to your profile
+      description: Pin a specific status post to your profile.
+      parameters:
+        - name: statusId
+          in: path
+          required: true
+          example: 7f4d99bd-d62e-4325-bba7-29afaa7f8aa7
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Status pinned to profile successfully
+        '404':
+          description: Status not found
+        '401':
+          description: Unauthorized
+
+    delete:
+      tags:
+        - Status
+      summary: Remove pin from profile
+      description: Remove a pinned status from your profile.
+      parameters:
+        - name: statusId
+          in: path
+          required: true
+          example: 7f4d99bd-d62e-4325-bba7-29afaa7f8aa7
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Pin removed from profile successfully
+        '404':
+          description: Status not found
+        '401':
+          description: Unauthorized       
+          
+  /timeline/statuses:
+    get:
+      tags:
+        - Timeline
+      summary: Retrieve timeline posts
+      description: Retrieve a list of statuses for the user's timeline.
+      responses:
+        '200':
+          description: List of statuses retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Status'
+              examples:    
+                timelineStatuses:
+                  $ref: '#/components/examples/FourStatusesExample'
+        '401':
+          description: Unauthorized
+
+  /timeline/tags/{tagId}:
+    get:
+      tags:
+        - Timeline
+      summary: Retrieve statuses by Tag
+      description: Retrieve a list of statuses associated with a specific tag.
+      parameters:
+        - name: tagId
+          in: path
+          required: true
+          example: e0db042c-470e-484f-b9b1-7942ce75288b
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of statuses retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Status'
+              examples:
+                returnedStatuses:
+                  $ref: '#/components/examples/FourStatusesExample'
+        '404':
+          description: Tag not found
+        '401':
+          description: Unauthorized
+
+  /explore/statuses:
+    get:
+      tags:
+        - Explore
+      summary: Explore posts
+      description: Retrieve a list of recent statuses.
+      responses:
+        '200':
+          description: List of statuses retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Status'
+              examples:
+                returnedStatuses:
+                  $ref: '#/components/examples/FourStatusesExample'
+        '401':
+          description: Unauthorized
+
+  /explore/tags:
+    get:
+      tags:
+        - Explore
+      summary: Explore tags
+      description: Retrieve a list of recent tags.
+      responses:
+        '200':
+          description: List of tags retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tag'
+              examples:
+                returnedTags:
+                  summary: "Recent tags"
+                  value:
+                    - id: "91370c3b-3e4f-4bcb-84da-a552c2e944c3"
+                      count: 4
+                      name: "pizza"
+                    - id: "25fb8e84-2530-42fa-9f78-ebdcefd41317"
+                      count: 40
+                      name: "hamburger"  
+        '401':
+          description: Unauthorized
+
+  /explore/accounts:
+    get:
+      tags:
+        - Explore
+      summary: Explore accounts
+      description: Retrieve a list of recent persons.
+      responses:
+        '200':
+          description: List of persons/accounts retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Person'
+              examples:
+                accountDetails:
+                  summary: Account details response
+                  value:
+                    - accountId: "159cbfe0-6fa6-4aec-8d43-0f5439e641db"
+                      avatarImage: "/avatar/b244a93d-8248-4516-b14d-c512c0192142.jpg"
+                      headerImage: "/header/618fde1c-686d-42ca-9696-bd7c667dca7a.jpg"
+                      
+                      displayName: "Tony Pizza"
+                      joinDate: "2021-01-01"
+                      domain: "hellofriend.social"
+                      summary: "This is a summary about Tony Pizza."
+                      totalFollowers: 100
+                      totalFollows: 50
+                      totalPosts: 20
+                      username: "tonypizza"
+                      isFollower: true
+                      isFollowing: false   
+                    - accountId: "159cbfe0-6fa6-4aec-8d43-0f5439e641db"
+                      avatarImage: "/avatar/b244a93d-8248-4516-b14d-c512c0192142.jpg"
+                      headerImage: "/header/618fde1c-686d-42ca-9696-bd7c667dca7a.jpg"
+                      
+                      displayName: "Mary Pizza"
+                      joinDate: "2021-01-01"
+                      domain: "hellofriend.social"
+                      summary: "This is a summary about Mary Pizza."
+                      totalFollowers: 100
+                      totalFollows: 50
+                      totalPosts: 20
+                      username: "tonypizza"
+                      isFollower: true
+                      isFollowing: false 
+        '401':
+          description: Unauthorized          
+          
+          
+components:
+  schemas:
+  
+    Status:
+      type: object
+      properties:
+        id:
+          type: string
+        account:
+          type: object
+          properties:
+            id:
+              type: string
+            displayName:
+              type: string
+            avatarImage:
+              type: string
+              nullable: true
+            domain:
+              type: string
+            username:
+              type: string
+        uri:
+          type: string
+        boost:
+          $ref: '#/components/schemas/Status'
+        replies:
+          type: array
+          items:
+            $ref: '#/components/schemas/Status'
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/StatusAttachment'
+        text:
+          type: string
+        pinned:
+          type: boolean
+        published:
+          type: string
+          format: date-time
+        isBookmarked:
+          type: boolean
+        isFavored:
+          type: boolean
+        isBoosted:
+          type: boolean
+        totalLikes:
+          type: integer
+              
+    StatusAttachment:
+      type: object
+      properties:
+        id:
+          type: integer
+        url:
+          type: string
+        contentType:
+          type: string
+        description:
+          type: string
+          nullable: true
+     
+       
+
+    SearchResults:
+      type: object
+      properties:
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Person'
+          nullable: true
+        statuses:
+          type: array
+          items:
+            $ref: '#/components/schemas/Status'
+          nullable: true
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+          nullable: true
+    Person:
+      type: object
+      properties:
+        id:
+          type: integer
+        displayName:
+          type: string
+        username:
+          type: string
+        domain:
+          type: string
+          nullable: true
+        avatarImage:
+          type: string
+          nullable: true
+        headerImage:
+          type: string
+          nullable: true
+        summary:
+          type: string
+          nullable: true
+        joinedDate:
+          type: string
+          format: date-time
+    Tag:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: true
+        count:
+          type: number
+          nullable: false
+        name:
+          type: string
+     
+  examples:
+    FourStatusesExample:
+      summary: Example with four statuses
+      value:
+        - id: "3c060582-fac0-4f03-b968-ab01b9bfbe43"
+          account:
+            id: "74b4d88e-465c-4e07-9513-8fbedec0bb49"
+            displayName: "Alice Johnson"
+            avatarImage: "avatars/avatar1.jpg"
+            domain: "hellofriend.social"
+            username: "alicej"
+          uri: "https://hellofriend.social/status/3c060582-fac0-4f03-b968-ab01b9bfbe43"
+          boost: null
+          replies: []
+          attachments: []
+          text: "This is the first status update."
+          pinned: false
+          published: "2023-01-01T12:00:00Z"
+          isBookmarked: false
+          isFavored: false
+          isBoosted: false
+          totalLikes: 10
+        - id: "214ea78f-f60a-43ef-af89-7a6f29321502"
+          account:
+            id: "ab280d0c-2bdd-489e-989a-8ea571f896a0"
+            displayName: "Bob Smith"
+            avatarImage: "avatars/avatar2.jpg"
+            domain: "hellofriend.social"
+            username: "bobs"
+          uri: "https://hellofriend.social/status/214ea78f-f60a-43ef-af89-7a6f29321502"
+          boost: null
+          replies: []
+          attachments: []
+          text: "Enjoying a lovely day out!"
+          pinned: false
+          published: "2023-01-02T08:30:00Z"
+          isBookmarked: true
+          isFavored: true
+          isBoosted: false
+          totalLikes: 20
+        - id: "29018a78-8f80-4318-b38e-bd3e932f814b"
+          account:
+            id: "8d0e3a10-370a-4133-a25e-3b25c59d6030"
+            displayName: "Charlie Adams"
+            avatarImage: "avatars/avatar3.jpg"
+            domain: "hellofriend.social"
+            username: "charliea"
+          uri: "https://hellofriend.social/status/29018a78-8f80-4318-b38e-bd3e932f814b"
+          boost: null
+          replies: []
+          attachments: []
+          text: "Latest blog post is up, check it out!"
+          pinned: true
+          published: "2023-01-03T15:45:00Z"
+          isBookmarked: false
+          isFavored: false
+          isBoosted: true
+          totalLikes: 30
+        - id: "6b9b6a31-622c-4065-beb0-3705208aa600"
+          account:
+            id: "331bd7d3-b34a-418c-9407-6a46945a5adb"
+            displayName: "Diana Prince"
+            avatarImage: "avatars/avatar4.jpg"
+            domain: "hellofriend.social"
+            username: "dianap"
+          uri: "https://hellofriend.social/status/6b9b6a31-622c-4065-beb0-3705208aa600"
+          boost: null
+          replies: []
+          attachments: []
+          text: "Thoughts on the new tech trends?"
+          pinned: false
+          published: "2023-01-04T11:00:00Z"
+          isBookmarked: false
+          isFavored: false
+          isBoosted: false
+          totalLikes: 40
+ 
+    SearchResultsExample:
+      summary: Example search results
+      value:
+        accounts:
+          - id: "19ccca42-53e5-48ee-8b7e-ffe1c9094405"
+            displayName: "Pizza Johnson"
+            username: "pizzaj"
+            domain: "hellofriend.social"
+            avatarImage: "avatars/c759eadc-9c02-4696-8d27-8a71611a6263.jpg"
+            headerImage: "avatars/aa9195a3-d129-405f-a7ee-5189b9934d31.jpg"
+            summary: "Lover of tech and nature."
+            joinedDate: "2021-01-01"
+          - id: "acdcad0b-2b00-424b-8d04-61891ea50e42"
+            displayName: "Bob Smith"
+            username: "bobs"
+            domain: "hellofriend.social"
+            avatarImage: "avatars/f253d6ed-5a25-4d64-b781-fedfc1c8499d.jpg"
+            headerImage: "avatars/2a242d4f-5469-4e04-9179-a20fd24af3a0.jpg"
+            summary: "Blogger and photographer."
+            joinedDate: "2020-06-15"
+        statuses:
+          - id: "3c060582-fac0-4f03-b968-ab01b9bfbe43"
+            account:
+              id: "74b4d88e-465c-4e07-9513-8fbedec0bb49"
+              displayName: "Alice Johnson"
+              avatarImage: "avatars/avatar1.jpg"
+              domain: "hellofriend.social"
+              username: "alicej"
+            uri: "https://hellofriend.social/status/3c060582-fac0-4f03-b968-ab01b9bfbe43"
+            boost: null
+            replies: []
+            attachments: []
+            text: "This is the first pizza!"
+            pinned: false
+            published: "2023-01-01T12:00:00Z"
+            isBookmarked: false
+            isFavored: false
+            isBoosted: false
+            totalLikes: 10
+        tags:
+          - id: "7f904467-5acd-4f77-90bf-1ddf08dbac27"
+            count: 3
+            name: "#pizza"
+          - id: "7ab37f32-9790-443a-b84a-c99c5a0c2105"
+            type: 100
+            name: "#pizzapie" 
+      
+  securitySchemes:
+    password:
+      type: oauth2
+      flows:
+        password:
+          tokenUrl: 'https://hellofriend.social/oauth/token'
+          scopes:
+            write: allows modifying resources
+            read: allows reading resources
