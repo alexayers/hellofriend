@@ -32,4 +32,8 @@ export class BookmarkRepository extends BaseRepository implements GenericReposit
 
         return !!bookmark;
     }
+
+    async getBookmarks(accountID: string) {
+        return await super.byPkeyAndPartialSkey(this._tableName, accountID, "Bookmark#");
+    }
 }

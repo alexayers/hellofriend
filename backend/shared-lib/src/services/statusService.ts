@@ -160,14 +160,31 @@ export class StatusService {
     }
 
     async getStatus(accountID : string, statusID: string) : Promise<StatusDto> {
-        let status : Status = await statusRepository.getStatusById(statusID);
-        let account : Account = await accountRepository.getByPkey(status.accountId);
-        let bookmarked : boolean = await bookmarkService.isBookmarked(accountID, statusID);
-        let favorited : boolean = await favoriteService.isFavorited(accountID, statusID);
+        const promises = [
+            statusRepository.getStatusById(statusID),
+            accountService.getById(accountID),
+            bookmarkService.isBookmarked(accountID, statusID),
+            favoriteService.isFavorited(accountID, statusID)
+        ];
+
+        // Use Promise.all to wait for all promises to resolve
+        const results = await Promise.all(promises);
+
+        // Extract results
+        const status : Status = results[0] as unknown as Status;
+        const account : Account = results[1] as unknown as Account;
+        const bookmarked : boolean = results[2] as unknown as boolean;
+        const favorited : boolean = results[3] as unknown as boolean;
 
 
         return {
-            account: {avatarFilename: account.avatarFilename, displayName: account.displayName, domain: account.domain, id: account.pkey, username: account.username},
+            account: {
+                avatarFilename: account?.avatarFilename,
+                displayName: account.displayName,
+                domain: account?.domain,
+                id: account.pkey,
+                username: account.username
+            },
             boosted: undefined,
             id: statusID,
             isBookmark: bookmarked,

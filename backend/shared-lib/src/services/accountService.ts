@@ -20,6 +20,7 @@ export class AccountService {
             skey: `Account#${registerUser.username.toLowerCase()}`,
             displayName: registerUser.displayName,
             summary: "",
+            uri: `https://www.${process.env.DOMAIN}/users/${registerUser.username}`,
             followersUrl: `https://api.${process.env.DOMAIN}/${registerUser.username}/followers`,
             inboxUrl: `https://api.${process.env.DOMAIN}/${registerUser.username}/inbox`,
             outboxUrl: `https://api.${process.env.DOMAIN}/${registerUser.username}/outbox`,
@@ -135,5 +136,10 @@ export class AccountService {
 
     async unpinStatus(accountID : string, statusID: string) {
         await accountRepository.unpinStatus(accountID, statusID);
+    }
+
+    async getById(accountID: string) : Promise<Account> {
+        let account = await accountRepository.byId(accountID);
+        return account;
     }
 }

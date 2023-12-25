@@ -49,6 +49,8 @@ export const serverlessConfiguration: AWS = {
       ACCOUNTS_TABLE: { "Fn::ImportValue": `${resourcePrefix}-AccountsTableName` },
       FOLLOWS_TABLE: { "Fn::ImportValue": `${resourcePrefix}-FollowsTableName` },
       STATUSES_TABLE: { "Fn::ImportValue": `${resourcePrefix}-StatusesTableName` },
+      OUTBOUND_QUEUE: { 'Fn::ImportValue': `${resourcePrefix}-OutboundQueueUrl` },
+      FILES_BUCKET: { 'Fn::ImportValue': `${resourcePrefix}-FilesBucketName` },
       TAGS_TABLE: { "Fn::ImportValue": `${resourcePrefix}-TagsTableName` },
       DOMAIN: '${self:custom.certificateName}'
     },
@@ -69,6 +71,15 @@ export const serverlessConfiguration: AWS = {
               `arn:aws:s3:::files.${domain}`,
               `arn:aws:s3:::files.${domain}/*`,
             ],
+          },
+          {
+            Effect: 'Allow',
+            Action: [
+              'sqs:SendMessage'
+            ],
+            Resource: [
+              { "Fn::ImportValue": {"Fn::Sub": `${resourcePrefix}-OutboundQueueArn`} }
+            ]
           },
           {
             Effect: "Allow",

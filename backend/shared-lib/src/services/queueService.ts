@@ -11,7 +11,7 @@ export class QueueService {
 
     }
 
-    async queue(object: any) {
+    async queue(object: any) : Promise<any> {
         const command = new SendMessageCommand({
             QueueUrl: this.queueName,
             MessageBody: JSON.stringify(object),

@@ -42,4 +42,7 @@ export class AccountRepository extends BaseRepository implements GenericReposito
     }
 
 
+    async byId(accountID: string) {
+        return await this.byPkeyAndPartialSkey(this._tableName, accountID, "Account");
+    }
 }

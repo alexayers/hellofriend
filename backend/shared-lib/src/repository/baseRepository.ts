@@ -19,7 +19,7 @@ export const documentClient: DynamoDBDocumentClient = DynamoDBDocumentClient.fro
 export class BaseRepository {
 
 
-    async put(tableName: string, object: any): Promise<Object> {
+    async put(tableName: string, object: any): Promise<any> {
 
         if (!object.createdAt) {
             object = {
@@ -50,7 +50,7 @@ export class BaseRepository {
         return object;
     }
 
-    async byPkey(tableName: string, pkey: string): Promise<Object> {
+    async byPkey(tableName: string, pkey: string): Promise<any> {
         const params = {
             TableName: tableName,
             KeyConditionExpression: "#pkey = :pkey",
@@ -80,7 +80,7 @@ export class BaseRepository {
     }
 
 
-    async byPkeyAndSkey(tableName : string, pkey: string, skey: string) : Promise<Object> {
+    async byPkeyAndSkey(tableName : string, pkey: string, skey: string) : Promise<any> {
         const params = {
             TableName: tableName,
             KeyConditionExpression: "#pkey = :pkey AND #skey = :skey",
@@ -111,7 +111,38 @@ export class BaseRepository {
         }
     }
 
-    async query(params: QueryCommandInput): Promise<Object> {
+    async byPkeyAndPartialSkey(tableName : string, pkey: string, skey: string) : Promise<any> {
+        const params = {
+            TableName: tableName,
+            KeyConditionExpression: "#pkey = :pkey AND begins_with(#skey, :skey)",
+            ExpressionAttributeNames: {
+                "#pkey": "pkey",
+                "#skey": "skey"
+            },
+            ExpressionAttributeValues: {
+                ":pkey": pkey,
+                ":skey": skey
+            }
+        };
+
+        console.log(params);
+
+        try {
+            const data : QueryCommandOutput  = await client.send(new QueryCommand(params));
+
+            if (data.Items.length >= 1) {
+                return data.Items;
+            } else {
+                return undefined;
+            }
+
+        } catch (error) {
+            console.error("Error:", error);
+            throw error;
+        }
+    }
+
+    async query(params: QueryCommandInput): Promise<any> {
         try {
             return await documentClient.send(new QueryCommand(params));
         } catch (e) {
@@ -120,7 +151,7 @@ export class BaseRepository {
         }
     }
 
-    async queryForOne(params: QueryCommandInput): Promise<Object> {
+    async queryForOne(params: QueryCommandInput): Promise<any> {
         try {
             let results: QueryCommandOutput = await documentClient.send(new QueryCommand(params));
             return results.Items[0];

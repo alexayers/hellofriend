@@ -1,5 +1,6 @@
 import {Favorite} from "../model/favorite";
 import {bookmarkResository, favoriteRepository} from "../repository";
+import {StatusDto} from "../dto/statusDto";
 
 
 export class FavoriteService {
@@ -15,8 +16,8 @@ export class FavoriteService {
         return await favoriteRepository.delete(accountID, statusID);
     }
 
-    async getFavorites(accountID: string) : Promise<Array<Favorite>> {
-        return [];
+    async getFavorites(accountID: string) : Promise<Array<StatusDto>> {
+        return await favoriteRepository.getFavorites(accountID) as Array<StatusDto>;
     }
 
     async isFavorited(accountID: string, statusID: string) {

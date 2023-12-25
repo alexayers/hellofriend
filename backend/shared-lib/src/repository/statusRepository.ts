@@ -66,6 +66,8 @@ export class StatusRepository extends BaseRepository implements GenericRepositor
             }
         };
 
+        console.log(params);
+
         try {
             const data : QueryCommandOutput = await documentClient.send(new QueryCommand(params));
 

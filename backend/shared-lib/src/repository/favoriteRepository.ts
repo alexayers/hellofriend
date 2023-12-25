@@ -32,4 +32,8 @@ export class FavoriteRepository extends BaseRepository implements GenericReposit
 
         return !!favorite;
     }
+
+    async getFavorites(accountID: string) {
+        return await super.byPkeyAndPartialSkey(this._tableName, accountID, "Favorite#");
+    }
 }
