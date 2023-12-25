@@ -1,7 +1,6 @@
 import {handlerPath} from "@libs/lambda/handler-resolver";
 
 
-
 export const explorePosts = {
     handler: `${handlerPath(__dirname)}/handler.explorePosts`,
     memorySize: 128,

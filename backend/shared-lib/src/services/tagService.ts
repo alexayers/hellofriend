@@ -1,7 +1,6 @@
 import console from "console";
 import {PersonActor} from "../activityPub/actors/personActor";
 import {tagRepository} from "../repository";
-import {v4 as uuidv4} from 'uuid';
 import {Tag} from "../model/tag";
 import {TagType} from "../activityPub/objects/activityTag";
 import {ActivityNote} from "../activityPub/activity/activities";
@@ -80,5 +79,7 @@ export class TagService {
     }
 
 
-
+    async findMatch(tagSearch: string) {
+        return await tagRepository.findMatch(tagSearch);
+    }
 }

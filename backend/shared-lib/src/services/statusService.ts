@@ -1,9 +1,4 @@
-import {
-    ActivityNote,
-    AnnounceActivity,
-    CreateActivity,
-    DeleteActivity
-} from "../activityPub/activity/activities";
+import {ActivityNote, AnnounceActivity, CreateActivity, DeleteActivity} from "../activityPub/activity/activities";
 import {actorFromUrl} from "../helpers/actorFromUrl";
 import {
     accountService,
@@ -14,7 +9,7 @@ import {
     webFingerService
 } from "./index";
 import {Status} from "../model/status";
-import {accountRepository, bookmarkResository, statusRepository} from "../repository";
+import {statusRepository} from "../repository";
 import {v4 as uuidv4} from 'uuid';
 import console from "console";
 import {StatusTag} from "../model/statusTag";
@@ -160,9 +155,11 @@ export class StatusService {
     }
 
     async getStatus(accountID : string, statusID: string) : Promise<StatusDto> {
+
+        const status : Status = await statusRepository.getStatusById(statusID);
+
         const promises = [
-            statusRepository.getStatusById(statusID),
-            accountService.getById(accountID),
+            accountService.getById(status.accountId),
             bookmarkService.isBookmarked(accountID, statusID),
             favoriteService.isFavorited(accountID, statusID)
         ];
@@ -171,11 +168,9 @@ export class StatusService {
         const results = await Promise.all(promises);
 
         // Extract results
-        const status : Status = results[0] as unknown as Status;
-        const account : Account = results[1] as unknown as Account;
-        const bookmarked : boolean = results[2] as unknown as boolean;
-        const favorited : boolean = results[3] as unknown as boolean;
-
+        const account : Account = results[0] as unknown as Account;
+        const bookmarked : boolean = results[1] as unknown as boolean;
+        const favorited : boolean = results[2] as unknown as boolean;
 
         return {
             account: {

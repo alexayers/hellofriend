@@ -1,9 +1,4 @@
-import {
-    DeleteItemCommand,
-    DeleteItemCommandInput,
-    DeleteItemCommandOutput,
-    DynamoDBClient
-} from "@aws-sdk/client-dynamodb";
+import {DeleteItemCommand, DeleteItemCommandOutput, DynamoDBClient} from "@aws-sdk/client-dynamodb";
 import {
     DynamoDBDocumentClient,
     PutCommand,
@@ -161,7 +156,7 @@ export class BaseRepository {
         }
     }
 
-    async deleteItemByPkeyAndSkey(tableName: string, pkey: string, skey: string) : Promise<boolean> {
+    protected async deleteItemByPkeyAndSkey(tableName: string, pkey: string, skey: string) : Promise<boolean> {
         try {
             const command: DeleteItemCommand = new DeleteItemCommand(
            {

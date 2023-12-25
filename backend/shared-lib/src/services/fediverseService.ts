@@ -50,7 +50,7 @@ export class FediverseService {
         return body;
     }
 
-    async signedDelivery(outboundMessage: any, destinationActor: string): Promise<void> {
+    async signedDelivery(outboundMessage: any, destinationActor: string): Promise<boolean> {
 
         console.log(outboundMessage);
         const sendingActorUri: string = outboundMessage.actor;
@@ -101,6 +101,8 @@ export class FediverseService {
         }
 
         console.log(`Response Code: ${response.status}`);
+
+        return response.status == 200 || response.status == 202;
     }
 
     private signString(data: string, privateKeyStr: string): string {

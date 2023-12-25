@@ -1,7 +1,6 @@
 import {handlerPath} from "@libs/lambda/handler-resolver";
 
 
-
 export const getTimeline = {
     handler: `${handlerPath(__dirname)}/handler.getTimeline`,
     memorySize: 128,

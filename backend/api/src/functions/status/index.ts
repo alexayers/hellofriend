@@ -1,7 +1,6 @@
 import {handlerPath} from "@libs/lambda/handler-resolver";
 
 
-
 export const postStatus = {
     handler: `${handlerPath(__dirname)}/handler.postStatus`,
     memorySize: 128,

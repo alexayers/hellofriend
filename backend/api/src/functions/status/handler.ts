@@ -2,6 +2,7 @@ import {middyfy} from "@libs/lambda/lambda";
 import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
 import {successResponse} from "@libs/lambda/api-gateway";
 import {accountService, bookmarkService, favoriteService, statusService} from "@libs/services";
+import {StatusDto} from "@libs/dto/statusDto";
 
 
 export const postStatus = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -15,7 +16,7 @@ export const getStatus = middyfy(async (event: APIGatewayProxyEvent): Promise<AP
     console.log(event);
     let statusID: string = event.pathParameters.statusID
     let accountID : string = event.requestContext.authorizer.claims.sub;
-    let status = await statusService.getStatus(accountID,statusID);
+    let status : StatusDto = await statusService.getStatus(accountID,statusID);
 
     return successResponse({status});
 });

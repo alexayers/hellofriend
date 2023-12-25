@@ -53,7 +53,6 @@ export class FileSystemService {
                 person.icon.filename = avatarPath;
                 person.icon.size = Buffer.from(data).byteLength;
 
-
                 console.info(`Wrote avatar to ${avatarFilename}`);
             } catch (e) {
                 console.error(e);

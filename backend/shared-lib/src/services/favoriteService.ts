@@ -1,5 +1,5 @@
 import {Favorite} from "../model/favorite";
-import {bookmarkResository, favoriteRepository} from "../repository";
+import {favoriteRepository} from "../repository";
 import {StatusDto} from "../dto/statusDto";
 
 

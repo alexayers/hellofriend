@@ -1,5 +1,6 @@
 import {Actor} from "./actor";
-import {Tag} from "../objects/tag";
+import {Tag} from "../../model/tag";
+import {ActivityTag} from "../objects/activityTag";
 
 export interface PersonActor extends Actor {
     "@context": any
@@ -13,6 +14,7 @@ export interface PersonActor extends Actor {
     name: string
     summary: string
     url: string
+    uri: string
     manuallyApprovesFollowers: boolean
     discoverable: boolean
     indexable: boolean
@@ -24,7 +26,7 @@ export interface PersonActor extends Actor {
         owner: string
         publicKeyPem: string
     },
-    tag?: Array<Tag>
+    tag?: Array<ActivityTag>
     attachment?: Array<{type: string, name: string, value: string}>
     endpoints: {
         sharedInbox: string

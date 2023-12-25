@@ -3,9 +3,8 @@ import {RegisterUser} from "../model/authenticationDtos";
 import * as process from "process";
 import {generateKeyPairSync} from 'crypto';
 import {PersonActor} from "../activityPub/actors/personActor";
-import {accountRepository, statusRepository} from "../repository";
+import {accountRepository} from "../repository";
 import {v4 as uuidv4} from 'uuid';
-import {accountService} from "./index";
 
 export class AccountService {
 
@@ -20,6 +19,7 @@ export class AccountService {
             skey: `Account#${registerUser.username.toLowerCase()}`,
             displayName: registerUser.displayName,
             summary: "",
+            url: `https://www.${process.env.DOMAIN}/@${registerUser.username}`,
             uri: `https://www.${process.env.DOMAIN}/users/${registerUser.username}`,
             followersUrl: `https://api.${process.env.DOMAIN}/${registerUser.username}/followers`,
             inboxUrl: `https://api.${process.env.DOMAIN}/${registerUser.username}/inbox`,
@@ -49,6 +49,8 @@ export class AccountService {
             inboxUrl: `https://${domain}/${person.preferredUsername}/inbox`,
             outboxUrl: `https://${domain}/${person.preferredUsername}/outbox`,
             sharedInboxUrl: `https://${domain}/${person.preferredUsername}/shared-inbox`,
+            url: person.url,
+            uri: person.uri,
             summary: person.summary,
             webFingeredAt: Date.now(),
             headerFilename: person.image.filename,
@@ -80,12 +82,14 @@ export class AccountService {
             sharedInboxUrl: `https://${domain}/${person.preferredUsername}/shared-inbox`,
             summary: person.summary,
             webFingeredAt: Date.now(),
-            headerFilename: person.image.filename,
-            headerRemotePath: person.image.url,
-            headerFileType: person.image.mediaType,
-            avatarFilename: person.icon.filename,
-            avatarRemotePath: person.icon.url,
-            avatarFileType: person.icon.mediaType,
+            url: person.url,
+            uri: person.uri,
+            headerFilename: person.image?.filename,
+            headerRemotePath: person.image?.url,
+            headerFileType: person.image?.mediaType,
+            avatarFilename: person.icon?.filename,
+            avatarRemotePath: person.icon?.url,
+            avatarFileType: person.icon?.mediaType,
             username: person.preferredUsername,
             publicKey: person.publicKey.publicKeyPem,
             indexable: true,
@@ -139,7 +143,10 @@ export class AccountService {
     }
 
     async getById(accountID: string) : Promise<Account> {
-        let account = await accountRepository.byId(accountID);
-        return account;
+        return await accountRepository.byId(accountID);
+    }
+
+    async findByUsername(query: string) : Promise<Array<Account>> {
+        return await accountRepository.findByUsername(query);
     }
 }

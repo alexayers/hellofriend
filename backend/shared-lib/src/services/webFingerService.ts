@@ -32,9 +32,10 @@ export class WebFingerService {
                 return cachedAccount;
             } else {
                 console.log(`Account ${cachedAccount.username} has already been cached, but needs to be refreshed`)
-
             }
         }
+
+        // Send a web finger request
 
         let webFingerUrl: string = `https://${domain}/.well-known/webfinger?resource=acct:${username}@${domain}`;
         console.debug(`WebFinger: ${webFingerUrl}`);
@@ -59,18 +60,27 @@ export class WebFingerService {
 
         let account: Account;
 
+        // Send an actor request
+
         if (accountUrl) {
             response = await fediverseService.signedRequest("get", accountUrl);
             person = response as PersonActor;
+            person.uri = accountUrl;
             await tagService.saveAccountTags(person);
             person = await fileSystemService.processPerson(person);
 
             if (cachedAccount) {
-                account = await accountService.updatePerson(cachedAccount,person, domain);
 
                 // Remove the old files
-                await fileSystemService.delete(cachedAccount.avatarFilename);
-                await fileSystemService.delete(cachedAccount.headerFilename);
+
+                const promises = [
+                    accountService.updatePerson(cachedAccount,person, domain),
+                    fileSystemService.delete(cachedAccount.avatarFilename),
+                    fileSystemService.delete(cachedAccount.headerFilename)];
+
+                const results = await Promise.all(promises);
+
+                account = results[0] as unknown as Account;
             } else {
                 account = await accountService.persistPerson(person, domain);
             }

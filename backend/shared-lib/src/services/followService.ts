@@ -1,10 +1,11 @@
 import {AcceptActivity, ActivityType, FollowActivity, UndoFollowActivity} from "../activityPub/activity/activities";
-import {accountService, fediverseService, followService, outboundQueueService, webFingerService} from "./index";
+import {accountService, fediverseService, outboundQueueService, webFingerService} from "./index";
 import {v4 as uuidv4} from 'uuid';
 import {Account} from "../model/account";
 import {actorFromUrl} from "../helpers/actorFromUrl";
 import {followerRepository} from "../repository";
 import {Follow} from "../model/follow";
+import console from "console";
 
 export class FollowService {
 
@@ -83,6 +84,9 @@ export class FollowService {
         const yourAccount: Account = results[0] as unknown as Account;
         const followAccount: Account = results[1] as unknown as Account;
 
+        console.log(yourAccount);
+        console.log(followAccount);
+
         let unfollowActivity = {
             '@context': "https://www.w3.org/ns/activitystreams",
             id: `https://www.${this.domain}/users/${yourAccount.username}#follows/${uuidv4()}/undo`,
@@ -100,11 +104,14 @@ export class FollowService {
         console.log(unfollowActivity);
 
         await outboundQueueService.queue(unfollowActivity);
+        await followerRepository.deleteFollowing(fromAccountID, unFollowAccountID);
+
         return unfollowActivity;
     }
 
     async sendUnFollowRequest(undoFollowActivity: UndoFollowActivity) : Promise<void> {
         await fediverseService.signedDelivery(undoFollowActivity, undoFollowActivity.object.object);
+
     }
 
     async sendFollowRequest(followActivity: FollowActivity) : Promise<void> {

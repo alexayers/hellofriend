@@ -28,4 +28,10 @@ export class FollowerRepository extends BaseRepository implements GenericReposit
 
         return await super.queryForOne(params) as Follow;
     }
+
+    async deleteFollowing(fromAccountID: string, unFollowAccountID: string) {
+        await super.deleteItemByPkeyAndSkey(this._tableName,
+            fromAccountID,
+            `Following#${unFollowAccountID}`);
+    }
 }
