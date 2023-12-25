@@ -3,8 +3,9 @@ import {RegisterUser} from "../model/authenticationDtos";
 import * as process from "process";
 import {generateKeyPairSync} from 'crypto';
 import {PersonActor} from "../activityPub/actors/personActor";
-import {accountRepository} from "../repository";
+import {accountRepository, statusRepository} from "../repository";
 import {v4 as uuidv4} from 'uuid';
+import {accountService} from "./index";
 
 export class AccountService {
 
@@ -128,5 +129,11 @@ export class AccountService {
     }
 
 
+    async pinStatus(accountID: string, statusID: string) {
+        await accountRepository.pinStatus(accountID, statusID);
+    }
 
+    async unpinStatus(accountID : string, statusID: string) {
+        await accountRepository.unpinStatus(accountID, statusID);
+    }
 }

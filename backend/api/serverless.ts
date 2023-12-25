@@ -47,6 +47,9 @@ export const serverlessConfiguration: AWS = {
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       COGNITO_CLIENT_ID: { "Fn::ImportValue": `${resourcePrefix}-CognitoUserPoolClientId` },
       ACCOUNTS_TABLE: { "Fn::ImportValue": `${resourcePrefix}-AccountsTableName` },
+      FOLLOWS_TABLE: { "Fn::ImportValue": `${resourcePrefix}-FollowsTableName` },
+      STATUSES_TABLE: { "Fn::ImportValue": `${resourcePrefix}-StatusesTableName` },
+      TAGS_TABLE: { "Fn::ImportValue": `${resourcePrefix}-TagsTableName` },
       DOMAIN: '${self:custom.certificateName}'
     },
     iam: {
@@ -82,6 +85,24 @@ export const serverlessConfiguration: AWS = {
               { "Fn::ImportValue": `${resourcePrefix}-AccountsTableArn` },
               { "Fn::Join": ['', [
                   { "Fn::ImportValue": `${resourcePrefix}-AccountsTableArn` },
+                  '/index/*'
+                ]]
+              },
+              { "Fn::ImportValue": `${resourcePrefix}-StatusesTableArn` },
+              { "Fn::Join": ['', [
+                  { "Fn::ImportValue": `${resourcePrefix}-StatusesTableArn` },
+                  '/index/*'
+                ]]
+              },
+              { "Fn::ImportValue": `${resourcePrefix}-FollowsTableArn` },
+              { "Fn::Join": ['', [
+                  { "Fn::ImportValue": `${resourcePrefix}-FollowsTableArn` },
+                  '/index/*'
+                ]]
+              },
+              { "Fn::ImportValue": `${resourcePrefix}-TagsTableArn` },
+              { "Fn::Join": ['', [
+                  { "Fn::ImportValue": `${resourcePrefix}-TagsTableArn` },
                   '/index/*'
                 ]]
               },

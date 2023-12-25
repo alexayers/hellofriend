@@ -5,13 +5,21 @@ import {
     DeleteActivity
 } from "../activityPub/activity/activities";
 import {actorFromUrl} from "../helpers/actorFromUrl";
-import {accountService, fediverseService, tagService, webFingerService} from "./index";
+import {
+    accountService,
+    bookmarkService,
+    favoriteService,
+    fediverseService,
+    tagService,
+    webFingerService
+} from "./index";
 import {Status} from "../model/status";
-import {statusRepository} from "../repository";
+import {accountRepository, bookmarkResository, statusRepository} from "../repository";
 import {v4 as uuidv4} from 'uuid';
 import console from "console";
 import {StatusTag} from "../model/statusTag";
 import {Account} from "../model/account";
+import {StatusDto} from "../dto/statusDto";
 
 export class StatusService {
 
@@ -149,5 +157,28 @@ export class StatusService {
         }
 
         return await this.storeCreate(createActivity);
+    }
+
+    async getStatus(accountID : string, statusID: string) : Promise<StatusDto> {
+        let status : Status = await statusRepository.getStatusById(statusID);
+        let account : Account = await accountRepository.getByPkey(status.accountId);
+        let bookmarked : boolean = await bookmarkService.isBookmarked(accountID, statusID);
+        let favorited : boolean = await favoriteService.isFavorited(accountID, statusID);
+
+
+        return {
+            account: {avatarFilename: account.avatarFilename, displayName: account.displayName, domain: account.domain, id: account.pkey, username: account.username},
+            boosted: undefined,
+            id: statusID,
+            isBookmark: bookmarked,
+            isFavorite: favorited,
+            published: status.published,
+            replies: undefined,
+            spoilerText: status.spoilerText,
+            text: status.content,
+            totalLikes: 0,
+            uri: status.uri
+
+        }
     }
 }

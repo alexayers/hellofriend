@@ -1,6 +1,8 @@
 import {GenericRepository} from "./genericRepository";
 import {Account} from "../model/account";
-import {BaseRepository} from "./baseRepository";
+import {BaseRepository, documentClient} from "./baseRepository";
+import {QueryCommand, QueryCommandOutput} from "@aws-sdk/lib-dynamodb";
+import console from "console";
 
 export class AccountRepository extends BaseRepository implements GenericRepository<Account> {
 
@@ -27,4 +29,17 @@ export class AccountRepository extends BaseRepository implements GenericReposito
 
         return await super.queryForOne(params) as Account;
     }
+
+    async pinStatus(accountID: string, statusID: string) {
+        return await this.put(this._tableName, {
+            pkey: accountID,
+            skey: `StatusPin#${statusID}`
+        });
+    }
+
+    async unpinStatus(accountID: string, statusID: string) {
+        await this.deleteItemByPkeyAndSkey(this._tableName,accountID,  `StatusPin#${statusID}`);
+    }
+
+
 }

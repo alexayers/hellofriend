@@ -1,7 +1,9 @@
-import {BaseRepository} from "./baseRepository";
+import {BaseRepository, documentClient} from "./baseRepository";
 import {GenericRepository} from "./genericRepository";
 import {Status} from "../model/status";
 import {StatusTag} from "../model/statusTag";
+import {QueryCommand, QueryCommandOutput} from "@aws-sdk/lib-dynamodb";
+import console from "console";
 
 
 export class StatusRepository extends BaseRepository implements GenericRepository<Status> {
@@ -49,4 +51,34 @@ export class StatusRepository extends BaseRepository implements GenericRepositor
     async deleteByConversation(conversationId: string): Promise<void> {
 
     }
+
+    async getStatusById(statusID: string) : Promise<Status> {
+        const params = {
+            TableName: this._tableName,
+            KeyConditionExpression: "#pkey = :pkey AND begins_with(#skey, :prefix)",
+            ExpressionAttributeNames: {
+                "#pkey": "pkey",
+                "#skey": "skey"
+            },
+            ExpressionAttributeValues: {
+                ":pkey": statusID,
+                ":prefix": "Author"
+            }
+        };
+
+        try {
+            const data : QueryCommandOutput = await documentClient.send(new QueryCommand(params));
+
+            if (data.Items.length == 1) {
+                return data.Items[0] as Status;
+            } else {
+                return undefined;
+            }
+
+        } catch (error) {
+            console.error("Error:", error);
+            throw error;
+        }
+    }
+
 }

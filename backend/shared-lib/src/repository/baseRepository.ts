@@ -62,6 +62,8 @@ export class BaseRepository {
             }
         };
 
+        console.log(params);
+
         try {
             const data = await client.send(new QueryCommand(params));
 
@@ -69,6 +71,38 @@ export class BaseRepository {
                 return data.Items[0];
             } else {
                 return undefined
+            }
+
+        } catch (error) {
+            console.error("Error:", error);
+            throw error;
+        }
+    }
+
+
+    async byPkeyAndSkey(tableName : string, pkey: string, skey: string) : Promise<Object> {
+        const params = {
+            TableName: tableName,
+            KeyConditionExpression: "#pkey = :pkey AND #skey = :skey",
+            ExpressionAttributeNames: {
+                "#pkey": "pkey",
+                "#skey": "skey"
+            },
+            ExpressionAttributeValues: {
+                ":pkey": pkey,
+                ":skey": skey
+            }
+        };
+
+        console.log(params);
+
+        try {
+            const data : QueryCommandOutput  = await client.send(new QueryCommand(params));
+
+            if (data.Items.length == 1) {
+                return data.Items[0];
+            } else {
+                return undefined;
             }
 
         } catch (error) {

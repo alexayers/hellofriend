@@ -18,4 +18,8 @@ export class BookmarkService {
     async getBookmarks(accountID: string) : Promise<Array<Bookmark>> {
         return [];
     }
+
+    async isBookmarked(accountID: string, statusID: string) {
+        return await bookmarkResository.isBookmarked(accountID, statusID);
+    }
 }

@@ -22,4 +22,14 @@ export class FavoriteRepository extends BaseRepository implements GenericReposit
     async delete(accountID: string, statusID: string) {
         return await this.deleteItemByPkeyAndSkey(this._tableName, accountID, `Favorite#${statusID}`);
     }
+
+    async isFavorited(accountID: string, statusID: string) : Promise<boolean> {
+        let favorite = await super.byPkeyAndSkey(
+            this._tableName,
+            accountID,
+            `Favorite#${statusID}`
+        );
+
+        return !!favorite;
+    }
 }

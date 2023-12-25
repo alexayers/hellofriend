@@ -1,7 +1,7 @@
 import {middyfy} from "@libs/lambda/lambda";
 import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
 import {successResponse} from "@libs/lambda/api-gateway";
-import {bookmarkService, favoriteService} from "@libs/services";
+import {accountService, bookmarkService, favoriteService, statusService} from "@libs/services";
 
 
 export const postStatus = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -13,8 +13,11 @@ export const postStatus = middyfy(async (event: APIGatewayProxyEvent): Promise<A
 
 export const getStatus = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     console.log(event);
-    //let statusID: string = event.pathParameters.statusID
-    return successResponse({});
+    let statusID: string = event.pathParameters.statusID
+    let accountID : string = event.requestContext.authorizer.claims.sub;
+    let status = await statusService.getStatus(accountID,statusID);
+
+    return successResponse({status});
 });
 
 export const updateStatus = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -78,14 +81,19 @@ export const removeBookmark = middyfy(async (event: APIGatewayProxyEvent): Promi
 
 export const pinStatus = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     console.log(event);
-  //  let statusID: string = event.pathParameters.statusID;
+    let accountID : string = event.requestContext.authorizer.claims.sub;
+    let statusID: string = event.pathParameters.statusID;
+
+    await accountService.pinStatus(accountID, statusID);
 
     return successResponse({});
 });
 
 export const unPinStatus = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     console.log(event);
-  //  let statusID: string = event.pathParameters.statusID;
+    let accountID : string = event.requestContext.authorizer.claims.sub;
+    let statusID: string = event.pathParameters.statusID;
 
+    await accountService.unpinStatus(accountID, statusID);
     return successResponse({});
 });

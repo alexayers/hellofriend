@@ -1,5 +1,5 @@
 import {Favorite} from "../model/favorite";
-import  {favoriteRepository} from "../repository";
+import {bookmarkResository, favoriteRepository} from "../repository";
 
 
 export class FavoriteService {
@@ -17,5 +17,9 @@ export class FavoriteService {
 
     async getFavorites(accountID: string) : Promise<Array<Favorite>> {
         return [];
+    }
+
+    async isFavorited(accountID: string, statusID: string) {
+        return await favoriteRepository.isFavorited(accountID, statusID);
     }
 }
