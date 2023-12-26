@@ -3,7 +3,6 @@ import configuration from "../../../../configuration"
 export const outboundQueueProcessor = {
     handler: `${handlerPath(__dirname)}/handler.outboundQueueProcessor`,
     memorySize: 128,
-    timeout: 90,
     events: [
         {
             sqs: {

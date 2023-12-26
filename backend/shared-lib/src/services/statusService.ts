@@ -48,6 +48,7 @@ export class StatusService {
         let status : Status = {
             pkey: uuidv4(),
             skey:  `Author#${account.pkey}`,
+            objectName: "Status",
             accountId: account.pkey,
             content: createNote.content,
             conversationId: createNote.conversation,
@@ -63,6 +64,9 @@ export class StatusService {
         }
 
         let createdStatus : Status = await statusRepository.persist(status);
+
+
+
         let tags: Map<string, string> = await tagService.saveNoteTags(createActivity.object as ActivityNote);
 
         const promises: Array<Promise<any>> = [];
@@ -86,8 +90,9 @@ export class StatusService {
 
     private async tagStatus(tagPkey: string, statusPkey: string)  : Promise<StatusTag> {
         return await statusRepository.tagStatus({
-            pkey: statusPkey,
-            skey: `Tag#${tagPkey}`
+            objectName: "Tag",
+            pkey: `${tagPkey}`,
+            skey: `Status#${statusPkey}`
         });
     }
 

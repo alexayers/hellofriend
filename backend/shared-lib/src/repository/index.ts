@@ -4,6 +4,7 @@ import {StatusRepository} from "./statusRepository";
 import {TagRepository} from "./tagRepository";
 import {FavoriteRepository} from "./favoriteRepository";
 import {BookmarkRepository} from "./bookmarkRepository";
+import {TimeSeriesRepository} from "./timeSeriesRepository";
 
 
 const accountRepository: AccountRepository = new AccountRepository();
@@ -15,4 +16,6 @@ const tagRepository: TagRepository = new TagRepository();
 const favoriteRepository: FavoriteRepository = new FavoriteRepository();
 const bookmarkResository: BookmarkRepository = new BookmarkRepository();
 
-export {accountRepository, followerRepository, statusRepository, tagRepository, favoriteRepository, bookmarkResository}
+const timeSeriesRepository : TimeSeriesRepository = new TimeSeriesRepository();
+
+export {accountRepository, followerRepository, statusRepository, tagRepository, favoriteRepository, bookmarkResository,timeSeriesRepository}

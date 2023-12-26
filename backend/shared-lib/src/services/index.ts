@@ -37,6 +37,8 @@ const timelineService : TimelineService = new TimelineService();
 
 const tagService : TagService = new TagService();
 
+const timeSeriesService : TimelineService = new TimelineService();
+
 export {accountService,
     webFingerService,
     authenticationService,
@@ -51,5 +53,6 @@ export {accountService,
     favoriteService,
     bookmarkService,
     searchService,
-    timelineService
+    timelineService,
+    timeSeriesService
 };

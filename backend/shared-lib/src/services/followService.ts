@@ -40,6 +40,7 @@ export class FollowService {
         }
 
         await followerRepository.persist({
+            objectName: "Follower",
             pkey: yourAccount.pkey,
             skey: `Follower#${followerAccount.pkey}`,
             uri: acceptActivity.id,
@@ -132,6 +133,7 @@ export class FollowService {
         }
 
         await followerRepository.persist({
+            objectName: "Following",
             pkey: yourAccount.pkey,
             skey: `Following#${followingAccount.pkey}`,
             uri: followActivity.id,

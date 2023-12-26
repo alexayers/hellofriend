@@ -7,6 +7,7 @@ export class FavoriteService {
 
     async addFavorite(accountID: string, statusID: string) : Promise<Favorite> {
         return await favoriteRepository.persist({
+            objectName: "Favorite",
             pkey: accountID,
             skey: statusID}
         );

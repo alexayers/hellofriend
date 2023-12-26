@@ -24,7 +24,8 @@ export class StatusRepository extends BaseRepository implements GenericRepositor
             delete status.spoilerText;
         }
 
-        return await this.put(this._tableName, status) as Status;
+        return await this.put(this._tableName, status) as Status;;
+
     }
 
     async getByPkey(pkey: string): Promise<Status> {

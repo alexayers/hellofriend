@@ -17,6 +17,7 @@ export class AccountService {
         let account: Account = {
             pkey: sub,
             skey: `Account#${registerUser.username.toLowerCase()}`,
+            objectName: 'Account',
             displayName: registerUser.displayName,
             summary: "",
             url: `https://www.${process.env.DOMAIN}/@${registerUser.username}`,
@@ -75,6 +76,7 @@ export class AccountService {
         let account: Account = {
             pkey: uuidv4(),
             skey: `Account#${person.preferredUsername.toLowerCase()}:${domain}`,
+            objectName: 'Account',
             displayName: person.name,
             followersUrl: `https://${domain}/${person.preferredUsername}/followers`,
             inboxUrl: `https://${domain}/${person.preferredUsername}/inbox`,
@@ -146,7 +148,5 @@ export class AccountService {
         return await accountRepository.byId(accountID);
     }
 
-    async findByUsername(query: string) : Promise<Array<Account>> {
-        return await accountRepository.findByUsername(query);
-    }
+
 }

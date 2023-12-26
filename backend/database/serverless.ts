@@ -23,9 +23,7 @@ export const serverlessConfiguration: AWS = {
         },
     },
     package: {individually: true},
-    custom: {
-
-    },
+    custom: {},
     resources: {
         Resources: {
             /*
@@ -190,6 +188,50 @@ export const serverlessConfiguration: AWS = {
                     },
                 }
             },
+            TimeSeriesTable: {
+                Type: "AWS::DynamoDB::Table",
+                Properties: {
+                    TableName: `${resourcePrefix}-time-series`,
+                    AttributeDefinitions: [
+                        {
+                            AttributeName: "pkey",
+                            AttributeType: "S",
+                        },
+                        {
+                            AttributeName: "skey",
+                            AttributeType: "S",
+                        },
+                        {
+                            AttributeName: "compoundKey",
+                            AttributeType: "S",
+                        }
+                    ],
+                    KeySchema: [
+                        {
+                            AttributeName: "pkey",
+                            KeyType: "HASH"
+                        },
+                        {
+                            AttributeName: "skey",
+                            KeyType: "RANGE"
+                        }],
+                    GlobalSecondaryIndexes: [
+                        {
+                            IndexName: 'compound-index',
+                            KeySchema: [{AttributeName: 'compoundKey', KeyType: 'HASH'}],
+                            Projection: {ProjectionType: 'ALL'},
+                            ProvisionedThroughput: {
+                                ReadCapacityUnits: 1,
+                                WriteCapacityUnits: 1
+                            }
+                        },
+                    ],
+                    ProvisionedThroughput: {
+                        ReadCapacityUnits: 1,
+                        WriteCapacityUnits: 1
+                    },
+                }
+            },
             StatusesTable: {
                 Type: "AWS::DynamoDB::Table",
                 Properties: {
@@ -209,6 +251,7 @@ export const serverlessConfiguration: AWS = {
                         {AttributeName: 'inReplyToId', AttributeType: 'S'},
                         {AttributeName: 'conversationId', AttributeType: 'S'},
                         {AttributeName: 'accountId', AttributeType: 'S'},
+                        {AttributeName: 'createdAt', AttributeType: 'N'},
                     ],
                     KeySchema: [
                         {
@@ -240,7 +283,8 @@ export const serverlessConfiguration: AWS = {
                         },
                         {
                             IndexName: 'in-reply-to-account-index',
-                            KeySchema: [{AttributeName: 'inReplyToAccountId', KeyType: 'HASH'}],
+                            KeySchema: [{AttributeName: 'inReplyToAccountId', KeyType: 'HASH'},
+                                {AttributeName: 'createdAt', KeyType: 'RANGE'}],
                             Projection: {ProjectionType: 'ALL'},
                             ProvisionedThroughput: {
                                 ReadCapacityUnits: 1,
@@ -249,7 +293,9 @@ export const serverlessConfiguration: AWS = {
                         },
                         {
                             IndexName: 'in-reply-to-index',
-                            KeySchema: [{AttributeName: 'inReplyToId', KeyType: 'HASH'}],
+                            KeySchema: [{AttributeName: 'inReplyToId', KeyType: 'HASH'},
+                                {AttributeName: 'createdAt', KeyType: 'RANGE'}
+                            ],
                             Projection: {ProjectionType: 'ALL'},
                             ProvisionedThroughput: {
                                 ReadCapacityUnits: 1,
@@ -258,7 +304,9 @@ export const serverlessConfiguration: AWS = {
                         },
                         {
                             IndexName: 'conversation-index',
-                            KeySchema: [{AttributeName: 'conversationId', KeyType: 'HASH'}],
+                            KeySchema: [{AttributeName: 'conversationId', KeyType: 'HASH'},
+                                {AttributeName: 'createdAt', KeyType: 'RANGE'}
+                            ],
                             Projection: {ProjectionType: 'ALL'},
                             ProvisionedThroughput: {
                                 ReadCapacityUnits: 1,
@@ -267,7 +315,10 @@ export const serverlessConfiguration: AWS = {
                         },
                         {
                             IndexName: 'account-index',
-                            KeySchema: [{AttributeName: 'accountId', KeyType: 'HASH'}],
+                            KeySchema: [
+                                {AttributeName: 'accountId', KeyType: 'HASH'},
+                                {AttributeName: 'createdAt', KeyType: 'RANGE'}
+                            ],
                             Projection: {ProjectionType: 'ALL'},
                             ProvisionedThroughput: {
                                 ReadCapacityUnits: 1,
@@ -317,6 +368,18 @@ export const serverlessConfiguration: AWS = {
                 Value: {Ref: 'TagsTable'},
                 Export: {
                     Name: `${resourcePrefix}-TagsTableName`
+                }
+            },
+            TimeSeriesTableArn: {
+                Value: {'Fn::GetAtt': ['TimeSeriesTable', 'Arn']},
+                Export: {
+                    Name: `${resourcePrefix}-TimeSeriesTableArn`
+                }
+            },
+            TimeSeriesTableName: {
+                Value: {Ref: 'TimeSeriesTable'},
+                Export: {
+                    Name: `${resourcePrefix}-TimeSeriesTableName`
                 }
             },
             StatusesTableArn: {

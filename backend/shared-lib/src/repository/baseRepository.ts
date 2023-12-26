@@ -14,7 +14,7 @@ export const documentClient: DynamoDBDocumentClient = DynamoDBDocumentClient.fro
 export class BaseRepository {
 
 
-    async put(tableName: string, object: any): Promise<any> {
+    protected async put(tableName: string, object: any): Promise<any> {
 
         if (!object.createdAt) {
             object = {
@@ -22,6 +22,7 @@ export class BaseRepository {
                 modifiedAt: Date.now(),
                 ...object
             };
+
         } else {
             object.modifiedAt = Date.now();
         }
@@ -42,10 +43,38 @@ export class BaseRepository {
             console.error(e);
         }
 
+        try {
+
+
+            const command: PutCommand = new PutCommand({
+                TableName: process.env.TIMESERIES_TABLE,
+                Item: {
+                    ...object,
+                    pkey: this.getCurrentDateFormatted(new Date()),
+                    skey: `${object.objectName}#${Date.now()}`,
+                    objectName: object.objectName,
+                    compoundKey: `${object.pkey}$$${object.skey}`,
+
+                }
+            });
+
+            await documentClient.send(command);
+        } catch (e) {
+            console.error(e);
+        }
+
         return object;
     }
 
-    async byPkey(tableName: string, pkey: string): Promise<any> {
+    getCurrentDateFormatted(now: Date) {
+        const year : number = now.getFullYear();
+        const month : string = String(now.getMonth() + 1).padStart(2, '0');
+        const day: string = String(now.getDate()).padStart(2, '0');
+
+        return `${year}-${month}-${day}`; // Format and return the date as YYYY-MM-DD
+    }
+
+    protected async byPkey(tableName: string, pkey: string): Promise<any> {
         const params = {
             TableName: tableName,
             KeyConditionExpression: "#pkey = :pkey",
@@ -75,7 +104,7 @@ export class BaseRepository {
     }
 
 
-    async byPkeyAndSkey(tableName : string, pkey: string, skey: string) : Promise<any> {
+    protected async byPkeyAndSkey(tableName : string, pkey: string, skey: string) : Promise<any> {
         const params = {
             TableName: tableName,
             KeyConditionExpression: "#pkey = :pkey AND #skey = :skey",
@@ -106,7 +135,7 @@ export class BaseRepository {
         }
     }
 
-    async byPkeyAndPartialSkey(tableName : string, pkey: string, skey: string) : Promise<any> {
+    protected async byPkeyAndPartialSkey(tableName : string, pkey: string, skey: string) : Promise<any> {
         const params = {
             TableName: tableName,
             KeyConditionExpression: "#pkey = :pkey AND begins_with(#skey, :skey)",
@@ -137,7 +166,7 @@ export class BaseRepository {
         }
     }
 
-    async query(params: QueryCommandInput): Promise<any> {
+    protected async query(params: QueryCommandInput): Promise<any> {
         try {
             return await documentClient.send(new QueryCommand(params));
         } catch (e) {
@@ -146,7 +175,7 @@ export class BaseRepository {
         }
     }
 
-    async queryForOne(params: QueryCommandInput): Promise<any> {
+    protected async queryForOne(params: QueryCommandInput): Promise<any> {
         try {
             let results: QueryCommandOutput = await documentClient.send(new QueryCommand(params));
             return results.Items[0];

@@ -7,6 +7,7 @@ export class BookmarkService {
 
     async addBookmark(accountID: string, statusID: string) : Promise<Bookmark> {
         return await bookmarkResository.persist({
+            objectName: "Bookmark",
             pkey: accountID,
             skey: statusID}
         );

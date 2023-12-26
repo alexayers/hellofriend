@@ -1,7 +1,6 @@
 import {GenericRepository} from "./genericRepository";
 import {Account} from "../model/account";
 import {BaseRepository, documentClient} from "./baseRepository";
-import {ScanCommand, ScanCommandOutput} from "@aws-sdk/lib-dynamodb";
 
 export class AccountRepository extends BaseRepository implements GenericRepository<Account> {
 
@@ -51,24 +50,5 @@ export class AccountRepository extends BaseRepository implements GenericReposito
         }
     }
 
-    async findByUsername(query: string) : Promise<Array<Account>> {
-        const params = {
-            TableName: this._tableName,
-            FilterExpression: "begins_with(#normalizedUserDomain, :prefix)",
-            ExpressionAttributeNames: {
-                "#normalizedUserDomain": "normalizedUserDomain"
-            },
-            ExpressionAttributeValues: {
-                ":prefix": `Account#${query}`
-            }
-        };
 
-        try {
-            const data: ScanCommandOutput = await documentClient.send(new ScanCommand(params));
-            return data.Items as unknown as Array<Account>;
-        } catch (error) {
-            console.error("Error", error);
-            throw error;
-        }
-    }
 }

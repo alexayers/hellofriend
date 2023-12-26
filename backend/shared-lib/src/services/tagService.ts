@@ -18,7 +18,7 @@ export class TagService {
                 continue;
             }
 
-            let name: string = activityNote.tag[i].name.toLowerCase().replace("#", "").replace("@", "");
+            let name: string = activityNote.tag[i].name.toLowerCase().replace("#", "").replace("@", "").replaceAll(":","");
 
             if (activityNote.tag[i].type == TagType.HASHTAG) {
 
@@ -28,6 +28,7 @@ export class TagService {
                     console.info(`New tag found ${name} on Note.`)
                     try {
                         let tag: Tag = await tagRepository.persist({
+                            objectName: "StatusTag",
                             pkey: name,
                             skey: `Tag#${name}`
                         });
@@ -54,7 +55,7 @@ export class TagService {
         }
 
         for (let i: number = 0; i < person.tag.length; i++) {
-            let name: string = person.tag[i].name.toLowerCase().replace("#", "");
+            let name: string = person.tag[i].name.toLowerCase().replace("#", "").replaceAll(":","");
 
             let tag: Tag = await tagRepository.getByPkey(name);
 
@@ -62,6 +63,7 @@ export class TagService {
                 console.info(`New tag found ${name} on Account.`)
                 try {
                     let tag: Tag = await tagRepository.persist({
+                        objectName: "AccountTag",
                         pkey: name,
                         skey: `Tag#${name}`
                     });
