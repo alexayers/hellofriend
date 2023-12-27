@@ -7,10 +7,10 @@ import {
     QueryCommandOutput
 } from "@aws-sdk/lib-dynamodb";
 import console from "console";
-import {Status} from "../model/status";
+import * as AWSXRay from 'aws-xray-sdk-core';
 import {BaseModel} from "../model/baseModel";
 
-const client: DynamoDBClient = new DynamoDBClient({region: "us-east-1"});
+const client: DynamoDBClient = AWSXRay.captureAWSv3Client(new DynamoDBClient({region: "us-east-1"}));
 export const documentClient: DynamoDBDocumentClient = DynamoDBDocumentClient.from(client);
 
 export class BaseRepository {

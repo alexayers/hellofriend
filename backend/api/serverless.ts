@@ -37,6 +37,10 @@ export const serverlessConfiguration: AWS = {
     name: 'aws',
     runtime: 'nodejs20.x',
     stage: 'dev',
+    tracing: {
+      lambda: true,
+      apiGateway: true,
+    },
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
@@ -58,6 +62,14 @@ export const serverlessConfiguration: AWS = {
     iam: {
       role: {
         statements: [
+          {
+            Effect: 'Allow',
+            Action: [
+              'xray:PutTraceSegments',
+              'xray:PutTelemetryRecords',
+            ],
+            Resource: '*',
+          },
           {
             Effect: 'Allow',
             Action: [

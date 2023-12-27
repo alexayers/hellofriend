@@ -3,7 +3,6 @@ import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
 import {successResponse} from "@libs/lambda/api-gateway";
 import {searchService} from "@libs/services";
 import {SearchResultsDto} from "@libs/dto/searchResultsDto";
-
 interface SearchRequest {
     query: string
 }

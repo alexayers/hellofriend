@@ -22,6 +22,7 @@
     "@aws-sdk/lib-storage": "^3.474.0",
     "@middy/core": "^3.4.0",
     "@middy/http-json-body-parser": "^3.4.0",
+    "aws-xray-sdk": "^3.5.3",
     "node-fetch": "^2.7.0",
     "node-rsa": "^1.1.1",
     "serverless-dynamodb-local": "^1.0.2",

@@ -3,8 +3,6 @@ import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
 import {successResponse} from "@libs/lambda/api-gateway";
 import {accountService, bookmarkService, favoriteService, statusService} from "@libs/services";
 import {StatusDto} from "@libs/dto/statusDto";
-
-
 export const postStatus = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     console.log(event);
 
