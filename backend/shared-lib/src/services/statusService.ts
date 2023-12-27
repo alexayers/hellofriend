@@ -109,6 +109,7 @@ export class StatusService {
             account = await accountService.getByNormalizedUsernameDomain(actor.username, actor.domain);
         }
 
+        // @ts-ignore
         let status : Status = await statusRepository.getByUri(deleteActivity.object.id);
 
         if (status && status.accountId == account.pkey) {

@@ -3,7 +3,7 @@ import {handlerPath} from "@libs/lambda/handler-resolver";
 
 export const search = {
     handler: `${handlerPath(__dirname)}/handler.search`,
-    memorySize: 128,
+    memorySize: 512,
     timeout: 30,
     events: [
         {

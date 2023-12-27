@@ -66,8 +66,14 @@ export class WebFingerService {
             response = await fediverseService.signedRequest("get", accountUrl);
             person = response as PersonActor;
             person.uri = accountUrl;
-            await tagService.saveAccountTags(person);
-            person = await fileSystemService.processPerson(person);
+
+            const processingPromises = [];
+
+            processingPromises.push(tagService.saveAccountTags(person));
+            processingPromises.push(fileSystemService.processPerson(person));
+
+            const processingResults = await Promise.all(processingPromises);
+            person = processingResults[1];
 
             if (cachedAccount) {
 
