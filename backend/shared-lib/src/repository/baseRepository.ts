@@ -7,6 +7,8 @@ import {
     QueryCommandOutput
 } from "@aws-sdk/lib-dynamodb";
 import console from "console";
+import {Status} from "../model/status";
+import {BaseModel} from "../model/baseModel";
 
 const client: DynamoDBClient = new DynamoDBClient({region: "us-east-1"});
 export const documentClient: DynamoDBDocumentClient = DynamoDBDocumentClient.from(client);
@@ -16,7 +18,11 @@ export class BaseRepository {
 
     protected async put(tableName: string, object: any): Promise<any> {
 
+        let createTimeSeries: boolean = false;
+
         if (!object.createdAt) {
+
+            createTimeSeries = true;
             object = {
                 createdAt: Date.now(),
                 modifiedAt: Date.now(),
@@ -45,20 +51,21 @@ export class BaseRepository {
 
         try {
 
+            if (createTimeSeries) {
+                const command: PutCommand = new PutCommand({
+                    TableName: process.env.TIMESERIES_TABLE,
+                    Item: {
+                        pkey: this.getCurrentDateFormatted(new Date()),
+                        skey: `${object.objectName}#${Date.now()}`,
+                        objectName: object.objectName,
+                        compoundKey: `${object.pkey}$$${object.skey}`,
 
-            const command: PutCommand = new PutCommand({
-                TableName: process.env.TIMESERIES_TABLE,
-                Item: {
-                    ...object,
-                    pkey: this.getCurrentDateFormatted(new Date()),
-                    skey: `${object.objectName}#${Date.now()}`,
-                    objectName: object.objectName,
-                    compoundKey: `${object.pkey}$$${object.skey}`,
+                    }
+                });
 
-                }
-            });
+                await documentClient.send(command);
+            }
 
-            await documentClient.send(command);
         } catch (e) {
             console.error(e);
         }
@@ -178,7 +185,13 @@ export class BaseRepository {
     protected async queryForOne(params: QueryCommandInput): Promise<any> {
         try {
             let results: QueryCommandOutput = await documentClient.send(new QueryCommand(params));
-            return results.Items[0];
+
+            if (results.Items.length == 1) {
+                return results.Items[0];
+            } else {
+                return null;
+            }
+
         } catch (e) {
             console.error(e);
             throw new Error(e);
@@ -197,10 +210,29 @@ export class BaseRepository {
             });
             const response: DeleteItemCommandOutput = await client.send(command);
             console.log("Item deleted successfully", response);
+
+            await this.deleteTimeSeries(pkey, skey);
+
             return true;
         } catch (error) {
             console.error("Error deleting item:", error);
             return false;
         }
+    }
+
+    protected async deleteTimeSeries(pkey: string, skey: string) : Promise<void> {
+
+        const params = {
+            TableName: process.env.TIMESERIES_TABLE,
+            IndexName: 'compound-index',
+            KeyConditionExpression: 'compoundKey = :value',
+            ExpressionAttributeValues: {
+                ':value': `${pkey}$$${skey}`
+            }
+        }
+
+        let result: BaseModel = await this.queryForOne(params) as BaseModel;
+        await this.deleteItemByPkeyAndSkey(process.env.TIMESERIES_TABLE, result.pkey, result.skey);
+
     }
 }

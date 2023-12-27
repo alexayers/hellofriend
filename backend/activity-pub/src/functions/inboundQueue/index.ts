@@ -3,6 +3,7 @@ import configuration from "../../../../configuration"
 export const inboundQueueProcessor = {
     handler: `${handlerPath(__dirname)}/handler.inboundQueueProcessor`,
     memorySize: 128,
+    timeout: 30,
     events: [
         {
             sqs: {

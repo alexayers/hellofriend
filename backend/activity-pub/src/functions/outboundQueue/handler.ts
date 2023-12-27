@@ -1,6 +1,6 @@
 import {SQSEvent} from "aws-lambda";
 import {Activity, ActivityType, FollowActivity, UndoFollowActivity} from "@libs/activityPub/activity/activities";
-import {followService} from "@libs/services";
+import {followService, inboundQueueService, outboundQueueService} from "@libs/services";
 
 /*
     This queue will handle data headed out of your instance and outwards into the Fediverse
@@ -29,7 +29,7 @@ export const outboundQueueProcessor = async (event: SQSEvent) => {
                         break;
                 }
 
-
+                await outboundQueueService.deleteMessage(message.receiptHandle);
             } catch (error) {
                 console.error('Error processing message:', message.messageId, error);
             }

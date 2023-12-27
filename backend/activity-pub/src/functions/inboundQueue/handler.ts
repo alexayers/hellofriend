@@ -6,7 +6,7 @@ import {
     CreateActivity, DeleteActivity,
     FollowActivity
 } from "@libs/activityPub/activity/activities";
-import {followService, statusService} from "@libs/services";
+import {followService, inboundQueueService, statusService} from "@libs/services";
 
 /*
     This queue will handle data headed into your instance from the Fediverse
@@ -26,7 +26,16 @@ export const inboundQueueProcessor = async (event: SQSEvent) => {
                     await statusService.storeCreate(activity as CreateActivity);
                     break;
                 case ActivityType.Delete:
-                    await statusService.deleteStatus(activity as DeleteActivity)
+
+                    let deleteActivity: DeleteActivity = activity as DeleteActivity;
+
+
+                    if (deleteActivity.actor == deleteActivity.object) {
+                        // Deleting an account
+                    } else {
+                        await statusService.deleteStatus(activity as DeleteActivity)
+                    }
+
                     break;
                 case ActivityType.Accept:
                     await followService.processAccept(activity as AcceptActivity);
@@ -41,6 +50,7 @@ export const inboundQueueProcessor = async (event: SQSEvent) => {
                     break;
             }
 
+            await inboundQueueService.deleteMessage(message.receiptHandle);
 
         } catch (error) {
             console.error('Error processing message:', message.messageId, error);

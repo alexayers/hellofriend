@@ -234,14 +234,36 @@ export const serverlessConfiguration: AWS = {
                 Type: 'AWS::SQS::Queue',
                 Properties: {
                     QueueName: `${resourcePrefix}-outbound-queue`,
+                    VisibilityTimeout: 120,
+                    RedrivePolicy: {
+                        deadLetterTargetArn: { 'Fn::GetAtt': ['OutboundDeadLetterQueue', 'Arn'] },
+                        maxReceiveCount: 5
+                    }
                 },
+            },
+            OutboundDeadLetterQueue: {
+                Type: 'AWS::SQS::Queue',
+                Properties: {
+                    QueueName: `${resourcePrefix}-outbound-dead-letter-queue`
+                }
             },
             InboundQueue: {
                 Type: 'AWS::SQS::Queue',
                 Properties: {
-                    QueueName: `${resourcePrefix}-inbound-queue`
+                    QueueName: `${resourcePrefix}-inbound-queue`,
+                    VisibilityTimeout: 120,
+                    RedrivePolicy: {
+                        deadLetterTargetArn: { 'Fn::GetAtt': ['InboundDeadLetterQueue', 'Arn'] },
+                        maxReceiveCount: 5
+                    }
                 },
             },
+            InboundDeadLetterQueue: {
+                Type: 'AWS::SQS::Queue',
+                Properties: {
+                    QueueName: `${resourcePrefix}-inbound-dead-letter-queue`
+                }
+            }
         },
         Outputs: {
             CognitoUserPoolClientId: {

@@ -49,6 +49,7 @@ export const serverlessConfiguration: AWS = {
       ACCOUNTS_TABLE: { "Fn::ImportValue": `${resourcePrefix}-AccountsTableName` },
       FOLLOWS_TABLE: { "Fn::ImportValue": `${resourcePrefix}-FollowsTableName` },
       STATUSES_TABLE: { "Fn::ImportValue": `${resourcePrefix}-StatusesTableName` },
+      TIMESERIES_TABLE: { "Fn::ImportValue": `${resourcePrefix}-TimeSeriesTableName` },
       OUTBOUND_QUEUE: { 'Fn::ImportValue': `${resourcePrefix}-OutboundQueueUrl` },
       FILES_BUCKET: { 'Fn::ImportValue': `${resourcePrefix}-FilesBucketName` },
       TAGS_TABLE: { "Fn::ImportValue": `${resourcePrefix}-TagsTableName` },
@@ -114,6 +115,12 @@ export const serverlessConfiguration: AWS = {
               { "Fn::ImportValue": `${resourcePrefix}-TagsTableArn` },
               { "Fn::Join": ['', [
                   { "Fn::ImportValue": `${resourcePrefix}-TagsTableArn` },
+                  '/index/*'
+                ]]
+              },
+              { "Fn::ImportValue": `${resourcePrefix}-TimeSeriesTableArn` },
+              { "Fn::Join": ['', [
+                  { "Fn::ImportValue": `${resourcePrefix}-TimeSeriesTableArn` },
                   '/index/*'
                 ]]
               },
