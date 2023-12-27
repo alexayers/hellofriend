@@ -6,6 +6,8 @@ import {successResponse} from "@libs/lambda/api-gateway";
 export const explorePosts = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     console.log(event);
 
+
+
     return successResponse({});
 });
 

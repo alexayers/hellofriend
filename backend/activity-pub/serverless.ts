@@ -48,6 +48,7 @@ export const serverlessConfiguration: AWS = {
             DOMAIN: '${self:custom.certificateName}',
             INBOUND_QUEUE: { 'Fn::ImportValue': `${resourcePrefix}-InboundQueueUrl` },
             OUTBOUND_QUEUE: { 'Fn::ImportValue': `${resourcePrefix}-OutboundQueueUrl` },
+            TIMELINE_QUEUE: { 'Fn::ImportValue': `${resourcePrefix}-TimelineQueueUrl` },
             FILES_BUCKET: { 'Fn::ImportValue': `${resourcePrefix}-FilesBucketName` },
         },
         iam: {
@@ -84,7 +85,8 @@ export const serverlessConfiguration: AWS = {
                         ],
                         Resource: [
                             { "Fn::ImportValue": {"Fn::Sub": `${resourcePrefix}-InboundQueueArn`} },
-                            { "Fn::ImportValue": {"Fn::Sub": `${resourcePrefix}-OutboundQueueArn`} }
+                            { "Fn::ImportValue": {"Fn::Sub": `${resourcePrefix}-OutboundQueueArn`} },
+                            { "Fn::ImportValue": {"Fn::Sub": `${resourcePrefix}-TimelineQueueArn`} }
                         ]
                     },
                     {

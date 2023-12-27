@@ -34,4 +34,8 @@ export class FollowerRepository extends BaseRepository implements GenericReposit
             fromAccountID,
             `Following#${unFollowAccountID}`);
     }
+
+    async getFollows(accountID: string) : Promise<Array<Follow>> {
+        return await this.getByPkey(accountID) as unknown as Array<Follow>;
+    }
 }

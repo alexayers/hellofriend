@@ -232,6 +232,55 @@ export const serverlessConfiguration: AWS = {
                     },
                 }
             },
+            TimelineTable: {
+                Type: "AWS::DynamoDB::Table",
+                Properties: {
+                    TableName: `${resourcePrefix}-timeline`,
+                    TimeToLiveSpecification: {
+                        AttributeName: "expiresAt",
+                        Enabled: true
+                    },
+                    AttributeDefinitions: [
+                        {
+                            AttributeName: "pkey",
+                            AttributeType: "S",
+                        },
+                        {
+                            AttributeName: "skey",
+                            AttributeType: "S",
+                        },
+                        {
+                            AttributeName: "accountId",
+                            AttributeType: "S",
+                        }
+                    ],
+                    KeySchema: [
+                        {
+                            AttributeName: "pkey",
+                            KeyType: "HASH"
+                        },
+                        {
+                            AttributeName: "skey",
+                            KeyType: "RANGE"
+                        }],
+                    GlobalSecondaryIndexes: [
+                        {
+                            IndexName: 'account-index',
+                            KeySchema: [{AttributeName: 'accountId', KeyType: 'HASH'},
+                                {AttributeName: 'skey', KeyType: 'RANGE'}
+                            ],
+                            Projection: {ProjectionType: 'ALL'},
+                            ProvisionedThroughput: {
+                                ReadCapacityUnits: 1,
+                                WriteCapacityUnits: 1
+                            }
+                        }],
+                    ProvisionedThroughput: {
+                        ReadCapacityUnits: 1,
+                        WriteCapacityUnits: 1
+                    },
+                }
+            },
             StatusesTable: {
                 Type: "AWS::DynamoDB::Table",
                 Properties: {
@@ -380,6 +429,18 @@ export const serverlessConfiguration: AWS = {
                 Value: {Ref: 'TimeSeriesTable'},
                 Export: {
                     Name: `${resourcePrefix}-TimeSeriesTableName`
+                }
+            },
+            TimelineTableArn: {
+                Value: {'Fn::GetAtt': ['TimelineTable', 'Arn']},
+                Export: {
+                    Name: `${resourcePrefix}-TimelineTableArn`
+                }
+            },
+            TimelineTableName: {
+                Value: {Ref: 'TimelineTable'},
+                Export: {
+                    Name: `${resourcePrefix}-TimelineTableName`
                 }
             },
             StatusesTableArn: {

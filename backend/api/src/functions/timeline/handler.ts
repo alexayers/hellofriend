@@ -5,6 +5,7 @@ import {successResponse} from "@libs/lambda/api-gateway";
 export const getTimeline = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     console.log(event);
 
+
     return successResponse({});
 });
 

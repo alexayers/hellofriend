@@ -153,4 +153,8 @@ export class FollowService {
         }
 
     }
+
+    async getFollowing(accountID: string) : Promise<Array<Follow>>{
+        return await followerRepository.getFollows(accountID);
+    }
 }

@@ -25,6 +25,7 @@ const statusService: StatusService = new StatusService(process.env.DOMAIN);
 
 const inboundQueueService : QueueService = new QueueService(process.env.INBOUND_QUEUE);
 const outboundQueueService : QueueService = new QueueService(process.env.OUTBOUND_QUEUE);
+const timelineQueueService : QueueService = new QueueService(process.env.TIMELINE_QUEUE);
 
 const fileSystemService : FileSystemService = new FileSystemService(process.env.FILES_BUCKET);
 
@@ -54,5 +55,6 @@ export {accountService,
     bookmarkService,
     searchService,
     timelineService,
-    timeSeriesService
+    timeSeriesService,
+    timelineQueueService
 };

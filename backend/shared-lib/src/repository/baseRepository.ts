@@ -73,7 +73,7 @@ export class BaseRepository {
         return object;
     }
 
-    getCurrentDateFormatted(now: Date) {
+    protected getCurrentDateFormatted(now: Date) {
         const year : number = now.getFullYear();
         const month : string = String(now.getMonth() + 1).padStart(2, '0');
         const day: string = String(now.getDate()).padStart(2, '0');
@@ -175,7 +175,14 @@ export class BaseRepository {
 
     protected async query(params: QueryCommandInput): Promise<any> {
         try {
-            return await documentClient.send(new QueryCommand(params));
+            const data: QueryCommandOutput = await documentClient.send(new QueryCommand(params));
+
+            if (data.Items.length >= 1) {
+                return data.Items;
+            } else {
+                return undefined;
+            }
+
         } catch (e) {
             console.error(e);
             throw new Error(e);

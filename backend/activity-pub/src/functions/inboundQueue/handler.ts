@@ -6,7 +6,9 @@ import {
     CreateActivity, DeleteActivity,
     FollowActivity
 } from "@libs/activityPub/activity/activities";
-import {followService, inboundQueueService, statusService} from "@libs/services";
+import {followService, inboundQueueService, statusService, timelineQueueService} from "@libs/services";
+import {Status} from "@libs/model/status";
+import {Account} from "@libs/model/account";
 
 /*
     This queue will handle data headed into your instance from the Fediverse
@@ -23,7 +25,12 @@ export const inboundQueueProcessor = async (event: SQSEvent) => {
                     await followService.acceptRequest(activity as FollowActivity);
                     break;
                 case ActivityType.Create:
-                    await statusService.storeCreate(activity as CreateActivity);
+                    let accountStatus : {status: Status, account: Account} = await statusService.storeCreate(activity as CreateActivity);
+
+                    if (accountStatus && !accountStatus.status.inReplyToId) {
+                        await timelineQueueService.queue(accountStatus);
+                    }
+
                     break;
                 case ActivityType.Delete:
 

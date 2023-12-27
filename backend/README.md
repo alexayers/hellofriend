@@ -30,3 +30,4 @@ This will make use of the following AWS Services
 - Cognito
 - IAM
 - Certificate Manager
+- XRay

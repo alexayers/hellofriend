@@ -4,6 +4,7 @@ import {Status} from "../model/status";
 import {StatusTag} from "../model/statusTag";
 import {QueryCommand, QueryCommandOutput} from "@aws-sdk/lib-dynamodb";
 import console from "console";
+import {StatusDto} from "../dto/statusDto";
 
 
 export class StatusRepository extends BaseRepository implements GenericRepository<Status> {
@@ -84,4 +85,18 @@ export class StatusRepository extends BaseRepository implements GenericRepositor
         }
     }
 
+    async getByAccountID(accountID: string) : Promise<Array<Status>> {
+
+        const params = {
+            TableName: this._tableName,
+            IndexName: 'account-index',
+            KeyConditionExpression: 'accountId = :value',
+            ExpressionAttributeValues: {
+                ':value': accountID
+            }
+        }
+
+
+        return await super.query(params) as Array<Status>;
+    }
 }

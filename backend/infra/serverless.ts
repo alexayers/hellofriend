@@ -263,6 +263,23 @@ export const serverlessConfiguration: AWS = {
                 Properties: {
                     QueueName: `${resourcePrefix}-inbound-dead-letter-queue`
                 }
+            },
+            TimelineQueue: {
+                Type: 'AWS::SQS::Queue',
+                Properties: {
+                    QueueName: `${resourcePrefix}-timeline-queue`,
+                    VisibilityTimeout: 120,
+                    RedrivePolicy: {
+                        deadLetterTargetArn: { 'Fn::GetAtt': ['TimelineDeadLetterQueue', 'Arn'] },
+                        maxReceiveCount: 5
+                    }
+                },
+            },
+            TimelineDeadLetterQueue: {
+                Type: 'AWS::SQS::Queue',
+                Properties: {
+                    QueueName: `${resourcePrefix}-timeline-dead-letter-queue`
+                }
             }
         },
         Outputs: {
@@ -306,6 +323,20 @@ export const serverlessConfiguration: AWS = {
                 Value: { 'Fn::GetAtt': ['InboundQueue', 'Arn'] },
                 Export: {
                     Name: `${resourcePrefix}-InboundQueueArn`,
+                },
+            },
+            TimelineQueueUrl: {
+                Description: "The URL of the Fediverse Timeline Queue",
+                Value: { 'Fn::GetAtt': ['TimelineQueue', 'QueueName'] },
+                Export: {
+                    Name: `${resourcePrefix}-TimelineQueueUrl`,
+                },
+            },
+            TimelineQueueArn: {
+                Description: "The ARN of the Fediverse Timeline Queue",
+                Value: { 'Fn::GetAtt': ['TimelineQueue', 'Arn'] },
+                Export: {
+                    Name: `${resourcePrefix}-TimelineQueueArn`,
                 },
             },
             FilesBucketName: {

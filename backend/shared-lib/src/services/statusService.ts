@@ -23,7 +23,7 @@ export class StatusService {
     }
 
 
-    async storeCreate(createActivity : CreateActivity) : Promise<Status> {
+    async storeCreate(createActivity : CreateActivity) : Promise<{status: Status, account: Account}> {
 
         let actor: { username: string, domain: string } = actorFromUrl(createActivity.actor);
         let account: Account = await accountService.getByNormalizedUsernameDomain(actor.username, actor.domain);
@@ -64,9 +64,6 @@ export class StatusService {
         }
 
         let createdStatus : Status = await statusRepository.persist(status);
-
-
-
         let tags: Map<string, string> = await tagService.saveNoteTags(createActivity.object as ActivityNote);
 
         const promises: Array<Promise<any>> = [];
@@ -84,7 +81,10 @@ export class StatusService {
         }
 
         await Promise.all(promises);
-        return status;
+        return {
+            status: status,
+            account: account
+        };
 
     }
 
@@ -129,17 +129,20 @@ export class StatusService {
             await webFingerService.finger(actor.username,actor.domain);
         }
 
-        let boostedStatus : Status = await this.fetchStatus(announceActivity.object);
-        console.info(`Boosted ${boostedStatus.pkey}`);
+        let boostedStatus : {status: Status, account: Account} = await this.fetchStatus(announceActivity.object);
+        console.info(`Boosted ${boostedStatus.status.pkey}`);
     }
 
-    private async fetchStatus(uri: string) : Promise<Status>{
+    private async fetchStatus(uri: string) : Promise<{status: Status, account: Account}>{
 
         let status : Status = await statusRepository.getByUri(uri);
 
         if (status) {
             console.info(`I already have the boosted message ${uri}, no need to fetch.`);
-            return status;
+            return {
+                status: status,
+                account: null
+            };
         }
 
         console.debug(`I need to download ${uri}`);
@@ -198,5 +201,11 @@ export class StatusService {
             uri: status.uri
 
         }
+    }
+
+    async getStatusesByAccount(accountID: string) : Promise<Array<Status>> {
+        let statuses : Array<Status> = await statusRepository.getByAccountID(accountID);
+
+        return statuses;
     }
 }

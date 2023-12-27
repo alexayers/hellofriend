@@ -5,6 +5,8 @@ import {generateKeyPairSync} from 'crypto';
 import {PersonActor} from "../activityPub/actors/personActor";
 import {accountRepository} from "../repository";
 import {v4 as uuidv4} from 'uuid';
+import {Follow} from "../model/follow";
+import {followService} from "./index";
 
 export class AccountService {
 
@@ -149,4 +151,9 @@ export class AccountService {
     }
 
 
+    async getFollowing(accountID: string) {
+        let follows : Array<Follow> = await followService.getFollowing(accountID);
+
+
+    }
 }

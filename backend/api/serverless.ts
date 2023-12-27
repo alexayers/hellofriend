@@ -21,6 +21,7 @@ import {
   updateStatus
 } from "@functions/status";
 import {getTimeline, getTimelineByTag} from "@functions/timeline";
+import {timelineQueueProcessor} from "@functions/timeline-queue";
 
 
 // We'll use this resourcePrefix for all our resources: dynamoDB, Cognito, etc
@@ -54,7 +55,9 @@ export const serverlessConfiguration: AWS = {
       FOLLOWS_TABLE: { "Fn::ImportValue": `${resourcePrefix}-FollowsTableName` },
       STATUSES_TABLE: { "Fn::ImportValue": `${resourcePrefix}-StatusesTableName` },
       TIMESERIES_TABLE: { "Fn::ImportValue": `${resourcePrefix}-TimeSeriesTableName` },
+      TIMELINE_TABLE: { "Fn::ImportValue": `${resourcePrefix}-TimelineTableName` },
       OUTBOUND_QUEUE: { 'Fn::ImportValue': `${resourcePrefix}-OutboundQueueUrl` },
+      TIMELINE_QUEUE: { 'Fn::ImportValue': `${resourcePrefix}-TimelineQueueUrl` },
       FILES_BUCKET: { 'Fn::ImportValue': `${resourcePrefix}-FilesBucketName` },
       TAGS_TABLE: { "Fn::ImportValue": `${resourcePrefix}-TagsTableName` },
       DOMAIN: '${self:custom.certificateName}'
@@ -91,7 +94,8 @@ export const serverlessConfiguration: AWS = {
               'sqs:SendMessage'
             ],
             Resource: [
-              { "Fn::ImportValue": {"Fn::Sub": `${resourcePrefix}-OutboundQueueArn`} }
+              { "Fn::ImportValue": {"Fn::Sub": `${resourcePrefix}-OutboundQueueArn`} },
+              { "Fn::ImportValue": {"Fn::Sub": `${resourcePrefix}-TimelineQueueArn`} }
             ]
           },
           {
@@ -136,6 +140,12 @@ export const serverlessConfiguration: AWS = {
                   '/index/*'
                 ]]
               },
+              { "Fn::ImportValue": `${resourcePrefix}-TimelineTableArn` },
+              { "Fn::Join": ['', [
+                  { "Fn::ImportValue": `${resourcePrefix}-TimelineTableArn` },
+                  '/index/*'
+                ]]
+              },
             ]
           }],
       },
@@ -167,7 +177,8 @@ export const serverlessConfiguration: AWS = {
     pinStatus,
     unPinStatus,
     getTimeline,
-    getTimelineByTag
+    getTimelineByTag,
+    timelineQueueProcessor
   },
   package: {individually: true},
   custom: {
