@@ -1,5 +1,5 @@
 {
-  "name": "hello-friend-infra",
+  "name": "hello-friend-dynamodb",
   "version": "1.0.0",
   "description": "Infrastructure for Hello Friend",
   "main": "serverless.ts",

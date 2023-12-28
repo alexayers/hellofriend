@@ -167,6 +167,10 @@ export class StatusService {
 
         const status : Status = await statusRepository.getStatusById(statusID);
 
+        if (!status) {
+            return null;
+        }
+
         const promises = [
             accountService.getById(status.accountId),
             bookmarkService.isBookmarked(accountID, statusID),

@@ -6,7 +6,7 @@ const resourcePrefix: string = configuration.resourcePrefix;
 
 
 export const serverlessConfiguration: AWS = {
-    service: 'hello-friend-database',
+    service: 'hello-friend-dynamodb',
     frameworkVersion: '3',
     provider: {
         name: 'aws',
@@ -121,6 +121,9 @@ export const serverlessConfiguration: AWS = {
                         ReadCapacityUnits: 1,
                         WriteCapacityUnits: 1
                     },
+                    StreamSpecification: {
+                        StreamViewType: 'NEW_IMAGE'
+                    }
                 }
             },
             FollowsTable: {
@@ -186,6 +189,9 @@ export const serverlessConfiguration: AWS = {
                         ReadCapacityUnits: 1,
                         WriteCapacityUnits: 1
                     },
+                    StreamSpecification: {
+                        StreamViewType: 'NEW_IMAGE'
+                    }
                 }
             },
             TimeSeriesTable: {
@@ -379,6 +385,9 @@ export const serverlessConfiguration: AWS = {
                         ReadCapacityUnits: 1,
                         WriteCapacityUnits: 1
                     },
+                    StreamSpecification: {
+                        StreamViewType: 'NEW_IMAGE'
+                    }
                 }
             },
         },
@@ -453,6 +462,30 @@ export const serverlessConfiguration: AWS = {
                 Value: {Ref: 'StatusesTable'},
                 Export: {
                     Name: `${resourcePrefix}-StatusesTableName`
+                }
+            },
+            StatusesTableStream: {
+                Value: {
+                    'Fn::GetAtt': ['StatusesTable', 'StreamArn']
+                },
+                Export: {
+                    Name: `${resourcePrefix}-StatusesTableStreamArn`
+                }
+            },
+            AccountsTableStream: {
+                Value: {
+                    'Fn::GetAtt': ['AccountsTable', 'StreamArn']
+                },
+                Export: {
+                    Name: `${resourcePrefix}-AccountsTableStreamArn`
+                }
+            },
+            TagsTableStream: {
+                Value: {
+                    'Fn::GetAtt': ['TagsTable', 'StreamArn']
+                },
+                Export: {
+                    Name: `${resourcePrefix}-TagsTableStreamArn`
                 }
             }
         }

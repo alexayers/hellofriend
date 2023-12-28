@@ -1,8 +1,10 @@
 import {middyfy} from "@libs/lambda/lambda";
 import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
-import {successResponse} from "@libs/lambda/api-gateway";
+import {notFoundResponse, successResponse} from "@libs/lambda/api-gateway";
 import {accountService, bookmarkService, favoriteService, statusService} from "@libs/services";
 import {StatusDto} from "@libs/dto/statusDto";
+import {Favorite} from "@libs/model/favorite";
+import {Bookmark} from "@libs/model/bookmark";
 export const postStatus = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     console.log(event);
 
@@ -16,7 +18,13 @@ export const getStatus = middyfy(async (event: APIGatewayProxyEvent): Promise<AP
     let accountID : string = event.requestContext.authorizer.claims.sub;
     let status : StatusDto = await statusService.getStatus(accountID,statusID);
 
-    return successResponse({status});
+    if (status) {
+        return successResponse({status});
+    } else {
+        return notFoundResponse(`Unable to find a status for ${statusID}`);
+    }
+
+
 });
 
 export const updateStatus = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -45,9 +53,14 @@ export const favoriteStatus = middyfy(async (event: APIGatewayProxyEvent): Promi
 
     let accountID : string = event.requestContext.authorizer.claims.sub;
     let statusID: string = event.pathParameters.statusID;
-    await favoriteService.addFavorite(accountID, statusID);
+    let favorite : Favorite = await favoriteService.addFavorite(accountID, statusID);
 
-    return successResponse({});
+    if (favorite) {
+        return successResponse({favorite});
+    } else {
+        return notFoundResponse(`Unable to find a status for ${statusID}`);
+    }
+
 });
 
 export const removeFavorite = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -55,17 +68,28 @@ export const removeFavorite = middyfy(async (event: APIGatewayProxyEvent): Promi
 
     let accountID : string = event.requestContext.authorizer.claims.sub;
     let statusID: string = event.pathParameters.statusID;
-    await favoriteService.removeFavorite(accountID, statusID);
+    let removed : boolean = await favoriteService.removeFavorite(accountID, statusID);
 
-    return successResponse({});
+    if (removed) {
+        return successResponse({removed});
+    } else {
+        return notFoundResponse(`Unable to find a status for ${statusID}`);
+    }
+
 });
 
 export const bookmarkStatus = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     let accountID : string = event.requestContext.authorizer.claims.sub;
     let statusID: string = event.pathParameters.statusID;
-    await bookmarkService.addBookmark(accountID, statusID);
+    let bookmark : Bookmark = await bookmarkService.addBookmark(accountID, statusID);
 
-    return successResponse({});
+    if (bookmark) {
+        return successResponse({bookmark});
+    } else {
+        return notFoundResponse(`Unable to find a status for ${statusID}`);
+    }
+
+
 });
 
 export const removeBookmark = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -73,9 +97,14 @@ export const removeBookmark = middyfy(async (event: APIGatewayProxyEvent): Promi
 
     let accountID : string = event.requestContext.authorizer.claims.sub;
     let statusID: string = event.pathParameters.statusID;
-    await bookmarkService.removeBookmark(accountID, statusID);
+    let removed : boolean = await bookmarkService.removeBookmark(accountID, statusID);
 
-    return successResponse({});
+    if (removed) {
+        return successResponse({removed});
+    } else {
+        return notFoundResponse(`Unable to find a status for ${statusID}`);
+    }
+
 });
 
 export const pinStatus = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -83,9 +112,14 @@ export const pinStatus = middyfy(async (event: APIGatewayProxyEvent): Promise<AP
     let accountID : string = event.requestContext.authorizer.claims.sub;
     let statusID: string = event.pathParameters.statusID;
 
-    await accountService.pinStatus(accountID, statusID);
+    let pinned : boolean = await accountService.pinStatus(accountID, statusID);
 
-    return successResponse({});
+    if (pinned) {
+        return successResponse({pinned});
+    } else {
+        return notFoundResponse(`Unable to find a status for ${statusID}`);
+    }
+
 });
 
 export const unPinStatus = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -93,6 +127,12 @@ export const unPinStatus = middyfy(async (event: APIGatewayProxyEvent): Promise<
     let accountID : string = event.requestContext.authorizer.claims.sub;
     let statusID: string = event.pathParameters.statusID;
 
-    await accountService.unpinStatus(accountID, statusID);
-    return successResponse({});
+    let unpinned : boolean = await accountService.unpinStatus(accountID, statusID);
+
+    if (unpinned) {
+        return successResponse({unpinned});
+    } else {
+        return notFoundResponse(`Unable to find a status for ${statusID}`);
+    }
+
 });

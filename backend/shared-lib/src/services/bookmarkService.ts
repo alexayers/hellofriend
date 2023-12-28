@@ -1,11 +1,19 @@
 import {Bookmark} from "../model/bookmark";
-import {bookmarkResository} from "../repository";
+import {bookmarkResository, statusRepository} from "../repository";
 import {StatusDto} from "../dto/statusDto";
+import {Status} from "../model/status";
 
 
 export class BookmarkService {
 
     async addBookmark(accountID: string, statusID: string) : Promise<Bookmark> {
+
+        const status : Status = await statusRepository.getStatusById(statusID);
+
+        if (!status) {
+            return null;
+        }
+
         return await bookmarkResository.persist({
             objectName: "Bookmark",
             pkey: accountID,
@@ -13,7 +21,14 @@ export class BookmarkService {
         );
     }
 
-    async removeBookmark(accountID: string, statusID: string) : Promise<void> {
+    async removeBookmark(accountID: string, statusID: string) : Promise<boolean> {
+
+        const status : Status = await statusRepository.getStatusById(statusID);
+
+        if (!status) {
+            return false;
+        }
+
         await bookmarkResository.delete(accountID, statusID);
     }
 
