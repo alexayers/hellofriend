@@ -2,24 +2,7 @@ import fetch from "node-fetch";
 import aws4 from "aws4";
 
 
-interface BaseSearchResults {
-    took:number
-    timed_out: boolean
-    _shards: {
-        total: number
-        successful: number
-        skipped: number
-        failed: number
-    },
-    hits: {
-        total: {
-            value: number
-            relation: string
-        },
-        max_score: number
-        hits: any
-    }
-}
+
 
 export interface AccountSearchData {
     id: string
@@ -38,6 +21,7 @@ export interface TagSearchData {
 
 export interface StatusSearchData {
     id: string
+    accountId: string
     status: string
     displayName: string
     domain: string
@@ -45,6 +29,7 @@ export interface StatusSearchData {
     avatarFilename:  string
     published:  string
     language: string
+    uri: string
 }
 
 export class OpenSearchService {
@@ -117,6 +102,7 @@ export class OpenSearchService {
                     id: { type: 'keyword' },
                     status: { type: 'text' },
                     displayName: {type: 'text'},
+                    accountId: {type: 'text'},
                     domain: {type: 'text'},
                     username: {type: 'text'},
                     avatarFilename:  { type: 'text' },
@@ -276,8 +262,8 @@ export class OpenSearchService {
             query: {
                 bool: {
                     should: [
-                        { wildcard: { username: `*${searchString}*` }},
-                        { wildcard: { displayName: `*${searchString}*` }}
+                        { wildcard: { username: `*${searchString.toLowerCase()}*` }},
+                        { wildcard: { displayName: `*${searchString.toLowerCase()}*` }}
                     ],
                     minimum_should_match: 1
                 }
@@ -330,7 +316,7 @@ export class OpenSearchService {
         const query = {
             query: {
                 wildcard: {
-                    username: `*${searchString}*`
+                    status: `*${searchString.toLowerCase()}*`
                 }
             }
         };
@@ -366,7 +352,9 @@ export class OpenSearchService {
                 language: source?.language,
                 published: source.published,
                 status: source?.status,
-                username: source.username
+                username: source.username,
+                accountId: source.accountId,
+                uri: source.uri
 
             });
         }
@@ -380,7 +368,7 @@ export class OpenSearchService {
         const query = {
             query: {
                 wildcard: {
-                    tag: `*${searchString}*`
+                    tag: `*${searchString.toLowerCase()}*`
                 }
             }
         };

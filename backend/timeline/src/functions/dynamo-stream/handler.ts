@@ -3,6 +3,7 @@ import {accountService, openSearchService} from "@libs/services";
 import {Account} from "@libs/model/account";
 import {Tag} from "@libs/model/tag";
 import {Status} from "@libs/model/status";
+import * as console from "console";
 
 
 export const dynamoDbStreamAccountsProcessor = async (event: { Records: any; }) => {
@@ -62,13 +63,19 @@ export const dynamoDbStreamStatusesProcessor = async (event: { Records: any; }) 
             const newImage = unmarshall(record.dynamodb.NewImage);
             console.log("New Image:", newImage);
 
+            if (newImage.objectName != "Status") {
+                continue;
+            }
+
             let status: Status = newImage as unknown as Status;
 
             let account : Account = await accountService.getById(status.accountId);
 
             await openSearchService.storeStatus({
                 id: status.pkey,
-                status: status?.text,
+                status: status?.content,
+                accountId : account.pkey,
+                uri: status.uri,
                 avatarFilename: account?.avatarFilename,
                 displayName: account.displayName,
                 domain: account?.domain,

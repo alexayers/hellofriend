@@ -3,7 +3,8 @@ import configuration from "../../../../configuration";
 
 export const dynamoDbStreamAccountsProcessor = {
     handler: `${handlerPath(__dirname)}/handler.dynamoDbStreamAccountsProcessor`,
-    memorySize: 128,
+    memorySize: 512,
+    timeout:120,
     events: [
         {
             stream: {
@@ -11,7 +12,7 @@ export const dynamoDbStreamAccountsProcessor = {
                 arn: {
                     'Fn::ImportValue': `${configuration.resourcePrefix}-AccountsTableStreamArn`
                 },
-                batchSize: 100,
+                batchSize: 10,
                 startingPosition: 'LATEST',
             },
         },
@@ -20,7 +21,8 @@ export const dynamoDbStreamAccountsProcessor = {
 
 export const dynamoDbStreamTagsProcessor = {
     handler: `${handlerPath(__dirname)}/handler.dynamoDbStreamTagsProcessor`,
-    memorySize: 128,
+    memorySize: 512,
+    timeout:240,
     events: [
         {
             stream: {
@@ -28,7 +30,7 @@ export const dynamoDbStreamTagsProcessor = {
                 arn: {
                     'Fn::ImportValue': `${configuration.resourcePrefix}-TagsTableStreamArn`
                 },
-                batchSize: 100,
+                batchSize: 10,
                 startingPosition: 'LATEST',
             },
         },
@@ -37,7 +39,8 @@ export const dynamoDbStreamTagsProcessor = {
 
 export const dynamoDbStreamStatusesProcessor = {
     handler: `${handlerPath(__dirname)}/handler.dynamoDbStreamStatusesProcessor`,
-    memorySize: 128,
+    memorySize: 512,
+    timeout: 120,
     events: [
         {
             stream: {
@@ -45,49 +48,9 @@ export const dynamoDbStreamStatusesProcessor = {
                 arn: {
                     'Fn::ImportValue': `${configuration.resourcePrefix}-StatusesTableStreamArn`
                 },
-                batchSize: 100,
+                batchSize: 10,
                 startingPosition: 'LATEST',
             },
         },
     ],
 };
-
-/*
-(async() =>{
-    console.log("Creating indices if needed...");
-    const endpoint:string = process.env.OPENSEARCH_ENDPOINT;
-    console.log(`Verifying existence of Index account-index on node: ${endpoint}`);
-
-    // Check if the index exists
-    const existsResponse = await fetch(`${endpoint}/account-index`, { method: 'HEAD' });
-    if (!existsResponse.ok) {
-
-        const createResponse = await fetch(endpoint, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                mappings: {
-                    properties: {
-                        id: { type: 'keyword' },
-                        username: { type: 'text' },
-                        displayName: { type: 'text' },
-                        summary: { type: 'text' }
-                    }
-                }
-            })
-        });
-
-        if (createResponse.ok) {
-            console.log(`Index account created`);
-        } else {
-            console.error('Error creating index:', await createResponse.text());
-        }
-
-
-    } else {
-        console.log(`Index account-index already exists`);
-    }
-
-
-})();*/
-
