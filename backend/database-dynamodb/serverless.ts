@@ -6,7 +6,7 @@ const resourcePrefix: string = configuration.resourcePrefix;
 
 
 export const serverlessConfiguration: AWS = {
-    service: 'hello-friend-database',
+    service: 'hello-friend-dynamodb',
     frameworkVersion: '3',
     provider: {
         name: 'aws',
@@ -23,9 +23,7 @@ export const serverlessConfiguration: AWS = {
         },
     },
     package: {individually: true},
-    custom: {
-
-    },
+    custom: {},
     resources: {
         Resources: {
             /*
@@ -123,6 +121,9 @@ export const serverlessConfiguration: AWS = {
                         ReadCapacityUnits: 1,
                         WriteCapacityUnits: 1
                     },
+                    StreamSpecification: {
+                        StreamViewType: 'NEW_IMAGE'
+                    }
                 }
             },
             FollowsTable: {
@@ -188,6 +189,102 @@ export const serverlessConfiguration: AWS = {
                         ReadCapacityUnits: 1,
                         WriteCapacityUnits: 1
                     },
+                    StreamSpecification: {
+                        StreamViewType: 'NEW_IMAGE'
+                    }
+                }
+            },
+            TimeSeriesTable: {
+                Type: "AWS::DynamoDB::Table",
+                Properties: {
+                    TableName: `${resourcePrefix}-time-series`,
+                    AttributeDefinitions: [
+                        {
+                            AttributeName: "pkey",
+                            AttributeType: "S",
+                        },
+                        {
+                            AttributeName: "skey",
+                            AttributeType: "S",
+                        },
+                        {
+                            AttributeName: "compoundKey",
+                            AttributeType: "S",
+                        }
+                    ],
+                    KeySchema: [
+                        {
+                            AttributeName: "pkey",
+                            KeyType: "HASH"
+                        },
+                        {
+                            AttributeName: "skey",
+                            KeyType: "RANGE"
+                        }],
+                    GlobalSecondaryIndexes: [
+                        {
+                            IndexName: 'compound-index',
+                            KeySchema: [{AttributeName: 'compoundKey', KeyType: 'HASH'}],
+                            Projection: {ProjectionType: 'ALL'},
+                            ProvisionedThroughput: {
+                                ReadCapacityUnits: 1,
+                                WriteCapacityUnits: 1
+                            }
+                        },
+                    ],
+                    ProvisionedThroughput: {
+                        ReadCapacityUnits: 1,
+                        WriteCapacityUnits: 1
+                    },
+                }
+            },
+            TimelineTable: {
+                Type: "AWS::DynamoDB::Table",
+                Properties: {
+                    TableName: `${resourcePrefix}-timeline`,
+                    TimeToLiveSpecification: {
+                        AttributeName: "expiresAt",
+                        Enabled: true
+                    },
+                    AttributeDefinitions: [
+                        {
+                            AttributeName: "pkey",
+                            AttributeType: "S",
+                        },
+                        {
+                            AttributeName: "skey",
+                            AttributeType: "S",
+                        },
+                        {
+                            AttributeName: "accountId",
+                            AttributeType: "S",
+                        }
+                    ],
+                    KeySchema: [
+                        {
+                            AttributeName: "pkey",
+                            KeyType: "HASH"
+                        },
+                        {
+                            AttributeName: "skey",
+                            KeyType: "RANGE"
+                        }],
+                    GlobalSecondaryIndexes: [
+                        {
+                            IndexName: 'account-index',
+                            KeySchema: [{AttributeName: 'accountId', KeyType: 'HASH'},
+                                {AttributeName: 'skey', KeyType: 'RANGE'}
+                            ],
+                            Projection: {ProjectionType: 'ALL'},
+                            ProvisionedThroughput: {
+                                ReadCapacityUnits: 1,
+                                WriteCapacityUnits: 1
+                            }
+                        }],
+                    ProvisionedThroughput: {
+                        ReadCapacityUnits: 1,
+                        WriteCapacityUnits: 1
+                    },
                 }
             },
             StatusesTable: {
@@ -209,6 +306,7 @@ export const serverlessConfiguration: AWS = {
                         {AttributeName: 'inReplyToId', AttributeType: 'S'},
                         {AttributeName: 'conversationId', AttributeType: 'S'},
                         {AttributeName: 'accountId', AttributeType: 'S'},
+                        {AttributeName: 'createdAt', AttributeType: 'N'},
                     ],
                     KeySchema: [
                         {
@@ -240,7 +338,8 @@ export const serverlessConfiguration: AWS = {
                         },
                         {
                             IndexName: 'in-reply-to-account-index',
-                            KeySchema: [{AttributeName: 'inReplyToAccountId', KeyType: 'HASH'}],
+                            KeySchema: [{AttributeName: 'inReplyToAccountId', KeyType: 'HASH'},
+                                {AttributeName: 'createdAt', KeyType: 'RANGE'}],
                             Projection: {ProjectionType: 'ALL'},
                             ProvisionedThroughput: {
                                 ReadCapacityUnits: 1,
@@ -249,7 +348,9 @@ export const serverlessConfiguration: AWS = {
                         },
                         {
                             IndexName: 'in-reply-to-index',
-                            KeySchema: [{AttributeName: 'inReplyToId', KeyType: 'HASH'}],
+                            KeySchema: [{AttributeName: 'inReplyToId', KeyType: 'HASH'},
+                                {AttributeName: 'createdAt', KeyType: 'RANGE'}
+                            ],
                             Projection: {ProjectionType: 'ALL'},
                             ProvisionedThroughput: {
                                 ReadCapacityUnits: 1,
@@ -258,7 +359,9 @@ export const serverlessConfiguration: AWS = {
                         },
                         {
                             IndexName: 'conversation-index',
-                            KeySchema: [{AttributeName: 'conversationId', KeyType: 'HASH'}],
+                            KeySchema: [{AttributeName: 'conversationId', KeyType: 'HASH'},
+                                {AttributeName: 'createdAt', KeyType: 'RANGE'}
+                            ],
                             Projection: {ProjectionType: 'ALL'},
                             ProvisionedThroughput: {
                                 ReadCapacityUnits: 1,
@@ -267,7 +370,10 @@ export const serverlessConfiguration: AWS = {
                         },
                         {
                             IndexName: 'account-index',
-                            KeySchema: [{AttributeName: 'accountId', KeyType: 'HASH'}],
+                            KeySchema: [
+                                {AttributeName: 'accountId', KeyType: 'HASH'},
+                                {AttributeName: 'createdAt', KeyType: 'RANGE'}
+                            ],
                             Projection: {ProjectionType: 'ALL'},
                             ProvisionedThroughput: {
                                 ReadCapacityUnits: 1,
@@ -279,6 +385,9 @@ export const serverlessConfiguration: AWS = {
                         ReadCapacityUnits: 1,
                         WriteCapacityUnits: 1
                     },
+                    StreamSpecification: {
+                        StreamViewType: 'NEW_IMAGE'
+                    }
                 }
             },
         },
@@ -319,6 +428,30 @@ export const serverlessConfiguration: AWS = {
                     Name: `${resourcePrefix}-TagsTableName`
                 }
             },
+            TimeSeriesTableArn: {
+                Value: {'Fn::GetAtt': ['TimeSeriesTable', 'Arn']},
+                Export: {
+                    Name: `${resourcePrefix}-TimeSeriesTableArn`
+                }
+            },
+            TimeSeriesTableName: {
+                Value: {Ref: 'TimeSeriesTable'},
+                Export: {
+                    Name: `${resourcePrefix}-TimeSeriesTableName`
+                }
+            },
+            TimelineTableArn: {
+                Value: {'Fn::GetAtt': ['TimelineTable', 'Arn']},
+                Export: {
+                    Name: `${resourcePrefix}-TimelineTableArn`
+                }
+            },
+            TimelineTableName: {
+                Value: {Ref: 'TimelineTable'},
+                Export: {
+                    Name: `${resourcePrefix}-TimelineTableName`
+                }
+            },
             StatusesTableArn: {
                 Value: {'Fn::GetAtt': ['StatusesTable', 'Arn']},
                 Export: {
@@ -329,6 +462,30 @@ export const serverlessConfiguration: AWS = {
                 Value: {Ref: 'StatusesTable'},
                 Export: {
                     Name: `${resourcePrefix}-StatusesTableName`
+                }
+            },
+            StatusesTableStream: {
+                Value: {
+                    'Fn::GetAtt': ['StatusesTable', 'StreamArn']
+                },
+                Export: {
+                    Name: `${resourcePrefix}-StatusesTableStreamArn`
+                }
+            },
+            AccountsTableStream: {
+                Value: {
+                    'Fn::GetAtt': ['AccountsTable', 'StreamArn']
+                },
+                Export: {
+                    Name: `${resourcePrefix}-AccountsTableStreamArn`
+                }
+            },
+            TagsTableStream: {
+                Value: {
+                    'Fn::GetAtt': ['TagsTable', 'StreamArn']
+                },
+                Export: {
+                    Name: `${resourcePrefix}-TagsTableStreamArn`
                 }
             }
         }

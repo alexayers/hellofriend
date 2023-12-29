@@ -3,22 +3,28 @@ import {RegisterUser} from "../model/authenticationDtos";
 import * as process from "process";
 import {generateKeyPairSync} from 'crypto';
 import {PersonActor} from "../activityPub/actors/personActor";
-import {accountRepository} from "../repository";
+import {accountRepository, statusRepository} from "../repository";
 import {v4 as uuidv4} from 'uuid';
+import {Follow} from "../model/follow";
+import {accountService, followService} from "./index";
+import {Status} from "../model/status";
 
 export class AccountService {
 
 
 
-    async createAccount(registerUser: RegisterUser): Promise<Account> {
+    async createAccount(registerUser: RegisterUser, sub: string): Promise<Account> {
 
         let keys: { privateKey: string, publicKey: string } = this.generatedKeys();
 
         let account: Account = {
-            pkey: uuidv4(),
+            pkey: sub,
             skey: `Account#${registerUser.username.toLowerCase()}`,
+            objectName: 'Account',
             displayName: registerUser.displayName,
             summary: "",
+            url: `https://www.${process.env.DOMAIN}/@${registerUser.username}`,
+            uri: `https://www.${process.env.DOMAIN}/users/${registerUser.username}`,
             followersUrl: `https://api.${process.env.DOMAIN}/${registerUser.username}/followers`,
             inboxUrl: `https://api.${process.env.DOMAIN}/${registerUser.username}/inbox`,
             outboxUrl: `https://api.${process.env.DOMAIN}/${registerUser.username}/outbox`,
@@ -47,6 +53,8 @@ export class AccountService {
             inboxUrl: `https://${domain}/${person.preferredUsername}/inbox`,
             outboxUrl: `https://${domain}/${person.preferredUsername}/outbox`,
             sharedInboxUrl: `https://${domain}/${person.preferredUsername}/shared-inbox`,
+            url: person.url,
+            uri: person.uri,
             summary: person.summary,
             webFingeredAt: Date.now(),
             headerFilename: person.image.filename,
@@ -68,9 +76,17 @@ export class AccountService {
     }
 
     async persistPerson(person: PersonActor, domain: string) : Promise<Account> {
+
+        let existingAccount :Account = await accountService.getByNormalizedUsernameDomain(person.preferredUsername, domain);
+
+        if (existingAccount) {
+            return existingAccount;
+        }
+
         let account: Account = {
             pkey: uuidv4(),
             skey: `Account#${person.preferredUsername.toLowerCase()}:${domain}`,
+            objectName: 'Account',
             displayName: person.name,
             followersUrl: `https://${domain}/${person.preferredUsername}/followers`,
             inboxUrl: `https://${domain}/${person.preferredUsername}/inbox`,
@@ -78,12 +94,14 @@ export class AccountService {
             sharedInboxUrl: `https://${domain}/${person.preferredUsername}/shared-inbox`,
             summary: person.summary,
             webFingeredAt: Date.now(),
-            headerFilename: person.image.filename,
-            headerRemotePath: person.image.url,
-            headerFileType: person.image.mediaType,
-            avatarFilename: person.icon.filename,
-            avatarRemotePath: person.icon.url,
-            avatarFileType: person.icon.mediaType,
+            url: person.url,
+            uri: person.uri,
+            headerFilename: person.image?.filename,
+            headerRemotePath: person.image?.url,
+            headerFileType: person.image?.mediaType,
+            avatarFilename: person.icon?.filename,
+            avatarRemotePath: person.icon?.url,
+            avatarFileType: person.icon?.mediaType,
             username: person.preferredUsername,
             publicKey: person.publicKey.publicKeyPem,
             indexable: true,
@@ -128,5 +146,38 @@ export class AccountService {
     }
 
 
+    async pinStatus(accountID: string, statusID: string): Promise<boolean> {
 
+        const status : Status = await statusRepository.getStatusById(statusID);
+
+        if (!status) {
+            return false;
+        }
+
+        await accountRepository.pinStatus(accountID, statusID);
+        return true;
+    }
+
+    async unpinStatus(accountID : string, statusID: string) : Promise<boolean> {
+
+        const status : Status = await statusRepository.getStatusById(statusID);
+
+        if (!status) {
+            return false;
+        }
+
+        await accountRepository.unpinStatus(accountID, statusID);
+        return true;
+    }
+
+    async getById(accountID: string) : Promise<Account> {
+        return await accountRepository.byId(accountID);
+    }
+
+
+    async getFollowing(accountID: string) {
+        let follows : Array<Follow> = await followService.getFollowing(accountID);
+
+
+    }
 }

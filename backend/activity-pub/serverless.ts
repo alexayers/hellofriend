@@ -23,6 +23,10 @@ export const serverlessConfiguration: AWS = {
         runtime: 'nodejs20.x',
         stage: 'dev',
         logRetentionInDays: 3,
+        tracing: {
+            lambda: true,
+            apiGateway: true,
+        },
         apiGateway: {
             minimumCompressionSize: 1024,
             shouldStartNameWithService: true,
@@ -39,15 +43,26 @@ export const serverlessConfiguration: AWS = {
             ACCOUNTS_TABLE: { "Fn::ImportValue": `${resourcePrefix}-AccountsTableName` },
             FOLLOWS_TABLE: { "Fn::ImportValue": `${resourcePrefix}-FollowsTableName` },
             STATUSES_TABLE: { "Fn::ImportValue": `${resourcePrefix}-StatusesTableName` },
+            TIMESERIES_TABLE: { "Fn::ImportValue": `${resourcePrefix}-TimeSeriesTableName` },
             TAGS_TABLE: { "Fn::ImportValue": `${resourcePrefix}-TagsTableName` },
             DOMAIN: '${self:custom.certificateName}',
             INBOUND_QUEUE: { 'Fn::ImportValue': `${resourcePrefix}-InboundQueueUrl` },
             OUTBOUND_QUEUE: { 'Fn::ImportValue': `${resourcePrefix}-OutboundQueueUrl` },
+            TIMELINE_QUEUE: { 'Fn::ImportValue': `${resourcePrefix}-TimelineQueueUrl` },
             FILES_BUCKET: { 'Fn::ImportValue': `${resourcePrefix}-FilesBucketName` },
         },
         iam: {
             role: {
+
                 statements: [
+                    {
+                        Effect: 'Allow',
+                        Action: [
+                            'xray:PutTraceSegments',
+                            'xray:PutTelemetryRecords',
+                        ],
+                        Resource: '*',
+                    },
                     {
                         Effect: 'Allow',
                         Action: [
@@ -70,7 +85,8 @@ export const serverlessConfiguration: AWS = {
                         ],
                         Resource: [
                             { "Fn::ImportValue": {"Fn::Sub": `${resourcePrefix}-InboundQueueArn`} },
-                            { "Fn::ImportValue": {"Fn::Sub": `${resourcePrefix}-OutboundQueueArn`} }
+                            { "Fn::ImportValue": {"Fn::Sub": `${resourcePrefix}-OutboundQueueArn`} },
+                            { "Fn::ImportValue": {"Fn::Sub": `${resourcePrefix}-TimelineQueueArn`} }
                         ]
                     },
                     {
@@ -106,6 +122,12 @@ export const serverlessConfiguration: AWS = {
                             { "Fn::ImportValue": `${resourcePrefix}-TagsTableArn` },
                             { "Fn::Join": ['', [
                                     { "Fn::ImportValue": `${resourcePrefix}-TagsTableArn` },
+                                    '/index/*'
+                                ]]
+                            },
+                            { "Fn::ImportValue": `${resourcePrefix}-TimeSeriesTableArn` },
+                            { "Fn::Join": ['', [
+                                    { "Fn::ImportValue": `${resourcePrefix}-TimeSeriesTableArn` },
                                     '/index/*'
                                 ]]
                             },

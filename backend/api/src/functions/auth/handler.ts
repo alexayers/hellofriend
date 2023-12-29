@@ -9,17 +9,17 @@ import {notValidResponse, successResponse} from "@libs/lambda/api-gateway";
 export const register = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
 
     let registerUser: RegisterUser = event.body as unknown as RegisterUser;
-    let result: boolean = await authenticationService.createCognitoUser(registerUser.email, registerUser.password);
+    let result: string = await authenticationService.createCognitoUser(registerUser.email, registerUser.password);
 
     if (result) {
 
-        let account: Account = await accountService.createAccount(registerUser);
+        let account: Account = await accountService.createAccount(registerUser, result);
 
         return successResponse({
             account
         });
     } else {
-        return notValidResponse("Error");
+        return notValidResponse("Unable to register account");
     }
 });
 

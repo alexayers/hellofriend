@@ -86,7 +86,7 @@ export interface Tombstone {
 
 export interface DeleteActivity extends Activity {
     to: Array<string>
-    object: Tombstone
+    object: Tombstone | string
     signature: Signature
 }
 

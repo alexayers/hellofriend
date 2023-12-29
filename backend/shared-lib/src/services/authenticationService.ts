@@ -15,7 +15,7 @@ export class AuthenticationService {
     constructor(private cognitoUserPoolClientId) {
     }
 
-    async createCognitoUser(email: string, password: string): Promise<boolean> {
+    async createCognitoUser(email: string, password: string): Promise<string> {
 
         const params = {
             ClientId: this.cognitoUserPoolClientId,
@@ -32,11 +32,12 @@ export class AuthenticationService {
         try {
             const command: SignUpCommand = new SignUpCommand(params);
             const response: SignUpCommandOutput = await client.send(command);
+
             console.log("User registration successful", response);
-            return true;
+            return response.UserSub;
         } catch (error) {
             console.error("Error in user registration", error);
-            return false;
+            return null;
         }
     }
 

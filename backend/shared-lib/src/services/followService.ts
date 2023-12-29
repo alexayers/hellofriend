@@ -1,10 +1,11 @@
 import {AcceptActivity, ActivityType, FollowActivity, UndoFollowActivity} from "../activityPub/activity/activities";
-import {accountService, fediverseService, followService, webFingerService} from "./index";
+import {accountService, fediverseService, outboundQueueService, webFingerService} from "./index";
 import {v4 as uuidv4} from 'uuid';
 import {Account} from "../model/account";
 import {actorFromUrl} from "../helpers/actorFromUrl";
 import {followerRepository} from "../repository";
 import {Follow} from "../model/follow";
+import console from "console";
 
 export class FollowService {
 
@@ -39,6 +40,7 @@ export class FollowService {
         }
 
         await followerRepository.persist({
+            objectName: "Follower",
             pkey: yourAccount.pkey,
             skey: `Follower#${followerAccount.pkey}`,
             uri: acceptActivity.id,
@@ -48,38 +50,69 @@ export class FollowService {
         await fediverseService.signedDelivery(acceptActivity, acceptActivity.object.actor);
     }
 
-    async generateFollowRequest(fromUsername: string, destination: string) : Promise<FollowActivity> {
+
+    async generateFollowRequest(fromAccountID: string, followAccountID: string) : Promise<FollowActivity> {
+
+        const promises = [
+            accountService.getById(fromAccountID),
+            accountService.getById(followAccountID)];
+
+        const results = await Promise.all(promises);
+
+        const yourAccount: Account = results[0] as unknown as Account;
+        const followAccount: Account = results[1] as unknown as Account;
+
         let followActivity = {
             '@context': "https://www.w3.org/ns/activitystreams",
-            actor: `https://www.${this.domain}/users/${fromUsername}`,
+            actor: `https://www.${this.domain}/users/${yourAccount.username}`,
             id: `https://www.${this.domain}/${uuidv4()}`,
-            object: destination,
+            object: followAccount.uri,
             type: ActivityType.Follow
         }
 
+        await outboundQueueService.queue(followActivity);
         return followActivity;
     }
 
-    async generateUnFollowRequest(fromUsername: string, destination: string) : Promise<UndoFollowActivity> {
+    async generateUnFollowRequest(fromAccountID: string, unFollowAccountID: string) : Promise<UndoFollowActivity> {
+
+        const promises = [
+            accountService.getById(fromAccountID),
+            accountService.getById(unFollowAccountID)];
+
+        const results = await Promise.all(promises);
+
+        const yourAccount: Account = results[0] as unknown as Account;
+        const followAccount: Account = results[1] as unknown as Account;
+
+        console.log(yourAccount);
+        console.log(followAccount);
+
         let unfollowActivity = {
             '@context': "https://www.w3.org/ns/activitystreams",
-            id: `https://www.${this.domain}/users/${fromUsername}#follows/${uuidv4()}/undo`,
+            id: `https://www.${this.domain}/users/${yourAccount.username}#follows/${uuidv4()}/undo`,
             type: ActivityType.Undo,
-            actor: `https://www.${this.domain}/users/${fromUsername}`,
+            actor: `https://www.${this.domain}/users/${yourAccount.username}`,
             object: {
                 '@context': "https://www.w3.org/ns/activitystreams",
-                actor: `https://www.${this.domain}/users/${fromUsername}`,
+                actor: `https://www.${this.domain}/users/${yourAccount.username}`,
                 id: `https://www.${this.domain}/${uuidv4()}`,
-                object: destination,
+                object: followAccount.uri,
                 type: ActivityType.Follow
             }
         }
+
+        console.log(unfollowActivity);
+
+        await outboundQueueService.queue(unfollowActivity);
+        await followerRepository.deleteFollowing(fromAccountID, unFollowAccountID);
 
         return unfollowActivity;
     }
 
     async sendUnFollowRequest(undoFollowActivity: UndoFollowActivity) : Promise<void> {
         await fediverseService.signedDelivery(undoFollowActivity, undoFollowActivity.object.object);
+
     }
 
     async sendFollowRequest(followActivity: FollowActivity) : Promise<void> {
@@ -100,6 +133,7 @@ export class FollowService {
         }
 
         await followerRepository.persist({
+            objectName: "Following",
             pkey: yourAccount.pkey,
             skey: `Following#${followingAccount.pkey}`,
             uri: followActivity.id,
@@ -118,5 +152,9 @@ export class FollowService {
             await followerRepository.persist(follow);
         }
 
+    }
+
+    async getFollowing(accountID: string) : Promise<Array<Follow>>{
+        return await followerRepository.getFollows(accountID);
     }
 }

@@ -1,17 +1,20 @@
-import {
-    ActivityNote,
-    AnnounceActivity,
-    CreateActivity,
-    DeleteActivity
-} from "../activityPub/activity/activities";
+import {ActivityNote, AnnounceActivity, CreateActivity, DeleteActivity} from "../activityPub/activity/activities";
 import {actorFromUrl} from "../helpers/actorFromUrl";
-import {accountService, fediverseService, tagService, webFingerService} from "./index";
+import {
+    accountService,
+    bookmarkService,
+    favoriteService,
+    fediverseService,
+    tagService,
+    webFingerService
+} from "./index";
 import {Status} from "../model/status";
 import {statusRepository} from "../repository";
 import {v4 as uuidv4} from 'uuid';
 import console from "console";
 import {StatusTag} from "../model/statusTag";
 import {Account} from "../model/account";
+import {StatusDto} from "../dto/statusDto";
 
 export class StatusService {
 
@@ -20,7 +23,7 @@ export class StatusService {
     }
 
 
-    async storeCreate(createActivity : CreateActivity) : Promise<Status> {
+    async storeCreate(createActivity : CreateActivity) : Promise<{status: Status, account: Account}> {
 
         let actor: { username: string, domain: string } = actorFromUrl(createActivity.actor);
         let account: Account = await accountService.getByNormalizedUsernameDomain(actor.username, actor.domain);
@@ -45,6 +48,7 @@ export class StatusService {
         let status : Status = {
             pkey: uuidv4(),
             skey:  `Author#${account.pkey}`,
+            objectName: "Status",
             accountId: account.pkey,
             content: createNote.content,
             conversationId: createNote.conversation,
@@ -77,14 +81,18 @@ export class StatusService {
         }
 
         await Promise.all(promises);
-        return status;
+        return {
+            status: status,
+            account: account
+        };
 
     }
 
     private async tagStatus(tagPkey: string, statusPkey: string)  : Promise<StatusTag> {
         return await statusRepository.tagStatus({
-            pkey: statusPkey,
-            skey: `Tag#${tagPkey}`
+            objectName: "Tag",
+            pkey: `${tagPkey}`,
+            skey: `Status#${statusPkey}`
         });
     }
 
@@ -101,6 +109,7 @@ export class StatusService {
             account = await accountService.getByNormalizedUsernameDomain(actor.username, actor.domain);
         }
 
+        // @ts-ignore
         let status : Status = await statusRepository.getByUri(deleteActivity.object.id);
 
         if (status && status.accountId == account.pkey) {
@@ -120,17 +129,20 @@ export class StatusService {
             await webFingerService.finger(actor.username,actor.domain);
         }
 
-        let boostedStatus : Status = await this.fetchStatus(announceActivity.object);
-        console.info(`Boosted ${boostedStatus.pkey}`);
+        let boostedStatus : {status: Status, account: Account} = await this.fetchStatus(announceActivity.object);
+        console.info(`Boosted ${boostedStatus.status.pkey}`);
     }
 
-    private async fetchStatus(uri: string) : Promise<Status>{
+    private async fetchStatus(uri: string) : Promise<{status: Status, account: Account}>{
 
         let status : Status = await statusRepository.getByUri(uri);
 
         if (status) {
             console.info(`I already have the boosted message ${uri}, no need to fetch.`);
-            return status;
+            return {
+                status: status,
+                account: null
+            };
         }
 
         console.debug(`I need to download ${uri}`);
@@ -149,5 +161,55 @@ export class StatusService {
         }
 
         return await this.storeCreate(createActivity);
+    }
+
+    async getStatus(accountID : string, statusID: string) : Promise<StatusDto> {
+
+        const status : Status = await statusRepository.getStatusById(statusID);
+
+        if (!status) {
+            return null;
+        }
+
+        const promises = [
+            accountService.getById(status.accountId),
+            bookmarkService.isBookmarked(accountID, statusID),
+            favoriteService.isFavorited(accountID, statusID)
+        ];
+
+        // Use Promise.all to wait for all promises to resolve
+        const results = await Promise.all(promises);
+
+        // Extract results
+        const account : Account = results[0] as unknown as Account;
+        const bookmarked : boolean = results[1] as unknown as boolean;
+        const favorited : boolean = results[2] as unknown as boolean;
+
+        return {
+            account: {
+                avatarFilename: account?.avatarFilename,
+                displayName: account.displayName,
+                domain: account?.domain,
+                id: account.pkey,
+                username: account.username
+            },
+            boosted: undefined,
+            id: statusID,
+            isBookmark: bookmarked,
+            isFavorite: favorited,
+            published: status.published,
+            replies: undefined,
+            spoilerText: status.spoilerText,
+            text: status.content,
+            totalLikes: 0,
+            uri: status.uri
+
+        }
+    }
+
+    async getStatusesByAccount(accountID: string) : Promise<Array<Status>> {
+        let statuses : Array<Status> = await statusRepository.getByAccountID(accountID);
+
+        return statuses;
     }
 }

@@ -118,6 +118,8 @@ export const serverlessConfiguration: AWS = {
                 },
             },
 
+
+
             /*
             -=-=-=-=-=-=-=-=-=-=-=-
                 S3
@@ -232,14 +234,53 @@ export const serverlessConfiguration: AWS = {
                 Type: 'AWS::SQS::Queue',
                 Properties: {
                     QueueName: `${resourcePrefix}-outbound-queue`,
+                    VisibilityTimeout: 120,
+                    RedrivePolicy: {
+                        deadLetterTargetArn: { 'Fn::GetAtt': ['OutboundDeadLetterQueue', 'Arn'] },
+                        maxReceiveCount: 5
+                    }
                 },
+            },
+            OutboundDeadLetterQueue: {
+                Type: 'AWS::SQS::Queue',
+                Properties: {
+                    QueueName: `${resourcePrefix}-outbound-dead-letter-queue`
+                }
             },
             InboundQueue: {
                 Type: 'AWS::SQS::Queue',
                 Properties: {
-                    QueueName: `${resourcePrefix}-inbound-queue`
+                    QueueName: `${resourcePrefix}-inbound-queue`,
+                    VisibilityTimeout: 120,
+                    RedrivePolicy: {
+                        deadLetterTargetArn: { 'Fn::GetAtt': ['InboundDeadLetterQueue', 'Arn'] },
+                        maxReceiveCount: 5
+                    }
                 },
             },
+            InboundDeadLetterQueue: {
+                Type: 'AWS::SQS::Queue',
+                Properties: {
+                    QueueName: `${resourcePrefix}-inbound-dead-letter-queue`
+                }
+            },
+            TimelineQueue: {
+                Type: 'AWS::SQS::Queue',
+                Properties: {
+                    QueueName: `${resourcePrefix}-timeline-queue`,
+                    VisibilityTimeout: 120,
+                    RedrivePolicy: {
+                        deadLetterTargetArn: { 'Fn::GetAtt': ['TimelineDeadLetterQueue', 'Arn'] },
+                        maxReceiveCount: 5
+                    }
+                },
+            },
+            TimelineDeadLetterQueue: {
+                Type: 'AWS::SQS::Queue',
+                Properties: {
+                    QueueName: `${resourcePrefix}-timeline-dead-letter-queue`
+                }
+            }
         },
         Outputs: {
             CognitoUserPoolClientId: {
@@ -247,6 +288,13 @@ export const serverlessConfiguration: AWS = {
                 Value: { "Fn::GetAtt": ["CognitoUserPoolClient", "ClientId"] },
                 Export: {
                     Name: `${resourcePrefix}-CognitoUserPoolClientId`
+                }
+            },
+            CognitoUserPoolClientArn: {
+                Description: "The HelloFriend Cognito User Pool Client Arn",
+                Value: { "Fn::GetAtt": ["CognitoUserPool", "Arn"] },
+                Export: {
+                    Name: `${resourcePrefix}-CognitoUserPoolArn`
                 }
             },
             OutboundQueueUrl: {
@@ -275,6 +323,20 @@ export const serverlessConfiguration: AWS = {
                 Value: { 'Fn::GetAtt': ['InboundQueue', 'Arn'] },
                 Export: {
                     Name: `${resourcePrefix}-InboundQueueArn`,
+                },
+            },
+            TimelineQueueUrl: {
+                Description: "The URL of the Fediverse Timeline Queue",
+                Value: { 'Fn::GetAtt': ['TimelineQueue', 'QueueName'] },
+                Export: {
+                    Name: `${resourcePrefix}-TimelineQueueUrl`,
+                },
+            },
+            TimelineQueueArn: {
+                Description: "The ARN of the Fediverse Timeline Queue",
+                Value: { 'Fn::GetAtt': ['TimelineQueue', 'Arn'] },
+                Export: {
+                    Name: `${resourcePrefix}-TimelineQueueArn`,
                 },
             },
             FilesBucketName: {

@@ -1,5 +1,5 @@
 {
-  "name": "hello-friend-infra",
+  "name": "hello-friend-opensearch",
   "version": "1.0.0",
   "description": "Infrastructure for Hello Friend",
   "main": "serverless.ts",
@@ -21,6 +21,7 @@
     "esbuild": "0.14.54",
     "json-schema-to-ts": "^1.5.0",
     "serverless": "^3.0.0",
+    "serverless-domain-manager": "^7.3.3",
     "serverless-esbuild": "^1.50.0",
     "ts-node": "^10.4.0",
     "tsconfig-paths": "^3.9.0",

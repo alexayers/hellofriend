@@ -26,7 +26,93 @@ export class FileSystemService {
         });
     }
 
+
     async processPerson(person: PersonActor): Promise<PersonActor> {
+
+        const downloadPromises = [];
+
+
+        if (person.icon && person.icon.url) {
+            console.info(`Downloading avatar for ${person.preferredUsername}`);
+            downloadPromises.push(fetch(person.icon.url, {
+                method: 'get',
+                headers: {
+                    "Accept": person.icon.mediaType
+                }
+            }));
+        }
+
+        if (person.image && person.image.url) {
+            console.info(`Downloading header for ${person.preferredUsername}`);
+            downloadPromises.push(fetch(person.image.url, {
+                method: 'get',
+                headers: {
+                    "Accept": person.image.mediaType
+                }
+            }));
+        }
+
+        const downloadResults = await Promise.all(downloadPromises);
+        const uploadPromises = [];
+
+        if (person.icon && person.icon.url) {
+            try {
+                let extension: string = person.icon.mediaType.split("/")[1];
+                let avatarPath: string = `avatars/${uuidv4()}.${extension}`;
+
+                let avatarFilename: string = `${this.s3Bucket}/${avatarPath}`;
+                let data: ArrayBuffer = await downloadResults[0].arrayBuffer();
+
+                uploadPromises.push(this.uploadData(this.s3Bucket, {
+                    key: avatarPath,
+                    body: Buffer.from(data),
+                    contentType: person.icon.mediaType
+                }));
+
+                person.icon.filename = avatarPath;
+                person.icon.size = Buffer.from(data).byteLength;
+
+                console.info(`Wrote avatar to ${avatarFilename}`);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        if (person.image && person.image.url) {
+            console.info(`Downloading header for ${person.preferredUsername}`);
+            const response = await fetch(person.image.url, {
+                method: 'get',
+                headers: {
+                    "Accept": person.image.mediaType
+                }
+            });
+
+            try {
+                let extension: string = person.image.mediaType.split("/")[1];
+                let headerPath: string = `headers/${uuidv4()}.${extension}`;
+                let headerFilename: string = `${this.s3Bucket}/${headerPath}`;
+                let data: ArrayBuffer = await response[1].arrayBuffer();
+
+                uploadPromises.push(this.uploadData(this.s3Bucket, {
+                    key: headerPath,
+                    body: Buffer.from(data),
+                    contentType: person.image.mediaType
+                }));
+                person.image.filename = headerPath;
+                person.image.size = Buffer.from(data).byteLength;
+
+                console.info(`Wrote header to ${headerFilename}`);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        await Promise.all(uploadPromises);
+
+        return person;
+    }
+    
+    async processPerson2(person: PersonActor): Promise<PersonActor> {
 
         if (person.icon && person.icon.url) {
             console.info(`Downloading avatar for ${person.preferredUsername}`);
@@ -52,7 +138,6 @@ export class FileSystemService {
                 });
                 person.icon.filename = avatarPath;
                 person.icon.size = Buffer.from(data).byteLength;
-
 
                 console.info(`Wrote avatar to ${avatarFilename}`);
             } catch (e) {

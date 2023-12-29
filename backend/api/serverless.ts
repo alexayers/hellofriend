@@ -1,6 +1,25 @@
 import type {AWS} from '@serverless/typescript';
 import {login, register} from "@functions/auth";
 import configuration from "../configuration";
+import {
+  followAccount,
+  getAccount,
+  getBookmarks,
+  getFavorites, getStatuses,
+  unFollowAccount,
+  updateAccount
+} from "@functions/account";
+import {exploreAccounts, explorePosts, exploreTags} from "@functions/explore";
+import {search} from "@functions/search";
+import {
+  bookmarkStatus,
+  deleteStatus,
+  favoriteStatus,
+  getStatus, pinStatus,
+  postStatus, removeBookmark, removeFavorite,
+  replyToStatus, unPinStatus,
+  updateStatus
+} from "@functions/status";
 
 
 // We'll use this resourcePrefix for all our resources: dynamoDB, Cognito, etc
@@ -17,6 +36,10 @@ export const serverlessConfiguration: AWS = {
     name: 'aws',
     runtime: 'nodejs20.x',
     stage: 'dev',
+    tracing: {
+      lambda: true,
+      apiGateway: true,
+    },
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
@@ -27,11 +50,26 @@ export const serverlessConfiguration: AWS = {
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       COGNITO_CLIENT_ID: { "Fn::ImportValue": `${resourcePrefix}-CognitoUserPoolClientId` },
       ACCOUNTS_TABLE: { "Fn::ImportValue": `${resourcePrefix}-AccountsTableName` },
+      FOLLOWS_TABLE: { "Fn::ImportValue": `${resourcePrefix}-FollowsTableName` },
+      STATUSES_TABLE: { "Fn::ImportValue": `${resourcePrefix}-StatusesTableName` },
+      TIMESERIES_TABLE: { "Fn::ImportValue": `${resourcePrefix}-TimeSeriesTableName` },
+      TIMELINE_TABLE: { "Fn::ImportValue": `${resourcePrefix}-TimelineTableName` },
+      OUTBOUND_QUEUE: { 'Fn::ImportValue': `${resourcePrefix}-OutboundQueueUrl` },
+      FILES_BUCKET: { 'Fn::ImportValue': `${resourcePrefix}-FilesBucketName` },
+      TAGS_TABLE: { "Fn::ImportValue": `${resourcePrefix}-TagsTableName` },
       DOMAIN: '${self:custom.certificateName}'
     },
     iam: {
       role: {
         statements: [
+          {
+            Effect: 'Allow',
+            Action: [
+              'xray:PutTraceSegments',
+              'xray:PutTelemetryRecords',
+            ],
+            Resource: '*',
+          },
           {
             Effect: 'Allow',
             Action: [
@@ -46,6 +84,15 @@ export const serverlessConfiguration: AWS = {
               `arn:aws:s3:::files.${domain}`,
               `arn:aws:s3:::files.${domain}/*`,
             ],
+          },
+          {
+            Effect: 'Allow',
+            Action: [
+              'sqs:SendMessage'
+            ],
+            Resource: [
+              { "Fn::ImportValue": {"Fn::Sub": `${resourcePrefix}-OutboundQueueArn`} }
+            ]
           },
           {
             Effect: "Allow",
@@ -65,13 +112,61 @@ export const serverlessConfiguration: AWS = {
                   '/index/*'
                 ]]
               },
+              { "Fn::ImportValue": `${resourcePrefix}-StatusesTableArn` },
+              { "Fn::Join": ['', [
+                  { "Fn::ImportValue": `${resourcePrefix}-StatusesTableArn` },
+                  '/index/*'
+                ]]
+              },
+              { "Fn::ImportValue": `${resourcePrefix}-FollowsTableArn` },
+              { "Fn::Join": ['', [
+                  { "Fn::ImportValue": `${resourcePrefix}-FollowsTableArn` },
+                  '/index/*'
+                ]]
+              },
+              { "Fn::ImportValue": `${resourcePrefix}-TagsTableArn` },
+              { "Fn::Join": ['', [
+                  { "Fn::ImportValue": `${resourcePrefix}-TagsTableArn` },
+                  '/index/*'
+                ]]
+              },
+              { "Fn::ImportValue": `${resourcePrefix}-TimeSeriesTableArn` },
+              { "Fn::Join": ['', [
+                  { "Fn::ImportValue": `${resourcePrefix}-TimeSeriesTableArn` },
+                  '/index/*'
+                ]]
+              },
             ]
           }],
       },
     }
   },
   // import the function via paths
-  functions: {login, register},
+  functions: {login,
+    register,
+    updateAccount,
+    getBookmarks,
+    getFavorites,
+    followAccount,
+    unFollowAccount,
+    getAccount,
+    getStatuses,
+    explorePosts,
+    exploreTags,
+    exploreAccounts,
+    search,
+    postStatus,
+    getStatus,
+    updateStatus,
+    deleteStatus,
+    replyToStatus,
+    favoriteStatus,
+    removeFavorite,
+    bookmarkStatus,
+    removeBookmark,
+    pinStatus,
+    unPinStatus
+  },
   package: {individually: true},
   custom: {
     certificateName: `${domain}`,
@@ -102,7 +197,22 @@ export const serverlessConfiguration: AWS = {
     }
   },
   resources: {
-    Resources: {}
+    Resources: {
+      CognitoUserPoolAuthorizer: {
+        Type: 'AWS::ApiGateway::Authorizer',
+        Properties: {
+          Name: `${resourcePrefix}-cognito-authorizer`,
+          Type: 'COGNITO_USER_POOLS',
+          IdentitySource: 'method.request.header.Authorization',
+          RestApiId: {
+            Ref: 'ApiGatewayRestApi',
+          },
+          ProviderARNs: [
+            { "Fn::ImportValue": `${resourcePrefix}-CognitoUserPoolArn` }
+          ],
+        },
+      },
+    }
   },
 };
 
