@@ -35,6 +35,7 @@ export const serverlessConfiguration: AWS = {
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       COGNITO_CLIENT_ID: { "Fn::ImportValue": `${resourcePrefix}-CognitoUserPoolClientId` },
       TIMELINE_QUEUE: { 'Fn::ImportValue': `${resourcePrefix}-TimelineQueueUrl` },
+      OPENSEARCH_ENDPOINT: { 'Fn::ImportValue': `${resourcePrefix}-OpenSearchEndpoint` },
       DOMAIN: '${self:custom.certificateName}'
     },
     iam: {

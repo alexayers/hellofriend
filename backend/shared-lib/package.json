@@ -19,6 +19,7 @@
     "@middy/core": "^3.4.0",
     "@middy/http-json-body-parser": "^3.4.0",
     "aws-xray-sdk-core": "^3.5.3",
+    "aws4": "^1.12.0",
     "node-fetch": "^2.7.0",
     "serverless-dynamodb-local": "^1.0.2",
     "uuid": "^9.0.1"

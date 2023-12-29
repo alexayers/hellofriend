@@ -13,6 +13,7 @@ import {FavoriteService} from "./favoriteService";
 import {BookmarkService} from "./bookmarkService";
 import {SearchService} from "./searchService";
 import {TimelineService} from "./timelineService";
+import {OpenSearchService} from "./openSearchService";
 
 
 const accountService: AccountService = new AccountService();
@@ -40,6 +41,8 @@ const tagService : TagService = new TagService();
 
 const timeSeriesService : TimelineService = new TimelineService();
 
+const openSearchService: OpenSearchService = new OpenSearchService();
+
 export {accountService,
     webFingerService,
     authenticationService,
@@ -56,5 +59,6 @@ export {accountService,
     searchService,
     timelineService,
     timeSeriesService,
-    timelineQueueService
+    timelineQueueService,
+    openSearchService
 };

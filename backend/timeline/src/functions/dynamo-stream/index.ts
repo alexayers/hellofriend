@@ -51,3 +51,43 @@ export const dynamoDbStreamStatusesProcessor = {
         },
     ],
 };
+
+/*
+(async() =>{
+    console.log("Creating indices if needed...");
+    const endpoint:string = process.env.OPENSEARCH_ENDPOINT;
+    console.log(`Verifying existence of Index account-index on node: ${endpoint}`);
+
+    // Check if the index exists
+    const existsResponse = await fetch(`${endpoint}/account-index`, { method: 'HEAD' });
+    if (!existsResponse.ok) {
+
+        const createResponse = await fetch(endpoint, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                mappings: {
+                    properties: {
+                        id: { type: 'keyword' },
+                        username: { type: 'text' },
+                        displayName: { type: 'text' },
+                        summary: { type: 'text' }
+                    }
+                }
+            })
+        });
+
+        if (createResponse.ok) {
+            console.log(`Index account created`);
+        } else {
+            console.error('Error creating index:', await createResponse.text());
+        }
+
+
+    } else {
+        console.log(`Index account-index already exists`);
+    }
+
+
+})();*/
+
