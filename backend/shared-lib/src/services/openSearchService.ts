@@ -315,7 +315,7 @@ export class OpenSearchService {
         const endpoint = `https://${OpenSearchService.OPENSEARCH_ENDPOINT}/${OpenSearchService.STATUS_INDEX}/_search`;
         const query = {
             query: {
-                wildcard: {
+                match: {
                     status: `*${searchString.toLowerCase()}*`
                 }
             }
