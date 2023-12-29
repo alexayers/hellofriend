@@ -262,8 +262,8 @@ export class OpenSearchService {
             query: {
                 bool: {
                     should: [
-                        { wildcard: { username: `*${searchString.toLowerCase()}*` }},
-                        { wildcard: { displayName: `*${searchString.toLowerCase()}*` }}
+                        { match: { username: `*${searchString.toLowerCase()}*` }},
+                        { match: { displayName: `*${searchString.toLowerCase()}*` }}
                     ],
                     minimum_should_match: 1
                 }

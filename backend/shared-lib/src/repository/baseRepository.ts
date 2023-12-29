@@ -59,7 +59,7 @@ export class BaseRepository {
                         skey: `${object.objectName}#${Date.now()}`,
                         objectName: object.objectName,
                         compoundKey: `${object.pkey}$$${object.skey}`,
-
+                        object: object
                     }
                 });
 
