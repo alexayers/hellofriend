@@ -227,7 +227,7 @@ export class BaseRepository {
         }
     }
 
-    protected async deleteTimeSeries(pkey: string, skey: string) : Promise<void> {
+    protected async deleteTimeSeries(pkey: string, skey: string) : Promise<boolean> {
 
         const params = {
             TableName: process.env.TIMESERIES_TABLE,
@@ -238,8 +238,27 @@ export class BaseRepository {
             }
         }
 
-        let result: BaseModel = await this.queryForOne(params) as BaseModel;
-        await this.deleteItemByPkeyAndSkey(process.env.TIMESERIES_TABLE, result.pkey, result.skey);
+        let result: {pkey : string, skey : number} = await this.queryForOne(params) as {pkey : string, skey : number};
 
+        try {
+            const command: DeleteItemCommand = new DeleteItemCommand(
+                {
+                    TableName: process.env.TIMESERIES_TABLE,
+                    Key: {
+                        "pkey": { S: result.pkey },
+                        // @ts-ignore
+                        "skey": { N: result.skey }
+                    }
+                });
+            const response: DeleteItemCommandOutput = await client.send(command);
+            console.log("Item deleted successfully", response);
+
+            await this.deleteTimeSeries(pkey, skey);
+
+            return true;
+        } catch (error) {
+            console.error("Error deleting item:", error);
+            return false;
+        }
     }
 }

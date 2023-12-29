@@ -31,3 +31,4 @@ This will make use of the following AWS Services
 - IAM
 - Certificate Manager
 - XRay
+- OpenSearch

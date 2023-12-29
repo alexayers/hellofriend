@@ -6,7 +6,7 @@ import {PersonActor} from "../activityPub/actors/personActor";
 import {accountRepository, statusRepository} from "../repository";
 import {v4 as uuidv4} from 'uuid';
 import {Follow} from "../model/follow";
-import {followService} from "./index";
+import {accountService, followService} from "./index";
 import {Status} from "../model/status";
 
 export class AccountService {
@@ -76,6 +76,13 @@ export class AccountService {
     }
 
     async persistPerson(person: PersonActor, domain: string) : Promise<Account> {
+
+        let existingAccount :Account = await accountService.getByNormalizedUsernameDomain(person.preferredUsername, domain);
+
+        if (existingAccount) {
+            return existingAccount;
+        }
+
         let account: Account = {
             pkey: uuidv4(),
             skey: `Account#${person.preferredUsername.toLowerCase()}:${domain}`,

@@ -1,11 +1,34 @@
 import fetch from "node-fetch";
 import aws4 from "aws4";
 
+
+interface BaseSearchResults {
+    took:number
+    timed_out: boolean
+    _shards: {
+        total: number
+        successful: number
+        skipped: number
+        failed: number
+    },
+    hits: {
+        total: {
+            value: number
+            relation: string
+        },
+        max_score: number
+        hits: any
+    }
+}
+
 export interface AccountSearchData {
     id: string
     username: string
     displayName: string
+    domain: string
     summary: string
+    avatarFilename:  string
+    headerFilename: string
 }
 
 export interface TagSearchData {
@@ -16,6 +39,12 @@ export interface TagSearchData {
 export interface StatusSearchData {
     id: string
     status: string
+    displayName: string
+    domain: string
+    username: string
+    avatarFilename:  string
+    published:  string
+    language: string
 }
 
 export class OpenSearchService {
@@ -33,7 +62,10 @@ export class OpenSearchService {
                     id: { type: 'keyword' },
                     username: { type: 'text' },
                     displayName: { type: 'text' },
-                    summary: { type: 'text' }
+                    domain: {type: 'text'},
+                    summary: { type: 'text' },
+                    avatarFilename:  { type: 'text' },
+                    headerFilename: { type: 'text' },
                 }
             }
         });
@@ -83,7 +115,13 @@ export class OpenSearchService {
             mappings: {
                 properties: {
                     id: { type: 'keyword' },
-                    status: { type: 'text' }
+                    status: { type: 'text' },
+                    displayName: {type: 'text'},
+                    domain: {type: 'text'},
+                    username: {type: 'text'},
+                    avatarFilename:  { type: 'text' },
+                    published:  { type: 'text' },
+                    language:  { type: 'text' },
                 }
             }
         });
@@ -103,7 +141,8 @@ export class OpenSearchService {
 
     }
 
-    private async signAndSend(request: any) : Promise<void> {
+    private async signAndSend(request: any) : Promise<any> {
+
         aws4.sign(request, {
             accessKeyId: process.env.AWS_ACCESS_KEY_ID,
             secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
@@ -119,21 +158,263 @@ export class OpenSearchService {
 
             const data = await response.json();
             console.log('Response:', data);
+            return data;
         } catch (error) {
             console.error('Error:', error);
         }
     }
 
     async storeAccount(accountSearchData : AccountSearchData) : Promise<void> {
+        const endpoint: string = `https://${OpenSearchService.OPENSEARCH_ENDPOINT}/${OpenSearchService.ACCOUNT_INDEX}/_doc`
 
+        const body : string = JSON.stringify(accountSearchData);
+
+
+        const request = {
+            host: OpenSearchService.OPENSEARCH_ENDPOINT,
+            method: 'POST',
+            url: endpoint,
+            path: `/${OpenSearchService.ACCOUNT_INDEX}/_doc`,
+            body: body,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+
+        await this.signAndSend(request);
     }
 
     async storeTag(tagSearchData : TagSearchData) : Promise<void> {
+        const endpoint: string = `https://${OpenSearchService.OPENSEARCH_ENDPOINT}/${OpenSearchService.TAG_INDEX}/_doc`
 
+        const body : string = JSON.stringify(tagSearchData);
+
+        const request = {
+            host: OpenSearchService.OPENSEARCH_ENDPOINT,
+            method: 'POST',
+            url: endpoint,
+            path: `/${OpenSearchService.TAG_INDEX}/_doc`,
+            body: body,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+
+        await this.signAndSend(request);
     }
 
     async storeStatus(statusSearchData : StatusSearchData) : Promise<void> {
+        const endpoint: string = `https://${OpenSearchService.OPENSEARCH_ENDPOINT}/${OpenSearchService.STATUS_INDEX}/_doc`
+
+        const body : string = JSON.stringify(statusSearchData);
+
+        const request = {
+            host: OpenSearchService.OPENSEARCH_ENDPOINT,
+            method: 'POST',
+            url: endpoint,
+            path: `/${OpenSearchService.STATUS_INDEX}/_doc`,
+            body: body,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+
+        await this.signAndSend(request);
+    }
+
+    async deleteAccountIndex() {
+        const endpoint: string = `https://${OpenSearchService.OPENSEARCH_ENDPOINT}/${OpenSearchService.ACCOUNT_INDEX}`;
+
+        const request = {
+            host: OpenSearchService.OPENSEARCH_ENDPOINT,
+            method: 'DELETE',
+            url: endpoint,
+            path: `/${OpenSearchService.ACCOUNT_INDEX}`,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+
+        await this.signAndSend(request);
+    }
+
+    async deleteStatusIndex() {
+        const endpoint: string = `https://${OpenSearchService.OPENSEARCH_ENDPOINT}/${OpenSearchService.STATUS_INDEX}`;
+
+        const request = {
+            host: OpenSearchService.OPENSEARCH_ENDPOINT,
+            method: 'DELETE',
+            url: endpoint,
+            path: `/${OpenSearchService.STATUS_INDEX}`,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+
+        await this.signAndSend(request);
+    }
+
+    async deleteTagIndex() {
+        const endpoint: string = `https://${OpenSearchService.OPENSEARCH_ENDPOINT}/${OpenSearchService.TAG_INDEX}`;
+
+        const request = {
+            host: OpenSearchService.OPENSEARCH_ENDPOINT,
+            method: 'DELETE',
+            url: endpoint,
+            path: `/${OpenSearchService.TAG_INDEX}`,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+
+        await this.signAndSend(request);
+    }
+
+    async searchAccounts(searchString: string) : Promise<Array<AccountSearchData>> {
+        const endpoint = `https://${OpenSearchService.OPENSEARCH_ENDPOINT}/${OpenSearchService.ACCOUNT_INDEX}/_search`;
+        const query = {
+            query: {
+                bool: {
+                    should: [
+                        { wildcard: { username: `*${searchString}*` }},
+                        { wildcard: { displayName: `*${searchString}*` }}
+                    ],
+                    minimum_should_match: 1
+                }
+            }
+        }
+
+        console.log(query);
+
+        const body = JSON.stringify(query);
+
+        const request = {
+            host: OpenSearchService.OPENSEARCH_ENDPOINT,
+            method: 'POST',
+            url: endpoint,
+            path: `/${OpenSearchService.ACCOUNT_INDEX}/_search`,
+            body: body,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+
+        console.log(request);
+
+        const response = await this.signAndSend(request);
+
+        let accountResults : Array<AccountSearchData> = [];
+
+        for (const hit of response.hits.hits) {
+
+            console.log(hit);
+
+            let source = hit._source;
+
+            accountResults.push({
+                avatarFilename: source?.avatarFilename,
+                displayName: source.displayName,
+                domain: source?.domain,
+                headerFilename: source?.headerFilename,
+                id: source.id,
+                summary: source?.summary,
+                username: source.username
+            });
+        }
+
+        return accountResults;
+    }
+
+    async searchStatuses(searchString: string) : Promise<Array<StatusSearchData>> {
+        const endpoint = `https://${OpenSearchService.OPENSEARCH_ENDPOINT}/${OpenSearchService.STATUS_INDEX}/_search`;
+        const query = {
+            query: {
+                wildcard: {
+                    username: `*${searchString}*`
+                }
+            }
+        };
+
+        const body = JSON.stringify(query);
+
+        const request = {
+            host: OpenSearchService.OPENSEARCH_ENDPOINT,
+            method: 'POST',
+            url: endpoint,
+            path: `/${OpenSearchService.STATUS_INDEX}/_search`,
+            body: body,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+
+        const response = await this.signAndSend(request);
+
+        let statusSearchData : Array<StatusSearchData> = [];
+
+        for (const hit of response.hits.hits) {
+
+            console.log(hit);
+
+            let source = hit._source;
+
+            statusSearchData.push({
+                avatarFilename: source?.avatarFilename,
+                displayName: source.displayName,
+                domain: source?.domain,
+                id: source.id,
+                language: source?.language,
+                published: source.published,
+                status: source?.status,
+                username: source.username
+
+            });
+        }
+
+        return statusSearchData;
 
     }
 
+    async searchTags(searchString: string) : Promise<Array<TagSearchData>> {
+        const endpoint = `https://${OpenSearchService.OPENSEARCH_ENDPOINT}/${OpenSearchService.TAG_INDEX}/_search`;
+        const query = {
+            query: {
+                wildcard: {
+                    tag: `*${searchString}*`
+                }
+            }
+        };
+
+        const body = JSON.stringify(query);
+
+        const request = {
+            host: OpenSearchService.OPENSEARCH_ENDPOINT,
+            method: 'POST',
+            url: endpoint,
+            path: `/${OpenSearchService.TAG_INDEX}/_search`,
+            body: body,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+
+        const response = await this.signAndSend(request);
+
+        let tagSearchData : Array<TagSearchData> = [];
+
+        for (const hit of response.hits.hits) {
+
+            console.log(hit);
+
+            let source = hit._source;
+
+            tagSearchData.push({
+                id: source.id,
+                tag: source.tag
+            });
+        }
+
+        return tagSearchData;
+
+    }
 }

@@ -8,6 +8,7 @@ This project must be deployed before the client project.
     2. infra
     3. database
     4. cloudfront
+    5. elasticsearch
 
 ### First Time setup
 
@@ -15,6 +16,8 @@ This project must be deployed before the client project.
 
 1. Run `npm i` to install your dependencies
 2. Run `npm run deploy` to deploy the stack
+3. Authenticate against the API project
+4. Hit **POST** `https://<domain>/timeline/search/indices`
 
 ### Updates
 
