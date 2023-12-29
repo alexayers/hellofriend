@@ -20,8 +20,6 @@ import {
   replyToStatus, unPinStatus,
   updateStatus
 } from "@functions/status";
-import {getTimeline, getTimelineByTag} from "@functions/timeline";
-import {timelineQueueProcessor} from "@functions/timeline-queue";
 
 
 // We'll use this resourcePrefix for all our resources: dynamoDB, Cognito, etc
@@ -57,7 +55,6 @@ export const serverlessConfiguration: AWS = {
       TIMESERIES_TABLE: { "Fn::ImportValue": `${resourcePrefix}-TimeSeriesTableName` },
       TIMELINE_TABLE: { "Fn::ImportValue": `${resourcePrefix}-TimelineTableName` },
       OUTBOUND_QUEUE: { 'Fn::ImportValue': `${resourcePrefix}-OutboundQueueUrl` },
-      TIMELINE_QUEUE: { 'Fn::ImportValue': `${resourcePrefix}-TimelineQueueUrl` },
       FILES_BUCKET: { 'Fn::ImportValue': `${resourcePrefix}-FilesBucketName` },
       TAGS_TABLE: { "Fn::ImportValue": `${resourcePrefix}-TagsTableName` },
       DOMAIN: '${self:custom.certificateName}'
@@ -94,8 +91,7 @@ export const serverlessConfiguration: AWS = {
               'sqs:SendMessage'
             ],
             Resource: [
-              { "Fn::ImportValue": {"Fn::Sub": `${resourcePrefix}-OutboundQueueArn`} },
-              { "Fn::ImportValue": {"Fn::Sub": `${resourcePrefix}-TimelineQueueArn`} }
+              { "Fn::ImportValue": {"Fn::Sub": `${resourcePrefix}-OutboundQueueArn`} }
             ]
           },
           {
@@ -140,12 +136,6 @@ export const serverlessConfiguration: AWS = {
                   '/index/*'
                 ]]
               },
-              { "Fn::ImportValue": `${resourcePrefix}-TimelineTableArn` },
-              { "Fn::Join": ['', [
-                  { "Fn::ImportValue": `${resourcePrefix}-TimelineTableArn` },
-                  '/index/*'
-                ]]
-              },
             ]
           }],
       },
@@ -175,10 +165,7 @@ export const serverlessConfiguration: AWS = {
     bookmarkStatus,
     removeBookmark,
     pinStatus,
-    unPinStatus,
-    getTimeline,
-    getTimelineByTag,
-    timelineQueueProcessor
+    unPinStatus
   },
   package: {individually: true},
   custom: {
