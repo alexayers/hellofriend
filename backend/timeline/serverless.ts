@@ -4,7 +4,7 @@ import {
   dynamoDbStreamAccountsProcessor,
   dynamoDbStreamStatusesProcessor,
   dynamoDbStreamTagsProcessor
-} from "@functions/dynamo-stream";
+} from "src/functions/search-stream";
 import {createIndices, destroyIndices} from "@functions/install";
 import {searchTimeline} from "@functions/search";
 

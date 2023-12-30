@@ -72,7 +72,7 @@ export class StatusService {
 
             console.debug(`Associating tag ${key} with status ${createdStatus.pkey}`);
 
-            const promise: Promise<any> = this.tagStatus(key, createdStatus.pkey).catch(e => {
+            const promise: Promise<any> = this.tagStatus(key, createdStatus.pkey, status).catch(e => {
                 console.error(e);
                 return null;
             });
@@ -88,11 +88,13 @@ export class StatusService {
 
     }
 
-    private async tagStatus(tagPkey: string, statusPkey: string): Promise<StatusTag> {
+    private async tagStatus(tagPkey: string, statusPkey: string, status: Status): Promise<StatusTag> {
         return await statusRepository.tagStatus({
             objectName: "StatusTag",
             pkey: `${tagPkey}`,
-            skey: `Status#${statusPkey}`
+            skey: `StatusTag#${Date.now()}`,
+            status: status,
+            statusId: status.pkey
         });
     }
 
@@ -211,5 +213,60 @@ export class StatusService {
         let statuses: Array<Status> = await statusRepository.getByAccountID(accountID);
 
         return statuses;
+    }
+
+    async getStatusByTag(accountID: string, tag: string) : Promise<Array<StatusDto>> {
+        let results = await statusRepository.getStatusByTag(tag);
+
+        if (!results) {
+            return null;
+        }
+
+        console.log(results);
+
+        let statuses : Array<StatusDto> = [];
+
+        for (const result of results) {
+
+            const promises = [
+                accountService.getById(result.status.accountId),
+                bookmarkService.isBookmarked(accountID, result.status.pkey),
+                favoriteService.isFavorited(accountID, result.status.pkey)
+            ];
+
+            // Use Promise.all to wait for all promises to resolve
+            const results = await Promise.all(promises);
+
+            // Extract results
+            const account: Account = results[0] as unknown as Account;
+            const bookmarked: boolean = results[1] as unknown as boolean;
+            const favorited: boolean = results[2] as unknown as boolean;
+
+            if (result.status) {
+                statuses.push({
+                    account: {avatarFilename: account.avatarFilename,
+                        displayName: account.displayName,
+                        domain: account.domain,
+                        id: account.pkey,
+                        username: account.username
+                    },
+                    boosted: undefined,
+                    id: result.status.pkey,
+                    isBookmark: bookmarked,
+                    isFavorite: favorited,
+                    published: result.status.published,
+                    replies: undefined,
+                    spoilerText: result.status.spoilerText,
+                    text: result.status.content,
+                    totalLikes: 0,
+                    uri: result.status.uri
+
+                })
+            }
+
+        }
+
+        return statuses;
+
     }
 }

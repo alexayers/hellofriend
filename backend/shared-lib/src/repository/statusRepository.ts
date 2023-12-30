@@ -102,4 +102,35 @@ export class StatusRepository extends BaseRepository implements GenericRepositor
 
         return await super.query(params) as Array<Status>;
     }
+
+    async getStatusByTag(tag: string) : Promise<Array<any>> {
+        const params = {
+            TableName: this._tableName,
+            KeyConditionExpression: "#pkey = :pkey",
+            ExpressionAttributeNames: {
+                "#pkey": "pkey"
+            },
+            ExpressionAttributeValues: {
+                ":pkey": tag
+            },
+            ScanIndexForward: false,
+            Limit: 25
+        };
+
+        console.log(params);
+
+        try {
+            const data = await documentClient.send(new QueryCommand(params));
+
+            if (data.Items) {
+                return data.Items;
+            } else {
+                return null;
+            }
+
+        } catch (error) {
+            console.error("Error:", error);
+            throw error;
+        }
+    }
 }

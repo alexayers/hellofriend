@@ -19,6 +19,7 @@ import {
   replyToStatus, unPinStatus,
   updateStatus
 } from "@functions/status";
+import {getStatusesByTag} from "@functions/tags";
 
 
 // We'll use this resourcePrefix for all our resources: dynamoDB, Cognito, etc
@@ -163,7 +164,8 @@ export const serverlessConfiguration: AWS = {
     bookmarkStatus,
     removeBookmark,
     pinStatus,
-    unPinStatus
+    unPinStatus,
+    getStatusesByTag
   },
   package: {individually: true},
   custom: {
