@@ -1,6 +1,6 @@
 import {SQSEvent} from "aws-lambda";
 import {Activity, ActivityType, FollowActivity, UndoFollowActivity} from "@libs/activityPub/activity/activities";
-import {followService, inboundQueueService, outboundQueueService} from "@libs/services";
+import {followService, outboundQueueService} from "@libs/services";
 
 /*
     This queue will handle data headed out of your instance and outwards into the Fediverse

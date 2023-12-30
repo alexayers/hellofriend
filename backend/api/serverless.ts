@@ -9,7 +9,7 @@ import {
   unFollowAccount,
   updateAccount
 } from "@functions/account";
-import {exploreAccounts, explorePosts, exploreTags} from "@functions/explore";
+import {exploreAccounts, exploreStatuses, exploreTags} from "@functions/explore";
 import {search} from "@functions/search";
 import {
   bookmarkStatus,
@@ -151,7 +151,7 @@ export const serverlessConfiguration: AWS = {
     unFollowAccount,
     getAccount,
     getStatuses,
-    explorePosts,
+    exploreStatuses,
     exploreTags,
     exploreAccounts,
     search,

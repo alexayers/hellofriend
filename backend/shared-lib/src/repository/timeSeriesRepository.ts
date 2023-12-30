@@ -6,6 +6,8 @@ import {TimeSeries} from "../model/timeSeries";
 
 export class TimeSeriesRepository extends BaseRepository implements GenericRepository<TimeSeries> {
 
+    private _tableName : string = process.env.TIMESERIES_TABLE;
+
     persist(timeSeries: TimeSeries): Promise<TimeSeries> {
         throw new Error("Method not implemented.");
     }
@@ -14,6 +16,18 @@ export class TimeSeriesRepository extends BaseRepository implements GenericRepos
     }
 
 
+    async getRecentByObjectName(objectName: string) : Promise<any> {
+        const params = {
+            TableName: this._tableName,
+            IndexName: 'object-index',
+            KeyConditionExpression: 'objectName = :value',
+            ExpressionAttributeValues: {
+                ':value': objectName
+            },
+            ScanIndexForward: false,
+            Limit: 50
+        }
 
-
+        return await super.query(params);
+    }
 }

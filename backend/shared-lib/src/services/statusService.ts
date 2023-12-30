@@ -90,7 +90,7 @@ export class StatusService {
 
     private async tagStatus(tagPkey: string, statusPkey: string)  : Promise<StatusTag> {
         return await statusRepository.tagStatus({
-            objectName: "Tag",
+            objectName: "StatusTag",
             pkey: `${tagPkey}`,
             skey: `Status#${statusPkey}`
         });

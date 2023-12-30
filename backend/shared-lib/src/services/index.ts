@@ -14,6 +14,7 @@ import {BookmarkService} from "./bookmarkService";
 import {SearchService} from "./searchService";
 import {TimelineService} from "./timelineService";
 import {OpenSearchService} from "./openSearchService";
+import {TimeSeriesService} from "./timeSeriesService";
 
 
 const accountService: AccountService = new AccountService();
@@ -39,7 +40,7 @@ const timelineService : TimelineService = new TimelineService();
 
 const tagService : TagService = new TagService();
 
-const timeSeriesService : TimelineService = new TimelineService();
+const timeSeriesService : TimeSeriesService = new TimeSeriesService();
 
 const openSearchService: OpenSearchService = new OpenSearchService();
 

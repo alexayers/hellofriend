@@ -1,14 +1,14 @@
 import {handlerPath} from "@libs/lambda/handler-resolver";
 
 
-export const explorePosts = {
-    handler: `${handlerPath(__dirname)}/handler.explorePosts`,
+export const exploreStatuses = {
+    handler: `${handlerPath(__dirname)}/handler.exploreStatuses`,
     memorySize: 128,
     events: [
         {
             http: {
                 method: 'get',
-                path: '/explore/posts',
+                path: '/explore/statuses',
                 authorizer: {
                     type: 'COGNITO_USER_POOLS',
                     authorizerId: {

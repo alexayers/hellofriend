@@ -28,7 +28,7 @@ export class TagService {
                     console.info(`New tag found ${name} on Note.`)
                     try {
                         let tag: Tag = await tagRepository.persist({
-                            objectName: "StatusTag",
+                            objectName: "Tag",
                             pkey: name,
                             skey: `Tag#${name}`
                         });
@@ -74,7 +74,7 @@ export class TagService {
                 console.info(`New tag found ${name} on Account.`);
                 try {
                     const newTag = await tagRepository.persist({
-                        objectName: "AccountTag",
+                        objectName: "Tag",
                         pkey: name,
                         skey: `Tag#${name}`
                     });

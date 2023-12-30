@@ -6,7 +6,6 @@ import {ValidationStatus} from "@libs/services/inboxService";
 import {Activity} from "@libs/activityPub/activity/activities";
 
 
-
 export const sharedInbox = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
 
     let validationStatus : ValidationStatus = await inboxSerivce.validateRequest("/activitypub/inbox",event.headers);

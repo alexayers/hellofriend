@@ -2,13 +2,13 @@ import {SQSEvent} from "aws-lambda";
 import {
     AcceptActivity,
     Activity,
-    ActivityType, AnnounceActivity,
-    CreateActivity, DeleteActivity,
+    ActivityType,
+    AnnounceActivity,
+    CreateActivity,
+    DeleteActivity,
     FollowActivity
 } from "@libs/activityPub/activity/activities";
 import {followService, inboundQueueService, statusService} from "@libs/services";
-import {Status} from "@libs/model/status";
-import {Account} from "@libs/model/account";
 
 /*
     This queue will handle data headed into your instance from the Fediverse
