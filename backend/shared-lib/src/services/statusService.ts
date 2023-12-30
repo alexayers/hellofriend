@@ -23,7 +23,7 @@ export class StatusService {
     }
 
 
-    async storeCreate(createActivity : CreateActivity) : Promise<{status: Status, account: Account}> {
+    async storeCreate(createActivity: CreateActivity): Promise<{ status: Status, account: Account }> {
 
         let actor: { username: string, domain: string } = actorFromUrl(createActivity.actor);
         let account: Account = await accountService.getByNormalizedUsernameDomain(actor.username, actor.domain);
@@ -34,7 +34,7 @@ export class StatusService {
 
         if (!account) {
             console.info(`I don't have an account for @${actor.username}@${actor.domain}, fetching`);
-            await webFingerService.finger(actor.username,actor.domain);
+            await webFingerService.finger(actor.username, actor.domain);
             account = await accountService.getByNormalizedUsernameDomain(actor.username, actor.domain);
         }
 
@@ -45,9 +45,9 @@ export class StatusService {
             language = key;
         }
 
-        let status : Status = {
+        let status: Status = {
             pkey: uuidv4(),
-            skey:  `Author#${account.pkey}`,
+            skey: `Author#${account.pkey}`,
             objectName: "Status",
             accountId: account.pkey,
             content: createNote.content,
@@ -63,7 +63,7 @@ export class StatusService {
             url: createNote.url
         }
 
-        let createdStatus : Status = await statusRepository.persist(status);
+        let createdStatus: Status = await statusRepository.persist(status);
         let tags: Map<string, string> = await tagService.saveNoteTags(createActivity.object as ActivityNote);
 
         const promises: Array<Promise<any>> = [];
@@ -72,7 +72,7 @@ export class StatusService {
 
             console.debug(`Associating tag ${key} with status ${createdStatus.pkey}`);
 
-            const promise : Promise<any> = this.tagStatus(key, createdStatus.pkey).catch(e => {
+            const promise: Promise<any> = this.tagStatus(key, createdStatus.pkey).catch(e => {
                 console.error(e);
                 return null;
             });
@@ -88,7 +88,7 @@ export class StatusService {
 
     }
 
-    private async tagStatus(tagPkey: string, statusPkey: string)  : Promise<StatusTag> {
+    private async tagStatus(tagPkey: string, statusPkey: string): Promise<StatusTag> {
         return await statusRepository.tagStatus({
             objectName: "StatusTag",
             pkey: `${tagPkey}`,
@@ -96,7 +96,7 @@ export class StatusService {
         });
     }
 
-    async deleteStatus(deleteActivity: DeleteActivity) : Promise<void> {
+    async deleteStatus(deleteActivity: DeleteActivity): Promise<void> {
 
         let actor: { username: string, domain: string } = actorFromUrl(deleteActivity.actor);
         let account: Account = await accountService.getByNormalizedUsernameDomain(actor.username, actor.domain);
@@ -105,12 +105,12 @@ export class StatusService {
 
         if (!account) {
             console.info(`I don't have an account for @${actor.username}@${actor.domain}, fetching`);
-            await webFingerService.finger(actor.username,actor.domain);
+            await webFingerService.finger(actor.username, actor.domain);
             account = await accountService.getByNormalizedUsernameDomain(actor.username, actor.domain);
         }
 
         // @ts-ignore
-        let status : Status = await statusRepository.getByUri(deleteActivity.object.id);
+        let status: Status = await statusRepository.getByUri(deleteActivity.object.id);
 
         if (status && status.accountId == account.pkey) {
             status.deletedAt = Date.now();
@@ -122,20 +122,20 @@ export class StatusService {
     async boostRequest(announceActivity: AnnounceActivity) {
 
         let actor: { username: string, domain: string } = actorFromUrl(announceActivity.actor);
-        let account : Account = await accountService.getByNormalizedUsernameDomain(actor.username, actor.domain);
+        let account: Account = await accountService.getByNormalizedUsernameDomain(actor.username, actor.domain);
 
-         if (!account) {
+        if (!account) {
             console.info(`I don't have an account for @${actor.username}@${actor.domain}, fetching`);
-            await webFingerService.finger(actor.username,actor.domain);
+            await webFingerService.finger(actor.username, actor.domain);
         }
 
-        let boostedStatus : {status: Status, account: Account} = await this.fetchStatus(announceActivity.object);
+        let boostedStatus: { status: Status, account: Account } = await this.fetchStatus(announceActivity.object);
         console.info(`Boosted ${boostedStatus.status.pkey}`);
     }
 
-    private async fetchStatus(uri: string) : Promise<{status: Status, account: Account}>{
+    private async fetchStatus(uri: string): Promise<{ status: Status, account: Account }> {
 
-        let status : Status = await statusRepository.getByUri(uri);
+        let status: Status = await statusRepository.getByUri(uri);
 
         if (status) {
             console.info(`I already have the boosted message ${uri}, no need to fetch.`);
@@ -148,7 +148,7 @@ export class StatusService {
         console.debug(`I need to download ${uri}`);
 
         let missingNote = await fediverseService.signedRequest("get", uri);
-        let createActivity : CreateActivity = {
+        let createActivity: CreateActivity = {
             "@context": undefined,
             actor: missingNote.attributedTo,
             cc: undefined,
@@ -163,9 +163,9 @@ export class StatusService {
         return await this.storeCreate(createActivity);
     }
 
-    async getStatus(accountID : string, statusID: string) : Promise<StatusDto> {
+    async getStatus(accountID: string, statusID: string): Promise<StatusDto> {
 
-        const status : Status = await statusRepository.getStatusById(statusID);
+        const status: Status = await statusRepository.getStatusById(statusID);
 
         if (!status) {
             return null;
@@ -181,9 +181,9 @@ export class StatusService {
         const results = await Promise.all(promises);
 
         // Extract results
-        const account : Account = results[0] as unknown as Account;
-        const bookmarked : boolean = results[1] as unknown as boolean;
-        const favorited : boolean = results[2] as unknown as boolean;
+        const account: Account = results[0] as unknown as Account;
+        const bookmarked: boolean = results[1] as unknown as boolean;
+        const favorited: boolean = results[2] as unknown as boolean;
 
         return {
             account: {
@@ -207,8 +207,8 @@ export class StatusService {
         }
     }
 
-    async getStatusesByAccount(accountID: string) : Promise<Array<Status>> {
-        let statuses : Array<Status> = await statusRepository.getByAccountID(accountID);
+    async getStatusesByAccount(accountID: string): Promise<Array<Status>> {
+        let statuses: Array<Status> = await statusRepository.getByAccountID(accountID);
 
         return statuses;
     }

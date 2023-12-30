@@ -18,7 +18,7 @@ export class TagService {
                 continue;
             }
 
-            let name: string = activityNote.tag[i].name.toLowerCase().replace("#", "").replace("@", "").replaceAll(":","");
+            let name: string = activityNote.tag[i].name.toLowerCase().replace("#", "").replace("@", "").replaceAll(":", "");
 
             if (activityNote.tag[i].type == TagType.HASHTAG) {
 
@@ -56,12 +56,12 @@ export class TagService {
 
         // Prepare all tag names and create promises for fetching tags
         const tagFetchPromises = person.tag.map(tagItem => {
-            const name : string = tagItem.name.toLowerCase().replace("#", "").replaceAll(":", "");
+            const name: string = tagItem.name.toLowerCase().replace("#", "").replaceAll(":", "");
             return tagRepository.getByPkey(name)
-                .then(tag => ({ name, tag })) // Attach name for identification in the next step
+                .then(tag => ({name, tag})) // Attach name for identification in the next step
                 .catch(e => {
                     console.error(e);
-                    return { name, tag: null };
+                    return {name, tag: null};
                 });
         });
 
@@ -69,7 +69,7 @@ export class TagService {
         const fetchedTags = await Promise.all(tagFetchPromises);
 
         // Iterate over the results
-        for (const { name, tag } of fetchedTags) {
+        for (const {name, tag} of fetchedTags) {
             if (!tag) {
                 console.info(`New tag found ${name} on Account.`);
                 try {

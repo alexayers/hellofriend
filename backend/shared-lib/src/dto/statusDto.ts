@@ -1,5 +1,3 @@
-
-
 export class StatusDto {
 
     id: string

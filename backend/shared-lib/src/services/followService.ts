@@ -25,10 +25,10 @@ export class FollowService {
         console.debug(acceptActivity);
 
         let you: { username: string, domain: string } = actorFromUrl(followActivity.object);
-        let yourAccount : Account = await accountService.getByNormalizedUsernameDomain(you.username);
+        let yourAccount: Account = await accountService.getByNormalizedUsernameDomain(you.username);
 
         let followerActor: { username: string, domain: string } = actorFromUrl(followActivity.actor);
-        let followerAccount : Account = await accountService.getByNormalizedUsernameDomain(followerActor.username, followerActor.domain);
+        let followerAccount: Account = await accountService.getByNormalizedUsernameDomain(followerActor.username, followerActor.domain);
 
         /*
             We've never seen this person. We need to fetch them from the remote server and store them locally.
@@ -36,7 +36,7 @@ export class FollowService {
 
         if (!followerAccount) {
             console.info(`I don't have an account for @${followerActor.username}@${followerActor.domain}, fetching`);
-            followerAccount = await webFingerService.finger(followerActor.username,followerActor.domain);
+            followerAccount = await webFingerService.finger(followerActor.username, followerActor.domain);
         }
 
         await followerRepository.persist({
@@ -51,7 +51,7 @@ export class FollowService {
     }
 
 
-    async generateFollowRequest(fromAccountID: string, followAccountID: string) : Promise<FollowActivity> {
+    async generateFollowRequest(fromAccountID: string, followAccountID: string): Promise<FollowActivity> {
 
         const promises = [
             accountService.getById(fromAccountID),
@@ -74,7 +74,7 @@ export class FollowService {
         return followActivity;
     }
 
-    async generateUnFollowRequest(fromAccountID: string, unFollowAccountID: string) : Promise<UndoFollowActivity> {
+    async generateUnFollowRequest(fromAccountID: string, unFollowAccountID: string): Promise<UndoFollowActivity> {
 
         const promises = [
             accountService.getById(fromAccountID),
@@ -110,18 +110,18 @@ export class FollowService {
         return unfollowActivity;
     }
 
-    async sendUnFollowRequest(undoFollowActivity: UndoFollowActivity) : Promise<void> {
+    async sendUnFollowRequest(undoFollowActivity: UndoFollowActivity): Promise<void> {
         await fediverseService.signedDelivery(undoFollowActivity, undoFollowActivity.object.object);
 
     }
 
-    async sendFollowRequest(followActivity: FollowActivity) : Promise<void> {
+    async sendFollowRequest(followActivity: FollowActivity): Promise<void> {
 
         let you: { username: string, domain: string } = actorFromUrl(followActivity.actor);
-        let yourAccount : Account = await accountService.getByNormalizedUsernameDomain(you.username);
+        let yourAccount: Account = await accountService.getByNormalizedUsernameDomain(you.username);
 
         let followingActor: { username: string, domain: string } = actorFromUrl(followActivity.object);
-        let followingAccount : Account = await accountService.getByNormalizedUsernameDomain(followingActor.username, followingActor.domain);
+        let followingAccount: Account = await accountService.getByNormalizedUsernameDomain(followingActor.username, followingActor.domain);
 
         /*
             We've never seen this person. We need to fetch them from the remote server and store them locally.
@@ -129,7 +129,7 @@ export class FollowService {
 
         if (!followingAccount) {
             console.info(`I don't have an account for @${followingActor.username}@${followingActor.domain}, fetching`);
-            followingAccount = await webFingerService.finger(followingActor.username,followingActor.domain);
+            followingAccount = await webFingerService.finger(followingActor.username, followingActor.domain);
         }
 
         await followerRepository.persist({
@@ -145,7 +145,7 @@ export class FollowService {
 
     async processAccept(acceptActivity: AcceptActivity) {
 
-        let follow : Follow = await followerRepository.getByUri(acceptActivity.object.id);
+        let follow: Follow = await followerRepository.getByUri(acceptActivity.object.id);
 
         if (follow) {
             follow.accepted = true;
@@ -154,7 +154,7 @@ export class FollowService {
 
     }
 
-    async getFollowing(accountID: string) : Promise<Array<Follow>>{
+    async getFollowing(accountID: string): Promise<Array<Follow>> {
         return await followerRepository.getFollows(accountID);
     }
 }

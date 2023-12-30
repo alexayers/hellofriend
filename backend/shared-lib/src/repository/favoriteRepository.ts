@@ -23,7 +23,7 @@ export class FavoriteRepository extends BaseRepository implements GenericReposit
         return await this.deleteItemByPkeyAndSkey(this._tableName, accountID, `Favorite#${statusID}`);
     }
 
-    async isFavorited(accountID: string, statusID: string) : Promise<boolean> {
+    async isFavorited(accountID: string, statusID: string): Promise<boolean> {
         let favorite = await super.byPkeyAndSkey(
             this._tableName,
             accountID,

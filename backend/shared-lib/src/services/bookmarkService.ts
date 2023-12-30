@@ -6,24 +6,25 @@ import {Status} from "../model/status";
 
 export class BookmarkService {
 
-    async addBookmark(accountID: string, statusID: string) : Promise<Bookmark> {
+    async addBookmark(accountID: string, statusID: string): Promise<Bookmark> {
 
-        const status : Status = await statusRepository.getStatusById(statusID);
+        const status: Status = await statusRepository.getStatusById(statusID);
 
         if (!status) {
             return null;
         }
 
         return await bookmarkResository.persist({
-            objectName: "Bookmark",
-            pkey: accountID,
-            skey: statusID}
+                objectName: "Bookmark",
+                pkey: accountID,
+                skey: statusID
+            }
         );
     }
 
-    async removeBookmark(accountID: string, statusID: string) : Promise<boolean> {
+    async removeBookmark(accountID: string, statusID: string): Promise<boolean> {
 
-        const status : Status = await statusRepository.getStatusById(statusID);
+        const status: Status = await statusRepository.getStatusById(statusID);
 
         if (!status) {
             return false;
@@ -32,7 +33,7 @@ export class BookmarkService {
         await bookmarkResository.delete(accountID, statusID);
     }
 
-    async getBookmarks(accountID: string) : Promise<Array<StatusDto>> {
+    async getBookmarks(accountID: string): Promise<Array<StatusDto>> {
         return await bookmarkResository.getBookmarks(accountID) as Array<StatusDto>;
     }
 

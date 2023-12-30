@@ -3,14 +3,14 @@ import {timeSeriesRepository} from "../repository";
 export class TimeSeriesService {
 
 
-    async getRecent(objectName: string) : Promise<Array<any>> {
+    async getRecent(objectName: string): Promise<Array<any>> {
         let results = await timeSeriesRepository.getRecentByObjectName(objectName);
 
         if (!results) {
             return [];
         }
 
-        let objects : Array<any> = [];
+        let objects: Array<any> = [];
         let pkeySet: Set<string> = new Set<string>();
 
         for (const obj of results) {

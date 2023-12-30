@@ -248,6 +248,10 @@ export const serverlessConfiguration: AWS = {
                             }
                         },
                     ],
+                    TimeToLiveSpecification: {
+                        AttributeName: "expiresAt",
+                        Enabled: true
+                    },
                     ProvisionedThroughput: {
                         ReadCapacityUnits: 1,
                         WriteCapacityUnits: 1

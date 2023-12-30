@@ -6,24 +6,25 @@ import {Status} from "../model/status";
 
 export class FavoriteService {
 
-    async addFavorite(accountID: string, statusID: string) : Promise<Favorite> {
+    async addFavorite(accountID: string, statusID: string): Promise<Favorite> {
 
-        const status : Status = await statusRepository.getStatusById(statusID);
+        const status: Status = await statusRepository.getStatusById(statusID);
 
         if (!status) {
             return null;
         }
 
         return await favoriteRepository.persist({
-            objectName: "Favorite",
-            pkey: accountID,
-            skey: statusID}
+                objectName: "Favorite",
+                pkey: accountID,
+                skey: statusID
+            }
         );
     }
 
-    async removeFavorite(accountID: string, statusID: string) : Promise<boolean> {
+    async removeFavorite(accountID: string, statusID: string): Promise<boolean> {
 
-        const status : Status = await statusRepository.getStatusById(statusID);
+        const status: Status = await statusRepository.getStatusById(statusID);
 
         if (!status) {
             return false;
@@ -32,7 +33,7 @@ export class FavoriteService {
         return await favoriteRepository.delete(accountID, statusID);
     }
 
-    async getFavorites(accountID: string) : Promise<Array<StatusDto>> {
+    async getFavorites(accountID: string): Promise<Array<StatusDto>> {
         return await favoriteRepository.getFavorites(accountID) as Array<StatusDto>;
     }
 

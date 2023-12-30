@@ -17,8 +17,17 @@ const tagRepository: TagRepository = new TagRepository();
 const favoriteRepository: FavoriteRepository = new FavoriteRepository();
 const bookmarkResository: BookmarkRepository = new BookmarkRepository();
 
-const timeSeriesRepository : TimeSeriesRepository = new TimeSeriesRepository();
+const timeSeriesRepository: TimeSeriesRepository = new TimeSeriesRepository();
 
-const timelineRepository : TimelineRepository = new TimelineRepository();
+const timelineRepository: TimelineRepository = new TimelineRepository();
 
-export {accountRepository, followerRepository, statusRepository, tagRepository, favoriteRepository, bookmarkResository,timeSeriesRepository,timelineRepository}
+export {
+    accountRepository,
+    followerRepository,
+    statusRepository,
+    tagRepository,
+    favoriteRepository,
+    bookmarkResository,
+    timeSeriesRepository,
+    timelineRepository
+}

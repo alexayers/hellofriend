@@ -8,7 +8,6 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 import console from "console";
 import * as AWSXRay from 'aws-xray-sdk-core';
-import {BaseModel} from "../model/baseModel";
 
 const client: DynamoDBClient = AWSXRay.captureAWSv3Client(new DynamoDBClient({region: "us-east-1"}));
 export const documentClient: DynamoDBDocumentClient = DynamoDBDocumentClient.from(client);
@@ -57,6 +56,7 @@ export class BaseRepository {
                     Item: {
                         pkey: this.getCurrentDateFormatted(new Date()),
                         skey: `${object.objectName}#${Date.now()}`,
+                        expiresAt: Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60),
                         objectName: object.objectName,
                         compoundKey: `${object.pkey}$$${object.skey}`,
                         object: object
@@ -74,8 +74,8 @@ export class BaseRepository {
     }
 
     protected getCurrentDateFormatted(now: Date) {
-        const year : number = now.getFullYear();
-        const month : string = String(now.getMonth() + 1).padStart(2, '0');
+        const year: number = now.getFullYear();
+        const month: string = String(now.getMonth() + 1).padStart(2, '0');
         const day: string = String(now.getDate()).padStart(2, '0');
 
         return `${year}-${month}-${day}`; // Format and return the date as YYYY-MM-DD
@@ -98,7 +98,7 @@ export class BaseRepository {
         try {
             const data = await client.send(new QueryCommand(params));
 
-            if (data.Items.length == 1) {
+            if (data.Items && data.Items.length == 1) {
                 return data.Items[0];
             } else {
                 return undefined
@@ -111,7 +111,7 @@ export class BaseRepository {
     }
 
 
-    protected async byPkeyAndSkey(tableName : string, pkey: string, skey: string) : Promise<any> {
+    protected async byPkeyAndSkey(tableName: string, pkey: string, skey: string): Promise<any> {
         const params = {
             TableName: tableName,
             KeyConditionExpression: "#pkey = :pkey AND #skey = :skey",
@@ -128,9 +128,9 @@ export class BaseRepository {
         console.log(params);
 
         try {
-            const data : QueryCommandOutput  = await client.send(new QueryCommand(params));
+            const data: QueryCommandOutput = await client.send(new QueryCommand(params));
 
-            if (data.Items.length == 1) {
+            if (data.Items && data.Items.length == 1) {
                 return data.Items[0];
             } else {
                 return undefined;
@@ -142,7 +142,7 @@ export class BaseRepository {
         }
     }
 
-    protected async byPkeyAndPartialSkey(tableName : string, pkey: string, skey: string) : Promise<any> {
+    protected async byPkeyAndPartialSkey(tableName: string, pkey: string, skey: string): Promise<any> {
         const params = {
             TableName: tableName,
             KeyConditionExpression: "#pkey = :pkey AND begins_with(#skey, :skey)",
@@ -159,9 +159,9 @@ export class BaseRepository {
         console.log(params);
 
         try {
-            const data : QueryCommandOutput  = await client.send(new QueryCommand(params));
+            const data: QueryCommandOutput = await client.send(new QueryCommand(params));
 
-            if (data.Items.length >= 1) {
+            if (data.Items && data.Items.length >= 1) {
                 return data.Items;
             } else {
                 return undefined;
@@ -177,7 +177,7 @@ export class BaseRepository {
         try {
             const data: QueryCommandOutput = await documentClient.send(new QueryCommand(params));
 
-            if (data.Items.length >= 1) {
+            if (data.Items && data.Items.length >= 1) {
                 return data.Items;
             } else {
                 return undefined;
@@ -193,7 +193,7 @@ export class BaseRepository {
         try {
             let results: QueryCommandOutput = await documentClient.send(new QueryCommand(params));
 
-            if (results.Items.length == 1) {
+            if (results.Items && results.Items.length == 1) {
                 return results.Items[0];
             } else {
                 return null;
@@ -205,16 +205,16 @@ export class BaseRepository {
         }
     }
 
-    protected async deleteItemByPkeyAndSkey(tableName: string, pkey: string, skey: string) : Promise<boolean> {
+    protected async deleteItemByPkeyAndSkey(tableName: string, pkey: string, skey: string): Promise<boolean> {
         try {
             const command: DeleteItemCommand = new DeleteItemCommand(
-           {
-                TableName: tableName,
-                Key: {
-                    "pkey": { S: pkey },
-                    "skey": { S: skey }
-                }
-            });
+                {
+                    TableName: tableName,
+                    Key: {
+                        "pkey": {S: pkey},
+                        "skey": {S: skey}
+                    }
+                });
             const response: DeleteItemCommandOutput = await client.send(command);
             console.log("Item deleted successfully", response);
 
@@ -227,7 +227,7 @@ export class BaseRepository {
         }
     }
 
-    protected async deleteTimeSeries(pkey: string, skey: string) : Promise<boolean> {
+    protected async deleteTimeSeries(pkey: string, skey: string): Promise<boolean> {
 
         const params = {
             TableName: process.env.TIMESERIES_TABLE,
@@ -238,16 +238,16 @@ export class BaseRepository {
             }
         }
 
-        let result: {pkey : string, skey : number} = await this.queryForOne(params) as {pkey : string, skey : number};
+        let result: { pkey: string, skey: number } = await this.queryForOne(params) as { pkey: string, skey: number };
 
         try {
             const command: DeleteItemCommand = new DeleteItemCommand(
                 {
                     TableName: process.env.TIMESERIES_TABLE,
                     Key: {
-                        "pkey": { S: result.pkey },
+                        "pkey": {S: result.pkey},
                         // @ts-ignore
-                        "skey": { N: result.skey }
+                        "skey": {N: result.skey}
                     }
                 });
             const response: DeleteItemCommandOutput = await client.send(command);

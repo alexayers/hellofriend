@@ -4,7 +4,6 @@ import {Status} from "../model/status";
 import {StatusTag} from "../model/statusTag";
 import {QueryCommand, QueryCommandOutput} from "@aws-sdk/lib-dynamodb";
 import console from "console";
-import {StatusDto} from "../dto/statusDto";
 
 
 export class StatusRepository extends BaseRepository implements GenericRepository<Status> {
@@ -25,7 +24,11 @@ export class StatusRepository extends BaseRepository implements GenericRepositor
             delete status.spoilerText;
         }
 
-        return await this.put(this._tableName, status) as Status;;
+        if (!status.updated) {
+            delete status.updated;
+        }
+
+        return await this.put(this._tableName, status) as Status;
 
     }
 
@@ -54,7 +57,7 @@ export class StatusRepository extends BaseRepository implements GenericRepositor
 
     }
 
-    async getStatusById(statusID: string) : Promise<Status> {
+    async getStatusById(statusID: string): Promise<Status> {
         const params = {
             TableName: this._tableName,
             KeyConditionExpression: "#pkey = :pkey AND begins_with(#skey, :prefix)",
@@ -71,7 +74,7 @@ export class StatusRepository extends BaseRepository implements GenericRepositor
         console.log(params);
 
         try {
-            const data : QueryCommandOutput = await documentClient.send(new QueryCommand(params));
+            const data: QueryCommandOutput = await documentClient.send(new QueryCommand(params));
 
             if (data.Items.length == 1) {
                 return data.Items[0] as Status;
@@ -85,7 +88,7 @@ export class StatusRepository extends BaseRepository implements GenericRepositor
         }
     }
 
-    async getByAccountID(accountID: string) : Promise<Array<Status>> {
+    async getByAccountID(accountID: string): Promise<Array<Status>> {
 
         const params = {
             TableName: this._tableName,

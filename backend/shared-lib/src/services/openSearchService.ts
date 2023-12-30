@@ -2,15 +2,13 @@ import fetch from "node-fetch";
 import aws4 from "aws4";
 
 
-
-
 export interface AccountSearchData {
     id: string
     username: string
     displayName: string
     domain: string
     summary: string
-    avatarFilename:  string
+    avatarFilename: string
     headerFilename: string
 }
 
@@ -26,8 +24,8 @@ export interface StatusSearchData {
     displayName: string
     domain: string
     username: string
-    avatarFilename:  string
-    published:  string
+    avatarFilename: string
+    published: string
     language: string
     uri: string
 }
@@ -36,21 +34,21 @@ export class OpenSearchService {
 
     private static OPENSEARCH_ENDPOINT = process.env.OPENSEARCH_ENDPOINT;
     private static ACCOUNT_INDEX: string = "account-index";
-    private static TAG_INDEX : string = "tag-index";
-    private static STATUS_INDEX : string = "status-index";
+    private static TAG_INDEX: string = "tag-index";
+    private static STATUS_INDEX: string = "status-index";
 
-    async createAccountIndex() : Promise<void> {
+    async createAccountIndex(): Promise<void> {
         const endpoint: string = `https://${OpenSearchService.OPENSEARCH_ENDPOINT}/${OpenSearchService.ACCOUNT_INDEX}`
         const body: string = JSON.stringify({
             mappings: {
                 properties: {
-                    id: { type: 'keyword' },
-                    username: { type: 'text' },
-                    displayName: { type: 'text' },
+                    id: {type: 'keyword'},
+                    username: {type: 'text'},
+                    displayName: {type: 'text'},
                     domain: {type: 'text'},
-                    summary: { type: 'text' },
-                    avatarFilename:  { type: 'text' },
-                    headerFilename: { type: 'text' },
+                    summary: {type: 'text'},
+                    avatarFilename: {type: 'text'},
+                    headerFilename: {type: 'text'},
                 }
             }
         });
@@ -69,13 +67,13 @@ export class OpenSearchService {
         await this.signAndSend(request);
     }
 
-    async createTagIndex() : Promise<void> {
+    async createTagIndex(): Promise<void> {
         const endpoint = `https://${OpenSearchService.OPENSEARCH_ENDPOINT}/${OpenSearchService.TAG_INDEX}`
         const body = JSON.stringify({
             mappings: {
                 properties: {
-                    id: { type: 'keyword' },
-                    tag: { type: 'text' }
+                    id: {type: 'keyword'},
+                    tag: {type: 'text'}
                 }
             }
         });
@@ -94,20 +92,20 @@ export class OpenSearchService {
         await this.signAndSend(request);
     }
 
-    async createStatusIndex() : Promise<void> {
+    async createStatusIndex(): Promise<void> {
         const endpoint = `https://${OpenSearchService.OPENSEARCH_ENDPOINT}/${OpenSearchService.STATUS_INDEX}`
         const body = JSON.stringify({
             mappings: {
                 properties: {
-                    id: { type: 'keyword' },
-                    status: { type: 'text' },
+                    id: {type: 'keyword'},
+                    status: {type: 'text'},
                     displayName: {type: 'text'},
                     accountId: {type: 'text'},
                     domain: {type: 'text'},
                     username: {type: 'text'},
-                    avatarFilename:  { type: 'text' },
-                    published:  { type: 'text' },
-                    language:  { type: 'text' },
+                    avatarFilename: {type: 'text'},
+                    published: {type: 'text'},
+                    language: {type: 'text'},
                 }
             }
         });
@@ -127,7 +125,7 @@ export class OpenSearchService {
 
     }
 
-    private async signAndSend(request: any) : Promise<any> {
+    private async signAndSend(request: any): Promise<any> {
 
         aws4.sign(request, {
             accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -150,10 +148,10 @@ export class OpenSearchService {
         }
     }
 
-    async storeAccount(accountSearchData : AccountSearchData) : Promise<void> {
+    async storeAccount(accountSearchData: AccountSearchData): Promise<void> {
         const endpoint: string = `https://${OpenSearchService.OPENSEARCH_ENDPOINT}/${OpenSearchService.ACCOUNT_INDEX}/_doc`
 
-        const body : string = JSON.stringify(accountSearchData);
+        const body: string = JSON.stringify(accountSearchData);
 
 
         const request = {
@@ -170,10 +168,10 @@ export class OpenSearchService {
         await this.signAndSend(request);
     }
 
-    async storeTag(tagSearchData : TagSearchData) : Promise<void> {
+    async storeTag(tagSearchData: TagSearchData): Promise<void> {
         const endpoint: string = `https://${OpenSearchService.OPENSEARCH_ENDPOINT}/${OpenSearchService.TAG_INDEX}/_doc`
 
-        const body : string = JSON.stringify(tagSearchData);
+        const body: string = JSON.stringify(tagSearchData);
 
         const request = {
             host: OpenSearchService.OPENSEARCH_ENDPOINT,
@@ -189,10 +187,10 @@ export class OpenSearchService {
         await this.signAndSend(request);
     }
 
-    async storeStatus(statusSearchData : StatusSearchData) : Promise<void> {
+    async storeStatus(statusSearchData: StatusSearchData): Promise<void> {
         const endpoint: string = `https://${OpenSearchService.OPENSEARCH_ENDPOINT}/${OpenSearchService.STATUS_INDEX}/_doc`
 
-        const body : string = JSON.stringify(statusSearchData);
+        const body: string = JSON.stringify(statusSearchData);
 
         const request = {
             host: OpenSearchService.OPENSEARCH_ENDPOINT,
@@ -256,14 +254,14 @@ export class OpenSearchService {
         await this.signAndSend(request);
     }
 
-    async searchAccounts(searchString: string) : Promise<Array<AccountSearchData>> {
+    async searchAccounts(searchString: string): Promise<Array<AccountSearchData>> {
         const endpoint = `https://${OpenSearchService.OPENSEARCH_ENDPOINT}/${OpenSearchService.ACCOUNT_INDEX}/_search`;
         const query = {
             query: {
                 bool: {
                     should: [
-                        { match: { username: `*${searchString.toLowerCase()}*` }},
-                        { match: { displayName: `*${searchString.toLowerCase()}*` }}
+                        {match: {username: `*${searchString.toLowerCase()}*`}},
+                        {match: {displayName: `*${searchString.toLowerCase()}*`}}
                     ],
                     minimum_should_match: 1
                 }
@@ -289,7 +287,7 @@ export class OpenSearchService {
 
         const response = await this.signAndSend(request);
 
-        let accountResults : Array<AccountSearchData> = [];
+        let accountResults: Array<AccountSearchData> = [];
 
         for (const hit of response.hits.hits) {
 
@@ -311,7 +309,7 @@ export class OpenSearchService {
         return accountResults;
     }
 
-    async searchStatuses(searchString: string) : Promise<Array<StatusSearchData>> {
+    async searchStatuses(searchString: string): Promise<Array<StatusSearchData>> {
         const endpoint = `https://${OpenSearchService.OPENSEARCH_ENDPOINT}/${OpenSearchService.STATUS_INDEX}/_search`;
         const query = {
             query: {
@@ -336,7 +334,7 @@ export class OpenSearchService {
 
         const response = await this.signAndSend(request);
 
-        let statusSearchData : Array<StatusSearchData> = [];
+        let statusSearchData: Array<StatusSearchData> = [];
 
         for (const hit of response.hits.hits) {
 
@@ -363,7 +361,7 @@ export class OpenSearchService {
 
     }
 
-    async searchTags(searchString: string) : Promise<Array<TagSearchData>> {
+    async searchTags(searchString: string): Promise<Array<TagSearchData>> {
         const endpoint = `https://${OpenSearchService.OPENSEARCH_ENDPOINT}/${OpenSearchService.TAG_INDEX}/_search`;
         const query = {
             query: {
@@ -388,7 +386,7 @@ export class OpenSearchService {
 
         const response = await this.signAndSend(request);
 
-        let tagSearchData : Array<TagSearchData> = [];
+        let tagSearchData: Array<TagSearchData> = [];
 
         for (const hit of response.hits.hits) {
 

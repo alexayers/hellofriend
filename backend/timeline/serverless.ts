@@ -36,7 +36,6 @@ export const serverlessConfiguration: AWS = {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       COGNITO_CLIENT_ID: { "Fn::ImportValue": `${resourcePrefix}-CognitoUserPoolClientId` },
-      TIMELINE_QUEUE: { 'Fn::ImportValue': `${resourcePrefix}-TimelineQueueUrl` },
       OPENSEARCH_ENDPOINT: { 'Fn::ImportValue': `${resourcePrefix}-OpenSearchEndpoint` },
       ACCOUNTS_TABLE: { "Fn::ImportValue": `${resourcePrefix}-AccountsTableName` },
       DOMAIN: '${self:custom.certificateName}'
@@ -51,15 +50,6 @@ export const serverlessConfiguration: AWS = {
               'xray:PutTelemetryRecords',
             ],
             Resource: '*',
-          },
-          {
-            Effect: 'Allow',
-            Action: [
-              'sqs:SendMessage'
-            ],
-            Resource: [
-              { "Fn::ImportValue": {"Fn::Sub": `${resourcePrefix}-TimelineQueueArn`} }
-            ]
           },
           {
             Effect: "Allow",

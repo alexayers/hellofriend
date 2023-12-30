@@ -6,7 +6,7 @@ export interface Status extends BaseModel {
     spoilerText?: string
     inReplyToId?: string
     inReplyToAccountId?: string
-    statusBoostedId?:string
+    statusBoostedId?: string
     language?: string
     published: string
     updated?: string

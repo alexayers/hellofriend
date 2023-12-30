@@ -19,11 +19,11 @@ export class BookmarkRepository extends BaseRepository implements GenericReposit
         throw new Error("Method not implemented.");
     }
 
-    async delete(accountID : string, statusID: string) : Promise<boolean> {
+    async delete(accountID: string, statusID: string): Promise<boolean> {
         return await this.deleteItemByPkeyAndSkey(this._tableName, accountID, `Bookmark#${statusID}`);
     }
 
-    async isBookmarked(accountID: string, statusID: string) : Promise<boolean> {
+    async isBookmarked(accountID: string, statusID: string): Promise<boolean> {
         let bookmark = await super.byPkeyAndSkey(
             this._tableName,
             accountID,

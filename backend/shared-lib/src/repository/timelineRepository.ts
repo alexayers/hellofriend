@@ -15,7 +15,7 @@ export class TimelineRepository extends BaseRepository implements GenericReposit
         timeLineEntry = {
             createdAt: Date.now(),
             modifiedAt: Date.now(),
-            expiresAt:  Math.floor(Date.now() / 1000) + (5 * 24 * 60 * 60),
+            expiresAt: Math.floor(Date.now() / 1000) + (5 * 24 * 60 * 60),
             pkey: this.getCurrentDateFormatted(new Date()),
             skey: Date.now(),
             ...timeLineEntry

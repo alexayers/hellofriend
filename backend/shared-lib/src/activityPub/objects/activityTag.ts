@@ -1,5 +1,3 @@
-
-
 export interface ActivityTag {
     id?: number
     type?: TagType

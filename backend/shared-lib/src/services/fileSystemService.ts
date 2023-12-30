@@ -10,6 +10,7 @@ export interface S3Data {
     body: any
     contentType: string
 }
+
 export interface FileUpload {
     buffer: ArrayBuffer
     filename: string

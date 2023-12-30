@@ -11,7 +11,7 @@ export class QueueService {
 
     }
 
-    async queue(object: any) : Promise<any> {
+    async queue(object: any): Promise<any> {
         const command = new SendMessageCommand({
             QueueUrl: this.queueName,
             MessageBody: JSON.stringify(object),
@@ -27,7 +27,7 @@ export class QueueService {
         }
     }
 
-    async deleteMessage(receiptHandle) : Promise <boolean>{
+    async deleteMessage(receiptHandle): Promise<boolean> {
         const deleteParams = {
             QueueUrl: this.queueName,
             ReceiptHandle: receiptHandle,

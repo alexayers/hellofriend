@@ -1,13 +1,40 @@
 import {middyfy} from "@libs/lambda/lambda";
 import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
 import {successResponse} from "@libs/lambda/api-gateway";
-import {timeSeriesService} from "@libs/services";
+import {accountService, timeSeriesService} from "@libs/services";
+import {Account} from "@libs/model/account";
 
 
 export const exploreStatuses = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     console.log(event);
 
     let results = await timeSeriesService.getRecent("Status");
+    const accountPromises = results.map(item => accountService.getById(item.accountId));
+    const accounts = await Promise.all(accountPromises);
+
+    results = results.map((item, index) => {
+        const account: Account = accounts[index];
+
+        return {
+            conversationId: item.conversationId,
+            language: item.language,
+            published: item.published,
+            sensitive: item.sensitive,
+            uri: item.uri,
+            content: item.content,
+            url: item.url,
+            account: {
+                id: item.accountId,
+                displayName: account.displayName,
+                username: account.username,
+                uri: account.uri,
+                domain: account.domain ? account.domain : process.env.DOMAIN,
+                avatarFilename: account.avatarFilename ? account.avatarFilename : null,
+                headerFilename: account.headerFilename ? account.headerFilename : null,
+            },
+            id: item.pkey
+        };
+    });
 
 
     return successResponse({results});
