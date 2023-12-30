@@ -85,6 +85,7 @@ export class AccountService {
         let account: Account = {
             pkey: uuidv4(),
             skey: `Account#${person.preferredUsername.toLowerCase()}:${domain}`,
+            domain: domain,
             objectName: 'Account',
             displayName: person.name,
             followersUrl: `https://${domain}/${person.preferredUsername}/followers`,

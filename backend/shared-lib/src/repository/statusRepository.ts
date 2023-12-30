@@ -16,6 +16,10 @@ export class StatusRepository extends BaseRepository implements GenericRepositor
             delete status.inReplyToAccountId
         }
 
+        if (!status.inReplyToAtomUri) {
+            delete status.inReplyToAtomUri
+        }
+
         if (!status.inReplyToId) {
             delete status.inReplyToId;
         }
@@ -76,7 +80,7 @@ export class StatusRepository extends BaseRepository implements GenericRepositor
         try {
             const data: QueryCommandOutput = await documentClient.send(new QueryCommand(params));
 
-            if (data.Items.length == 1) {
+            if (data.Items && data.Items.length == 1) {
                 return data.Items[0] as Status;
             } else {
                 return undefined;
@@ -99,8 +103,14 @@ export class StatusRepository extends BaseRepository implements GenericRepositor
             }
         }
 
+        let results = await super.query(params);
 
-        return await super.query(params) as Array<Status>;
+        if (!results) {
+            return null;
+        } else {
+           return results as Array<Status>
+        }
+
     }
 
     async getStatusByTag(tag: string) : Promise<Array<any>> {

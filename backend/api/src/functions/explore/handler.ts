@@ -1,41 +1,35 @@
 import {middyfy} from "@libs/lambda/lambda";
 import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
 import {successResponse} from "@libs/lambda/api-gateway";
-import {accountService, timeSeriesService} from "@libs/services";
-import {Account} from "@libs/model/account";
-
+import {bookmarkService, favoriteService, timeSeriesService} from "@libs/services";
 
 export const exploreStatuses = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     console.log(event);
 
+    let accountID : string = event.requestContext.authorizer.claims.sub;
     let results = await timeSeriesService.getRecent("Status");
-    const accountPromises = results.map(item => accountService.getById(item.accountId));
-    const accounts = await Promise.all(accountPromises);
 
+    const bookmarkAndFavoritePromises = results.map(item => Promise.all([
+        bookmarkService.isBookmarked(accountID, item.pkey),
+        favoriteService.isFavorited(accountID, item.pkey)
+    ]));
+
+    const bookmarkAndFavoriteResults = await Promise.all(bookmarkAndFavoritePromises);
     results = results.map((item, index) => {
-        const account: Account = accounts[index];
+
+        const [isBookmarked, isFavorites] = bookmarkAndFavoriteResults[index];
 
         return {
-            conversationId: item.conversationId,
-            language: item.language,
+            account: item.account,
+            id:item.pkey,
+            isBookmark: isBookmarked,
+            isFavorite: isFavorites,
             published: item.published,
-            sensitive: item.sensitive,
-            uri: item.uri,
-            content: item.content,
-            url: item.url,
-            account: {
-                id: item.accountId,
-                displayName: account.displayName,
-                username: account.username,
-                uri: account.uri,
-                domain: account.domain ? account.domain : process.env.DOMAIN,
-                avatarFilename: account.avatarFilename ? account.avatarFilename : null,
-                headerFilename: account.headerFilename ? account.headerFilename : null,
-            },
-            id: item.pkey
-        };
+            text: item.content,
+            totalLikes: 0,
+            uri: item.uri
+        }
     });
-
 
     return successResponse({results});
 });

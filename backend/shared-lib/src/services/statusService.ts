@@ -1,5 +1,5 @@
 import {ActivityNote, AnnounceActivity, CreateActivity, DeleteActivity} from "../activityPub/activity/activities";
-import {actorFromUrl} from "../helpers/actorFromUrl";
+import {actorFromReplyUrl, actorFromUrl} from "../helpers/actorFromUrl";
 import {
     accountService,
     bookmarkService,
@@ -26,6 +26,7 @@ export class StatusService {
     async storeCreate(createActivity: CreateActivity): Promise<{ status: Status, account: Account }> {
 
         let actor: { username: string, domain: string } = actorFromUrl(createActivity.actor);
+
         let account: Account = await accountService.getByNormalizedUsernameDomain(actor.username, actor.domain);
 
         /*
@@ -45,6 +46,18 @@ export class StatusService {
             language = key;
         }
 
+        let repliedAccount: Account = null;
+
+        if (createNote.inReplyTo) {
+            let replyingToActor: { username: string, domain: string } = actorFromReplyUrl(createNote.inReplyTo);
+            let repliedAccount: Account = await accountService.getByNormalizedUsernameDomain(replyingToActor.username, replyingToActor.domain);
+
+            if (!repliedAccount) {
+                console.info(`I don't have an account for @${replyingToActor.username}@${replyingToActor.domain}, fetching`);
+                repliedAccount = await webFingerService.finger(replyingToActor.username, replyingToActor.domain);
+            }
+        }
+
         let status: Status = {
             pkey: uuidv4(),
             skey: `Author#${account.pkey}`,
@@ -52,7 +65,8 @@ export class StatusService {
             accountId: account.pkey,
             content: createNote.content,
             conversationId: createNote.conversation,
-            inReplyToAccountId: createNote.inReplyToAtomUri,
+            inReplyToAtomUri: createNote.inReplyToAtomUri,
+            inReplyToAccountId: repliedAccount ? repliedAccount.pkey : null,
             inReplyToId: createNote.inReplyTo,
             language: language,
             published: createNote.published,
@@ -60,7 +74,14 @@ export class StatusService {
             spoilerText: createNote.summary,
             updated: createNote.updated,
             uri: createNote.atomUri,
-            url: createNote.url
+            url: createNote.url,
+            account: {
+                id: account.pkey,
+                username: account.username,
+                displayName: account.displayName,
+                domain: account.domain,
+                avatarFilename: account.avatarFilename
+            }
         }
 
         let createdStatus: Status = await statusRepository.persist(status);
@@ -229,7 +250,6 @@ export class StatusService {
         for (const result of results) {
 
             const promises = [
-                accountService.getById(result.status.accountId),
                 bookmarkService.isBookmarked(accountID, result.status.pkey),
                 favoriteService.isFavorited(accountID, result.status.pkey)
             ];
@@ -238,18 +258,12 @@ export class StatusService {
             const results = await Promise.all(promises);
 
             // Extract results
-            const account: Account = results[0] as unknown as Account;
-            const bookmarked: boolean = results[1] as unknown as boolean;
-            const favorited: boolean = results[2] as unknown as boolean;
+            const bookmarked: boolean = results[0] as unknown as boolean;
+            const favorited: boolean = results[1] as unknown as boolean;
 
             if (result.status) {
                 statuses.push({
-                    account: {avatarFilename: account.avatarFilename,
-                        displayName: account.displayName,
-                        domain: account.domain,
-                        id: account.pkey,
-                        username: account.username
-                    },
+                    account: result.status.account,
                     boosted: undefined,
                     id: result.status.pkey,
                     isBookmark: bookmarked,
@@ -260,8 +274,7 @@ export class StatusService {
                     text: result.status.content,
                     totalLikes: 0,
                     uri: result.status.uri
-
-                })
+                });
             }
 
         }

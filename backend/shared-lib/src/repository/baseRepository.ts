@@ -51,6 +51,7 @@ export class BaseRepository {
         try {
 
             if (createTimeSeries) {
+
                 const command: PutCommand = new PutCommand({
                     TableName: process.env.TIMESERIES_TABLE,
                     Item: {
@@ -180,7 +181,7 @@ export class BaseRepository {
             if (data.Items && data.Items.length >= 1) {
                 return data.Items;
             } else {
-                return undefined;
+                return null;
             }
 
         } catch (e) {

@@ -2,7 +2,13 @@ import {middyfy} from "@libs/lambda/lambda";
 import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
 import {notFoundResponse, successResponse} from "@libs/lambda/api-gateway";
 import {StatusDto} from "@libs/dto/statusDto";
-import {accountService, bookmarkService, favoriteService, followService, statusService} from "@libs/services";
+import {
+    accountService,
+    bookmarkService,
+    favoriteService,
+    followService,
+    statusService
+} from "@libs/services";
 import {Account} from "@libs/model/account";
 import {Status} from "@libs/model/status";
 
@@ -97,10 +103,32 @@ export const getStatuses = middyfy(async (event: APIGatewayProxyEvent): Promise<
 
     let statuses : Array<Status> = await statusService.getStatusesByAccount(accountID);
 
-    if (statuses.length == 0) {
+    if (!statuses) {
         return notFoundResponse(`No statuses found`);
     }
 
-    return successResponse({statuses});
+    const bookmarkAndFavoritePromises = statuses.map(item => Promise.all([
+        bookmarkService.isBookmarked(accountID, item.pkey),
+        favoriteService.isFavorited(accountID, item.pkey)
+    ]));
+
+    const bookmarkAndFavoriteResults = await Promise.all(bookmarkAndFavoritePromises);
+    let results = statuses.map((item, index) => {
+
+        const [isBookmarked, isFavorites] = bookmarkAndFavoriteResults[index];
+
+        return {
+            account: item.account,
+            id:item.pkey,
+            isBookmark: isBookmarked,
+            isFavorite: isFavorites,
+            published: item.published,
+            text: item.content,
+            totalLikes: 0,
+            uri: item.uri
+        }
+    });
+
+    return successResponse({results});
 });
 
