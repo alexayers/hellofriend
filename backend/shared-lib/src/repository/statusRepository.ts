@@ -83,12 +83,12 @@ export class StatusRepository extends BaseRepository implements GenericRepositor
             if (data.Items && data.Items.length == 1) {
                 return data.Items[0] as Status;
             } else {
-                return undefined;
+                return null;
             }
 
         } catch (error) {
             console.error("Error:", error);
-            throw error;
+            return null;
         }
     }
 

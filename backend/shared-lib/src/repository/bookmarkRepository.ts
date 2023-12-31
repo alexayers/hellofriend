@@ -9,9 +9,14 @@ export class BookmarkRepository extends BaseRepository implements GenericReposit
 
     async persist(bookMark: Bookmark): Promise<Bookmark> {
 
+        if (!bookMark.status.spoilerText) {
+            delete bookMark.status.spoilerText;
+        }
+
         return await this.put(this._tableName, {
             pkey: bookMark.pkey,
-            skey: `Bookmark#${bookMark.skey}`
+            skey: `Bookmark#${bookMark.skey}`,
+            status: bookMark.status
         }) as Bookmark;
     }
 
@@ -33,7 +38,7 @@ export class BookmarkRepository extends BaseRepository implements GenericReposit
         return !!bookmark;
     }
 
-    async getBookmarks(accountID: string) {
-        return await super.byPkeyAndPartialSkey(this._tableName, accountID, "Bookmark#");
+    async getBookmarks(accountID: string) : Promise<Array<Bookmark>> {
+        return await super.byPkeyAndPartialSkey(this._tableName, accountID, "Bookmark#") as unknown as Array<Bookmark>;
     }
 }

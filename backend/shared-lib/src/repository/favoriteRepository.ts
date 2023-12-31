@@ -9,10 +9,17 @@ export class FavoriteRepository extends BaseRepository implements GenericReposit
     private _tableName: string = process.env.ACCOUNTS_TABLE;
 
     async persist(favorite: Favorite): Promise<Favorite> {
+
+        if (!favorite.status.spoilerText) {
+            delete favorite.status.spoilerText;
+        }
+
+
         return await this.put(this._tableName, {
             pkey: favorite.pkey,
-            skey: `Favorite#${favorite.skey}`
-        }) as Bookmark;
+            skey: `Favorite#${favorite.skey}`,
+            status: favorite.status
+        }) as Favorite;
     }
 
     async getByPkey(pkey: string): Promise<Array<Favorite>> {
@@ -33,7 +40,7 @@ export class FavoriteRepository extends BaseRepository implements GenericReposit
         return !!favorite;
     }
 
-    async getFavorites(accountID: string) {
-        return await super.byPkeyAndPartialSkey(this._tableName, accountID, "Favorite#");
+    async getFavorites(accountID: string) : Promise<Array<Favorite>> {
+        return await super.byPkeyAndPartialSkey(this._tableName, accountID, "Favorite#") as unknown as Array<Favorite>;
     }
 }

@@ -14,10 +14,23 @@ export class BookmarkService {
             return null;
         }
 
+        console.log(`Status found ${status.pkey}`)
+
         return await bookmarkResository.persist({
                 objectName: "Bookmark",
                 pkey: accountID,
-                skey: statusID
+                skey: statusID,
+                status: {
+                    account: status.account,
+                    id: status.pkey,
+                    text: status.content,
+                    spoilerText: status.spoilerText,
+                    published: status.published,
+                    uri: status.uri,
+                    totalLikes: 0,
+                    isFavorite: false,
+                    isBookmark: true
+                }
             }
         );
     }
@@ -33,8 +46,8 @@ export class BookmarkService {
         await bookmarkResository.delete(accountID, statusID);
     }
 
-    async getBookmarks(accountID: string): Promise<Array<StatusDto>> {
-        return await bookmarkResository.getBookmarks(accountID) as Array<StatusDto>;
+    async getBookmarks(accountID: string): Promise<Array<Bookmark>> {
+        return await bookmarkResository.getBookmarks(accountID);
     }
 
     async isBookmarked(accountID: string, statusID: string) {

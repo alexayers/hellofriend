@@ -44,6 +44,7 @@ export class BaseRepository {
             });
 
             await documentClient.send(command);
+            console.log(`Persisted data`);
         } catch (e) {
             console.error(e);
         }
@@ -65,6 +66,7 @@ export class BaseRepository {
                 });
 
                 await documentClient.send(command);
+                console.log(`Persisted timeseries`);
             }
 
         } catch (e) {

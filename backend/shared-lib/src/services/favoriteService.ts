@@ -17,7 +17,18 @@ export class FavoriteService {
         return await favoriteRepository.persist({
                 objectName: "Favorite",
                 pkey: accountID,
-                skey: statusID
+                skey: statusID,
+                status: {
+                    account: status.account,
+                    id: status.pkey,
+                    text: status.content,
+                    spoilerText: status.spoilerText,
+                    published: status.published,
+                    uri: status.uri,
+                    totalLikes: 0,
+                    isFavorite: true,
+                    isBookmark: false
+                }
             }
         );
     }
@@ -33,8 +44,8 @@ export class FavoriteService {
         return await favoriteRepository.delete(accountID, statusID);
     }
 
-    async getFavorites(accountID: string): Promise<Array<StatusDto>> {
-        return await favoriteRepository.getFavorites(accountID) as Array<StatusDto>;
+    async getFavorites(accountID: string): Promise<Array<Favorite>> {
+        return await favoriteRepository.getFavorites(accountID);
     }
 
     async isFavorited(accountID: string, statusID: string) {
