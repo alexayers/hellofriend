@@ -8,7 +8,6 @@ export const exploreStatuses = middyfy(async (event: APIGatewayProxyEvent): Prom
 
     let accountID : string = event.requestContext.authorizer.claims.sub;
     let results = await timeSeriesService.getRecent("Status");
-
     const pkeys = results.map(item => item.pkey);
 
     const [bookmarkedResults, favoritedResults] = await Promise.all([
