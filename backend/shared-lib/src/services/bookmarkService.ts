@@ -53,4 +53,8 @@ export class BookmarkService {
     async isBookmarked(accountID: string, statusID: string) {
         return await bookmarkResository.isBookmarked(accountID, statusID);
     }
+
+    async areBookmarked(accountID: string, statusIDs: string[]): Promise<boolean[]> {
+        return await bookmarkResository.areBookmarked(accountID, statusIDs);
+    }
 }

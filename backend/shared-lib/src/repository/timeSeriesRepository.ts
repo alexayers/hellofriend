@@ -25,7 +25,7 @@ export class TimeSeriesRepository extends BaseRepository implements GenericRepos
                 ':value': objectName
             },
             ScanIndexForward: false,
-            Limit: 25
+            Limit: 15
         }
 
         return await super.query(params);

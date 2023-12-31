@@ -1,6 +1,7 @@
-import {BaseRepository} from "./baseRepository";
+import {BaseRepository, documentClient} from "./baseRepository";
 import {GenericRepository} from "./genericRepository";
 import {Bookmark} from "../model/bookmark";
+import {BatchGetItemCommand} from "@aws-sdk/client-dynamodb";
 
 
 export class BookmarkRepository extends BaseRepository implements GenericRepository<Bookmark> {
@@ -37,8 +38,50 @@ export class BookmarkRepository extends BaseRepository implements GenericReposit
 
         return !!bookmark;
     }
+    
 
     async getBookmarks(accountID: string) : Promise<Array<Bookmark>> {
         return await super.byPkeyAndPartialSkey(this._tableName, accountID, "Bookmark#") as unknown as Array<Bookmark>;
+    }
+
+    async areBookmarked(accountID: string, statusIDs: string[]): Promise<boolean[]> {
+
+        const BATCH_SIZE :number = 100;
+        const chunks = [];
+        for (let i: number = 0; i < statusIDs.length; i += BATCH_SIZE) {
+            chunks.push(statusIDs.slice(i, i + BATCH_SIZE));
+        }
+
+        let bookmarkedStatuses = [];
+        for (const chunk of chunks) {
+            let keys = chunk.map(statusID => ({
+                pkey: { S: accountID },
+                skey: { S: `Bookmark#${statusID}` }
+            }));
+
+            const params = {
+                RequestItems: {
+                    [this._tableName]: {
+                        Keys: keys
+                    }
+                }
+            };
+
+            try {
+                const data = await documentClient.send(new BatchGetItemCommand(params));
+                let results = data.Responses[this._tableName];
+
+                const chunkBookmarked = chunk.map(statusID =>
+                    results.some(item => item.skey.S === `Bookmark#${statusID}`)
+                );
+
+                bookmarkedStatuses.push(...chunkBookmarked);
+            } catch (error) {
+                console.error("Error:", error);
+                throw error;
+            }
+        }
+
+        return bookmarkedStatuses;
     }
 }

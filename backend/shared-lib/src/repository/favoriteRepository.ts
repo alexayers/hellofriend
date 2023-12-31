@@ -1,7 +1,8 @@
-import {BaseRepository} from "./baseRepository";
+import {BaseRepository, documentClient} from "./baseRepository";
 import {GenericRepository} from "./genericRepository";
 import {Favorite} from "../model/favorite";
 import {Bookmark} from "../model/bookmark";
+import {BatchGetItemCommand} from "@aws-sdk/client-dynamodb";
 
 
 export class FavoriteRepository extends BaseRepository implements GenericRepository<Favorite> {
@@ -42,5 +43,46 @@ export class FavoriteRepository extends BaseRepository implements GenericReposit
 
     async getFavorites(accountID: string) : Promise<Array<Favorite>> {
         return await super.byPkeyAndPartialSkey(this._tableName, accountID, "Favorite#") as unknown as Array<Favorite>;
+    }
+
+    async areFavorited(accountID: string, statusIDs: string[]): Promise<boolean[]> {
+
+        const BATCH_SIZE : number = 100;
+        const chunks = [];
+        for (let i : number = 0; i < statusIDs.length; i += BATCH_SIZE) {
+            chunks.push(statusIDs.slice(i, i + BATCH_SIZE));
+        }
+
+        let favoritedStatuses = [];
+        for (const chunk of chunks) {
+            let keys = chunk.map(statusID => ({
+                pkey: { S: accountID },
+                skey: { S: `Favorite#${statusID}` }
+            }));
+
+            const params = {
+                RequestItems: {
+                    [this._tableName]: {
+                        Keys: keys
+                    }
+                }
+            };
+
+            try {
+                const data = await documentClient.send(new BatchGetItemCommand(params));
+                let results = data.Responses[this._tableName];
+
+                const chunkFavorited = chunk.map(statusID =>
+                    results.some(item => item.skey.S === `Favorite#${statusID}`)
+                );
+
+                favoritedStatuses.push(...chunkFavorited);
+            } catch (error) {
+                console.error("Error:", error);
+                throw error;
+            }
+        }
+
+        return favoritedStatuses;
     }
 }

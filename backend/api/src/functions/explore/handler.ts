@@ -9,21 +9,19 @@ export const exploreStatuses = middyfy(async (event: APIGatewayProxyEvent): Prom
     let accountID : string = event.requestContext.authorizer.claims.sub;
     let results = await timeSeriesService.getRecent("Status");
 
-    const bookmarkAndFavoritePromises = results.map(item => Promise.all([
-        bookmarkService.isBookmarked(accountID, item.pkey),
-        favoriteService.isFavorited(accountID, item.pkey)
-    ]));
+    const pkeys = results.map(item => item.pkey);
 
-    const bookmarkAndFavoriteResults = await Promise.all(bookmarkAndFavoritePromises);
+    const [bookmarkedResults, favoritedResults] = await Promise.all([
+        bookmarkService.areBookmarked(accountID, pkeys),
+        favoriteService.areFavorited(accountID, pkeys)
+    ]);
+
     results = results.map((item, index) => {
-
-        const [isBookmarked, isFavorites] = bookmarkAndFavoriteResults[index];
-
         return {
             account: item.account,
-            id:item.pkey,
-            isBookmark: isBookmarked,
-            isFavorite: isFavorites,
+            id: item.pkey,
+            isBookmark: bookmarkedResults[index],
+            isFavorite: favoritedResults[index],
             published: item.published,
             text: item.content,
             totalLikes: 0,

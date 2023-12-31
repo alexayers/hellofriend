@@ -6,6 +6,7 @@ import {Account} from "@libs/model/account";
 import {Status} from "@libs/model/status";
 import {Bookmark} from "@libs/model/bookmark";
 import {Favorite} from "@libs/model/favorite";
+import {StatusDto} from "@libs/dto/statusDto";
 
 
 export const updateAccount = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -25,20 +26,19 @@ export const getBookmarks = middyfy(async (event: APIGatewayProxyEvent): Promise
         return notFoundResponse(`No bookmarks found`);
     }
 
-    const bookmarkAndFavoritePromises = bookmarks.map(item => Promise.all([
-        favoriteService.isFavorited(accountID, item.status.id)
-    ]));
+    const pkeys = bookmarks.map(item => item.status.id);
 
-    const bookmarkAndFavoriteResults = await Promise.all(bookmarkAndFavoritePromises);
-    let results = bookmarks.map((item, index) => {
+    const [bookmarkedResults, favoritedResults] = await Promise.all([
+        bookmarkService.areBookmarked(accountID, pkeys),
+        favoriteService.areFavorited(accountID, pkeys)
+    ]);
 
-        const isFavorited = bookmarkAndFavoriteResults[index];
-
+    let statusDtos: Array<StatusDto> = bookmarks.map((item, index) => {
         return {
             account: item.status.account,
             id: item.status.id,
-            isBookmark: true,
-            isFavorite: isFavorited[0],
+            isBookmark: bookmarkedResults[index],
+            isFavorite: favoritedResults[index],
             published: item.status.published,
             text: item.status.text,
             totalLikes: 0,
@@ -46,7 +46,7 @@ export const getBookmarks = middyfy(async (event: APIGatewayProxyEvent): Promise
         }
     });
 
-    return successResponse({results});
+    return successResponse({statusDtos});
 });
 
 export const getFavorites = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -58,19 +58,20 @@ export const getFavorites = middyfy(async (event: APIGatewayProxyEvent): Promise
         return notFoundResponse(`No favorites found`);
     }
 
-    const bookmarkAndFavoritePromises = favorites.map(item => Promise.all([
-        bookmarkService.isBookmarked(accountID, item.status.id)]));
 
-    const bookmarkAndFavoriteResults = await Promise.all(bookmarkAndFavoritePromises);
-    let results = favorites.map((item, index) => {
+    const pkeys = favorites.map(item => item.status.id);
 
-        const isBookmarked = bookmarkAndFavoriteResults[index];
+    const [bookmarkedResults, favoritedResults] = await Promise.all([
+        bookmarkService.areBookmarked(accountID, pkeys),
+        favoriteService.areFavorited(accountID, pkeys)
+    ]);
 
+    let statusDtos: Array<StatusDto> = favorites.map((item, index) => {
         return {
             account: item.status.account,
             id: item.status.id,
-            isBookmark: isBookmarked[0],
-            isFavorite: true,
+            isBookmark: bookmarkedResults[index],
+            isFavorite: favoritedResults[index],
             published: item.status.published,
             text: item.status.text,
             totalLikes: 0,
@@ -78,7 +79,7 @@ export const getFavorites = middyfy(async (event: APIGatewayProxyEvent): Promise
         }
     });
 
-    return successResponse({results});
+    return successResponse({statusDtos});
 });
 
 export const followAccount = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -131,6 +132,7 @@ export const getAccount = middyfy(async (event: APIGatewayProxyEvent): Promise<A
 export const getStatuses = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     console.log(event);
     let accountID: string = event.pathParameters.accountID;
+    let yourAccountID: string = event.requestContext.authorizer.claims.sub;
     let account: Account = await accountService.getById(accountID);
 
     if (!account) {
@@ -143,21 +145,19 @@ export const getStatuses = middyfy(async (event: APIGatewayProxyEvent): Promise<
         return notFoundResponse(`No statuses found`);
     }
 
-    const bookmarkAndFavoritePromises = statuses.map(item => Promise.all([
-        bookmarkService.isBookmarked(accountID, item.pkey),
-        favoriteService.isFavorited(accountID, item.pkey)
-    ]));
+    const pkeys = statuses.map(item => item.pkey);
 
-    const bookmarkAndFavoriteResults = await Promise.all(bookmarkAndFavoritePromises);
-    let results = statuses.map((item, index) => {
+    const [bookmarkedResults, favoritedResults] = await Promise.all([
+        bookmarkService.areBookmarked(yourAccountID, pkeys),
+        favoriteService.areFavorited(yourAccountID, pkeys)
+    ]);
 
-        const [isBookmarked, isFavorites] = bookmarkAndFavoriteResults[index];
-
+    let statusDtos: Array<StatusDto> = statuses.map((item, index) => {
         return {
             account: item.account,
             id: item.pkey,
-            isBookmark: isBookmarked,
-            isFavorite: isFavorites,
+            isBookmark: bookmarkedResults[index],
+            isFavorite: favoritedResults[index],
             published: item.published,
             text: item.content,
             totalLikes: 0,
@@ -165,6 +165,6 @@ export const getStatuses = middyfy(async (event: APIGatewayProxyEvent): Promise<
         }
     });
 
-    return successResponse({results});
+    return successResponse({statusDtos});
 });
 

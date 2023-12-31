@@ -1,5 +1,5 @@
 import {Favorite} from "../model/favorite";
-import {favoriteRepository, statusRepository} from "../repository";
+import {bookmarkResository, favoriteRepository, statusRepository} from "../repository";
 import {StatusDto} from "../dto/statusDto";
 import {Status} from "../model/status";
 
@@ -50,5 +50,9 @@ export class FavoriteService {
 
     async isFavorited(accountID: string, statusID: string) {
         return await favoriteRepository.isFavorited(accountID, statusID);
+    }
+
+    async areFavorited(accountID: string, statusIDs: string[]): Promise<boolean[]> {
+        return await favoriteRepository.areFavorited(accountID, statusIDs);
     }
 }

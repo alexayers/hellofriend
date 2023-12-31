@@ -4,6 +4,7 @@ import {handlerPath} from "@libs/lambda/handler-resolver";
 export const exploreStatuses = {
     handler: `${handlerPath(__dirname)}/handler.exploreStatuses`,
     memorySize: 128,
+    timeout: 30,
     events: [
         {
             http: {
@@ -24,6 +25,7 @@ export const exploreStatuses = {
 export const exploreTags = {
     handler: `${handlerPath(__dirname)}/handler.exploreTags`,
     memorySize: 128,
+    timeout: 30,
     events: [
         {
             http: {
@@ -43,6 +45,7 @@ export const exploreTags = {
 export const exploreAccounts = {
     handler: `${handlerPath(__dirname)}/handler.exploreAccounts`,
     memorySize: 128,
+    timeout: 30,
     events: [
         {
             http: {

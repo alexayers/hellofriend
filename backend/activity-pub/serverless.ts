@@ -97,6 +97,7 @@ export const serverlessConfiguration: AWS = {
                             "dynamodb:PutItem",
                             "dynamodb:UpdateItem",
                             "dynamodb:DeleteItem",
+                            "dynamodb:BatchGetItem"
                         ],
                         Resource: [
                             { "Fn::ImportValue": `${resourcePrefix}-AccountsTableArn` },
