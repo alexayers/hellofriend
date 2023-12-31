@@ -4,6 +4,7 @@ import {handlerPath} from "@libs/lambda/handler-resolver";
 export const postStatus = {
     handler: `${handlerPath(__dirname)}/handler.postStatus`,
     memorySize: 128,
+    timeout: 30,
     events: [
         {
             http: {
@@ -23,6 +24,7 @@ export const postStatus = {
 export const getStatus = {
     handler: `${handlerPath(__dirname)}/handler.getStatus`,
     memorySize: 128,
+    timeout: 30,
     events: [
         {
             http: {
@@ -42,6 +44,7 @@ export const getStatus = {
 export const updateStatus = {
     handler: `${handlerPath(__dirname)}/handler.updateStatus`,
     memorySize: 128,
+    timeout: 30,
     events: [
         {
             http: {
@@ -61,6 +64,7 @@ export const updateStatus = {
 export const deleteStatus = {
     handler: `${handlerPath(__dirname)}/handler.deleteStatus`,
     memorySize: 128,
+    timeout: 30,
     events: [
         {
             http: {
@@ -80,6 +84,7 @@ export const deleteStatus = {
 export const replyToStatus = {
     handler: `${handlerPath(__dirname)}/handler.replyToStatus`,
     memorySize: 128,
+    timeout: 30,
     events: [
         {
             http: {
@@ -99,6 +104,7 @@ export const replyToStatus = {
 export const favoriteStatus = {
     handler: `${handlerPath(__dirname)}/handler.favoriteStatus`,
     memorySize: 128,
+    timeout: 30,
     events: [
         {
             http: {
@@ -118,6 +124,7 @@ export const favoriteStatus = {
 export const removeFavorite = {
     handler: `${handlerPath(__dirname)}/handler.removeFavorite`,
     memorySize: 128,
+    timeout: 30,
     events: [
         {
             http: {
@@ -137,6 +144,7 @@ export const removeFavorite = {
 export const bookmarkStatus = {
     handler: `${handlerPath(__dirname)}/handler.bookmarkStatus`,
     memorySize: 128,
+    timeout: 30,
     events: [
         {
             http: {
@@ -156,6 +164,7 @@ export const bookmarkStatus = {
 export const removeBookmark = {
     handler: `${handlerPath(__dirname)}/handler.removeBookmark`,
     memorySize: 128,
+    timeout: 30,
     events: [
         {
             http: {
@@ -175,6 +184,7 @@ export const removeBookmark = {
 export const pinStatus = {
     handler: `${handlerPath(__dirname)}/handler.pinStatus`,
     memorySize: 128,
+    timeout: 30,
     events: [
         {
             http: {
@@ -194,6 +204,7 @@ export const pinStatus = {
 export const unPinStatus = {
     handler: `${handlerPath(__dirname)}/handler.unPinStatus`,
     memorySize: 128,
+    timeout: 30,
     events: [
         {
             http: {

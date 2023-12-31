@@ -210,6 +210,10 @@ export const serverlessConfiguration: AWS = {
                         {
                             AttributeName: "compoundKey",
                             AttributeType: "S",
+                        },
+                        {
+                            AttributeName: "objectName",
+                            AttributeType: "S",
                         }
                     ],
                     KeySchema: [
@@ -231,7 +235,23 @@ export const serverlessConfiguration: AWS = {
                                 WriteCapacityUnits: 1
                             }
                         },
+                        {
+                            IndexName: 'object-index',
+                            KeySchema: [
+                                {AttributeName: 'objectName', KeyType: 'HASH'},
+                                {AttributeName: 'skey', KeyType: 'RANGE'}
+                            ],
+                            Projection: {ProjectionType: 'ALL'},
+                            ProvisionedThroughput: {
+                                ReadCapacityUnits: 1,
+                                WriteCapacityUnits: 1
+                            }
+                        },
                     ],
+                    TimeToLiveSpecification: {
+                        AttributeName: "expiresAt",
+                        Enabled: true
+                    },
                     ProvisionedThroughput: {
                         ReadCapacityUnits: 1,
                         WriteCapacityUnits: 1

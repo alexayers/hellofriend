@@ -4,7 +4,6 @@ import {Status} from "../model/status";
 import {StatusTag} from "../model/statusTag";
 import {QueryCommand, QueryCommandOutput} from "@aws-sdk/lib-dynamodb";
 import console from "console";
-import {StatusDto} from "../dto/statusDto";
 
 
 export class StatusRepository extends BaseRepository implements GenericRepository<Status> {
@@ -17,6 +16,10 @@ export class StatusRepository extends BaseRepository implements GenericRepositor
             delete status.inReplyToAccountId
         }
 
+        if (!status.inReplyToAtomUri) {
+            delete status.inReplyToAtomUri
+        }
+
         if (!status.inReplyToId) {
             delete status.inReplyToId;
         }
@@ -25,7 +28,11 @@ export class StatusRepository extends BaseRepository implements GenericRepositor
             delete status.spoilerText;
         }
 
-        return await this.put(this._tableName, status) as Status;;
+        if (!status.updated) {
+            delete status.updated;
+        }
+
+        return await this.put(this._tableName, status) as Status;
 
     }
 
@@ -54,7 +61,7 @@ export class StatusRepository extends BaseRepository implements GenericRepositor
 
     }
 
-    async getStatusById(statusID: string) : Promise<Status> {
+    async getStatusById(statusID: string): Promise<Status> {
         const params = {
             TableName: this._tableName,
             KeyConditionExpression: "#pkey = :pkey AND begins_with(#skey, :prefix)",
@@ -71,21 +78,21 @@ export class StatusRepository extends BaseRepository implements GenericRepositor
         console.log(params);
 
         try {
-            const data : QueryCommandOutput = await documentClient.send(new QueryCommand(params));
+            const data: QueryCommandOutput = await documentClient.send(new QueryCommand(params));
 
-            if (data.Items.length == 1) {
+            if (data.Items && data.Items.length == 1) {
                 return data.Items[0] as Status;
             } else {
-                return undefined;
+                return null;
             }
 
         } catch (error) {
             console.error("Error:", error);
-            throw error;
+            return null;
         }
     }
 
-    async getByAccountID(accountID: string) : Promise<Array<Status>> {
+    async getByAccountID(accountID: string): Promise<Array<Status>> {
 
         const params = {
             TableName: this._tableName,
@@ -96,7 +103,44 @@ export class StatusRepository extends BaseRepository implements GenericRepositor
             }
         }
 
+        let results = await super.query(params);
 
-        return await super.query(params) as Array<Status>;
+        if (!results) {
+            return null;
+        } else {
+           return results as Array<Status>
+        }
+
+    }
+
+    async getStatusByTag(tag: string) : Promise<Array<any>> {
+        const params = {
+            TableName: this._tableName,
+            KeyConditionExpression: "#pkey = :pkey",
+            ExpressionAttributeNames: {
+                "#pkey": "pkey"
+            },
+            ExpressionAttributeValues: {
+                ":pkey": tag
+            },
+            ScanIndexForward: false,
+            Limit: 25
+        };
+
+        console.log(params);
+
+        try {
+            const data = await documentClient.send(new QueryCommand(params));
+
+            if (data.Items) {
+                return data.Items;
+            } else {
+                return null;
+            }
+
+        } catch (error) {
+            console.error("Error:", error);
+            throw error;
+        }
     }
 }

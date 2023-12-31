@@ -6,24 +6,38 @@ import {Status} from "../model/status";
 
 export class BookmarkService {
 
-    async addBookmark(accountID: string, statusID: string) : Promise<Bookmark> {
+    async addBookmark(accountID: string, statusID: string): Promise<Bookmark> {
 
-        const status : Status = await statusRepository.getStatusById(statusID);
+        const status: Status = await statusRepository.getStatusById(statusID);
 
         if (!status) {
             return null;
         }
 
+        console.log(`Status found ${status.pkey}`)
+
         return await bookmarkResository.persist({
-            objectName: "Bookmark",
-            pkey: accountID,
-            skey: statusID}
+                objectName: "Bookmark",
+                pkey: accountID,
+                skey: statusID,
+                status: {
+                    account: status.account,
+                    id: status.pkey,
+                    text: status.content,
+                    spoilerText: status.spoilerText,
+                    published: status.published,
+                    uri: status.uri,
+                    totalLikes: 0,
+                    isFavorite: false,
+                    isBookmark: true
+                }
+            }
         );
     }
 
-    async removeBookmark(accountID: string, statusID: string) : Promise<boolean> {
+    async removeBookmark(accountID: string, statusID: string): Promise<boolean> {
 
-        const status : Status = await statusRepository.getStatusById(statusID);
+        const status: Status = await statusRepository.getStatusById(statusID);
 
         if (!status) {
             return false;
@@ -32,11 +46,15 @@ export class BookmarkService {
         await bookmarkResository.delete(accountID, statusID);
     }
 
-    async getBookmarks(accountID: string) : Promise<Array<StatusDto>> {
-        return await bookmarkResository.getBookmarks(accountID) as Array<StatusDto>;
+    async getBookmarks(accountID: string): Promise<Array<Bookmark>> {
+        return await bookmarkResository.getBookmarks(accountID);
     }
 
     async isBookmarked(accountID: string, statusID: string) {
         return await bookmarkResository.isBookmarked(accountID, statusID);
+    }
+
+    async areBookmarked(accountID: string, statusIDs: string[]): Promise<boolean[]> {
+        return await bookmarkResository.areBookmarked(accountID, statusIDs);
     }
 }

@@ -1,10 +1,10 @@
 import {middyfy} from "@libs/lambda/lambda";
 import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
 import {Account} from "@libs/model/account";
-import {accountService, inboxSerivce, inboundQueueService} from "@libs/services";
+import {accountService, inboundQueueService, inboxSerivce} from "@libs/services";
 import {notAuthenticatedResponse, notFoundResponse, successResponse} from "@libs/lambda/api-gateway";
 import {ValidationStatus} from "@libs/services/inboxService";
-import {Activity, ActivityType, FollowActivity} from "@libs/activityPub/activity/activities";
+import {Activity} from "@libs/activityPub/activity/activities";
 
 
 export const getUser = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {

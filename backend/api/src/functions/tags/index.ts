@@ -1,15 +1,15 @@
 import {handlerPath} from "@libs/lambda/handler-resolver";
 
 
-export const search = {
-    handler: `${handlerPath(__dirname)}/handler.search`,
-    memorySize: 512,
+export const getStatusesByTag = {
+    handler: `${handlerPath(__dirname)}/handler.tags`,
+    memorySize: 128,
     timeout: 30,
     events: [
         {
             http: {
-                method: 'post',
-                path: '/search',
+                method: 'get',
+                path: '/tags/{tag}',
                 authorizer: {
                     type: 'COGNITO_USER_POOLS',
                     authorizerId: {

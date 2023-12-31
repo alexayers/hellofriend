@@ -3,6 +3,7 @@ import {handlerPath} from "@libs/lambda/handler-resolver";
 export const updateAccount = {
     handler: `${handlerPath(__dirname)}/handler.updateAccount`,
     memorySize: 128,
+    timeout: 30,
     events: [
         {
             http: {
@@ -23,6 +24,7 @@ export const updateAccount = {
 export const getBookmarks = {
     handler: `${handlerPath(__dirname)}/handler.getBookmarks`,
     memorySize: 128,
+    timeout: 30,
     events: [
         {
             http: {
@@ -42,6 +44,7 @@ export const getBookmarks = {
 export const getFavorites = {
     handler: `${handlerPath(__dirname)}/handler.getFavorites`,
     memorySize: 128,
+    timeout: 30,
     events: [
         {
             http: {
@@ -61,6 +64,7 @@ export const getFavorites = {
 export const followAccount = {
     handler: `${handlerPath(__dirname)}/handler.followAccount`,
     memorySize: 128,
+    timeout: 30,
     events: [
         {
             http: {
@@ -80,6 +84,7 @@ export const followAccount = {
 export const unFollowAccount = {
     handler: `${handlerPath(__dirname)}/handler.unFollowAccount`,
     memorySize: 128,
+    timeout: 30,
     events: [
         {
             http: {
@@ -99,6 +104,7 @@ export const unFollowAccount = {
 export const getAccount = {
     handler: `${handlerPath(__dirname)}/handler.getAccount`,
     memorySize: 128,
+    timeout: 30,
     events: [
         {
             http: {
@@ -118,6 +124,7 @@ export const getAccount = {
 export const getStatuses = {
     handler: `${handlerPath(__dirname)}/handler.getStatuses`,
     memorySize: 128,
+    timeout: 30,
     events: [
         {
             http: {

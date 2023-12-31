@@ -17,7 +17,7 @@ export interface FingerLinkResponse {
 
 export class WebFingerService {
 
-    async finger(username: string, domain: string) : Promise<Account> {
+    async finger(username: string, domain: string): Promise<Account> {
 
         let cachedAccount: Account = await accountService.getByNormalizedUsernameDomain(username, domain);
 
@@ -39,7 +39,7 @@ export class WebFingerService {
 
         let webFingerUrl: string = `https://${domain}/.well-known/webfinger?resource=acct:${username}@${domain}`;
         console.debug(`WebFinger: ${webFingerUrl}`);
-        let response : PersonActor = await fediverseService.signedRequest("get", webFingerUrl);
+        let response: PersonActor = await fediverseService.signedRequest("get", webFingerUrl);
         let person: PersonActor | undefined;
 
         if (!response) {
@@ -51,7 +51,7 @@ export class WebFingerService {
         let fingerResponse: FingerResponse = response as unknown as FingerResponse;
         let accountUrl: string | undefined;
 
-        for (const link  of fingerResponse.links) {
+        for (const link of fingerResponse.links) {
             if (link.type == "application/activity+json") {
                 accountUrl = link.href;
                 break;
@@ -80,7 +80,7 @@ export class WebFingerService {
                 // Remove the old files
 
                 const promises = [
-                    accountService.updatePerson(cachedAccount,person, domain),
+                    accountService.updatePerson(cachedAccount, person, domain),
                     fileSystemService.delete(cachedAccount.avatarFilename),
                     fileSystemService.delete(cachedAccount.headerFilename)];
 

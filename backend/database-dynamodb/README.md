@@ -1,4 +1,4 @@
-# Hello Friend: Database
+# Hello Friend: DynamoDB
 
 This project will setup the follow prerequisites.
 

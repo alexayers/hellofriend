@@ -4,7 +4,7 @@ import {
   dynamoDbStreamAccountsProcessor,
   dynamoDbStreamStatusesProcessor,
   dynamoDbStreamTagsProcessor
-} from "@functions/dynamo-stream";
+} from "src/functions/search-stream";
 import {createIndices, destroyIndices} from "@functions/install";
 import {searchTimeline} from "@functions/search";
 
@@ -36,9 +36,10 @@ export const serverlessConfiguration: AWS = {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       COGNITO_CLIENT_ID: { "Fn::ImportValue": `${resourcePrefix}-CognitoUserPoolClientId` },
-      TIMELINE_QUEUE: { 'Fn::ImportValue': `${resourcePrefix}-TimelineQueueUrl` },
       OPENSEARCH_ENDPOINT: { 'Fn::ImportValue': `${resourcePrefix}-OpenSearchEndpoint` },
+      FILES_BUCKET: { 'Fn::ImportValue': `${resourcePrefix}-FilesBucketName` },
       ACCOUNTS_TABLE: { "Fn::ImportValue": `${resourcePrefix}-AccountsTableName` },
+      TIMESERIES_TABLE: { "Fn::ImportValue": `${resourcePrefix}-TimeSeriesTableName` },
       DOMAIN: '${self:custom.certificateName}'
     },
     iam: {
@@ -55,11 +56,17 @@ export const serverlessConfiguration: AWS = {
           {
             Effect: 'Allow',
             Action: [
-              'sqs:SendMessage'
+              's3:GetBucketPolicy',
+              's3:ListBucket',
+              's3:DeleteBucket',
+              's3:PutObject',
+              's3:GetObject',
+              's3:DeleteObject'
             ],
             Resource: [
-              { "Fn::ImportValue": {"Fn::Sub": `${resourcePrefix}-TimelineQueueArn`} }
-            ]
+              `arn:aws:s3:::files.${domain}`,
+              `arn:aws:s3:::files.${domain}/*`,
+            ],
           },
           {
             Effect: "Allow",
@@ -67,6 +74,9 @@ export const serverlessConfiguration: AWS = {
               "dynamodb:DescribeTable",
               "dynamodb:Query",
               "dynamodb:GetItem",
+              "dynamodb:PutItem",
+              "dynamodb:UpdateItem",
+              "dynamodb:DeleteItem"
             ],
             Resource: [
               {"Fn::ImportValue": `${resourcePrefix}-AccountsTableArn`},
@@ -90,13 +100,19 @@ export const serverlessConfiguration: AWS = {
                   '/index/*'
                 ]]
               },
+              { "Fn::ImportValue": `${resourcePrefix}-TimeSeriesTableArn` },
+              { "Fn::Join": ['', [
+                  { "Fn::ImportValue": `${resourcePrefix}-TimeSeriesTableArn` },
+                  '/index/*'
+                ]]
+              },
             ]
           }
           ],
       },
     }
   },
-  // import the function via paths
+
   functions: {
     dynamoDbStreamStatusesProcessor,
     dynamoDbStreamTagsProcessor,

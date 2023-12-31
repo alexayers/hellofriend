@@ -30,7 +30,7 @@ export class InboxService {
             return ValidationStatus.NO_RETRY;
         }
 
-        let incomingDate : Date = new Date(date);
+        let incomingDate: Date = new Date(date);
         const oneMinuteAgo: Date = new Date(incomingDate.getTime() - 60000);
 
         if (incomingDate < oneMinuteAgo) {
@@ -42,8 +42,8 @@ export class InboxService {
         let expectedHeaders: string = this.extractExpectedHeaders(signatureMap, inboxUrl, headers);
 
         let keyId: string = signatureMap.get("keyId");
-        let actor : {username: string, domain: string} = actorFromUrl(keyId);
-        let account : Account = await accountService.getByNormalizedUsernameDomain(actor.username, actor.domain);
+        let actor: { username: string, domain: string } = actorFromUrl(keyId);
+        let account: Account = await accountService.getByNormalizedUsernameDomain(actor.username, actor.domain);
 
         if (account) {
 
@@ -64,9 +64,9 @@ export class InboxService {
         }
     }
 
-    private validateKey(publicKey: string, signature: string,expectedHeaders: string ) : ValidationStatus {
+    private validateKey(publicKey: string, signature: string, expectedHeaders: string): ValidationStatus {
 
-        const key : crypto.KeyObject = crypto.createPublicKey(publicKey);
+        const key: crypto.KeyObject = crypto.createPublicKey(publicKey);
 
         let isValid: boolean = crypto.verify(
             "sha256",
@@ -78,7 +78,7 @@ export class InboxService {
             Buffer.from(signature, 'base64')
         );
 
-        return isValid ?  ValidationStatus.VALID : ValidationStatus.REFRESH;
+        return isValid ? ValidationStatus.VALID : ValidationStatus.REFRESH;
     }
 
     private extractExpectedHeaders(signatureMap: Map<string, string>, inboxUrl: string, headers: APIGatewayProxyEventHeaders): string {

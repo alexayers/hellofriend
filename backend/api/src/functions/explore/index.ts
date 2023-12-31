@@ -1,14 +1,15 @@
 import {handlerPath} from "@libs/lambda/handler-resolver";
 
 
-export const explorePosts = {
-    handler: `${handlerPath(__dirname)}/handler.explorePosts`,
+export const exploreStatuses = {
+    handler: `${handlerPath(__dirname)}/handler.exploreStatuses`,
     memorySize: 128,
+    timeout: 30,
     events: [
         {
             http: {
                 method: 'get',
-                path: '/explore/posts',
+                path: '/explore/statuses',
                 authorizer: {
                     type: 'COGNITO_USER_POOLS',
                     authorizerId: {
@@ -24,6 +25,7 @@ export const explorePosts = {
 export const exploreTags = {
     handler: `${handlerPath(__dirname)}/handler.exploreTags`,
     memorySize: 128,
+    timeout: 30,
     events: [
         {
             http: {
@@ -43,6 +45,7 @@ export const exploreTags = {
 export const exploreAccounts = {
     handler: `${handlerPath(__dirname)}/handler.exploreAccounts`,
     memorySize: 128,
+    timeout: 30,
     events: [
         {
             http: {

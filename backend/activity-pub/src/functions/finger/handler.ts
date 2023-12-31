@@ -1,7 +1,7 @@
 import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
 import {middyfy} from "@libs/lambda/lambda";
 import {Account} from "@libs/model/account";
-import {accountService, fediverseService, webFingerService} from "@libs/services";
+import {accountService, webFingerService} from "@libs/services";
 import {notFoundResponse, notValidResponse, successResponse} from "@libs/lambda/api-gateway";
 
 

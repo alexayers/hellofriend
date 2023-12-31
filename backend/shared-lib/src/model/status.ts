@@ -1,12 +1,15 @@
 import {BaseModel} from "./baseModel";
+import {Account} from "./account";
+import {AccountDto} from "../dto/accountDto";
 
 
 export interface Status extends BaseModel {
     text?: string
     spoilerText?: string
     inReplyToId?: string
+    inReplyToAtomUri?: string
     inReplyToAccountId?: string
-    statusBoostedId?:string
+    statusBoostedId?: string
     language?: string
     published: string
     updated?: string
@@ -17,4 +20,5 @@ export interface Status extends BaseModel {
     sensitive: boolean
     conversationId: string
     content: string
+    account: AccountDto
 }

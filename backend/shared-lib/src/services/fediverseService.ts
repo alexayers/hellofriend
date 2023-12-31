@@ -12,8 +12,8 @@ export class FediverseService {
 
     async signedRequest(method: string, url: string): Promise<any> {
 
-        let sendingUsername : string = "$hello.system$";
-        let account: Account  = await accountService.getByNormalizedUsernameDomain(sendingUsername);
+        let sendingUsername: string = "$hello.system$";
+        let account: Account = await accountService.getByNormalizedUsernameDomain(sendingUsername);
 
         if (!account) {
             console.error("Unable to find user");
@@ -23,7 +23,7 @@ export class FediverseService {
         const destinationHostname: string = new URL(url).hostname;
         const date: string = new Date().toUTCString();
         const digest: string = this.createSha256Digest("");
-        const destinationPath: string = url.replace("https://","").replace(destinationHostname,"").replace("#main-key","");
+        const destinationPath: string = url.replace("https://", "").replace(destinationHostname, "").replace("#main-key", "");
         const stringToSign: string = `(request-target): ${method} ${destinationPath}\nhost: ${destinationHostname}\ndate: ${date}\ndigest: SHA-256=${digest}`;
         const signatureB64: string = this.signString(stringToSign, account.privateKey);
         let keyId: string = `https://${this.domain}/users/${sendingUsername}#main-key`;
@@ -39,7 +39,7 @@ export class FediverseService {
                 "Accept": "application/activity+json",
             }
         });
-        let body:any;
+        let body: any;
 
         console.debug(`Request to ${url} returned status: ${response.status}`);
 

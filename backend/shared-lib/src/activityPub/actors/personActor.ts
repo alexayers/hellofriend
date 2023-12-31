@@ -1,5 +1,4 @@
 import {Actor} from "./actor";
-import {Tag} from "../../model/tag";
 import {ActivityTag} from "../objects/activityTag";
 
 export interface PersonActor extends Actor {
@@ -27,7 +26,7 @@ export interface PersonActor extends Actor {
         publicKeyPem: string
     },
     tag?: Array<ActivityTag>
-    attachment?: Array<{type: string, name: string, value: string}>
+    attachment?: Array<{ type: string, name: string, value: string }>
     endpoints: {
         sharedInbox: string
     },

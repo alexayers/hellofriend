@@ -12,7 +12,6 @@ import {Status} from "../model/status";
 export class AccountService {
 
 
-
     async createAccount(registerUser: RegisterUser, sub: string): Promise<Account> {
 
         let keys: { privateKey: string, publicKey: string } = this.generatedKeys();
@@ -75,9 +74,9 @@ export class AccountService {
         return account;
     }
 
-    async persistPerson(person: PersonActor, domain: string) : Promise<Account> {
+    async persistPerson(person: PersonActor, domain: string): Promise<Account> {
 
-        let existingAccount :Account = await accountService.getByNormalizedUsernameDomain(person.preferredUsername, domain);
+        let existingAccount: Account = await accountService.getByNormalizedUsernameDomain(person.preferredUsername, domain);
 
         if (existingAccount) {
             return existingAccount;
@@ -86,6 +85,7 @@ export class AccountService {
         let account: Account = {
             pkey: uuidv4(),
             skey: `Account#${person.preferredUsername.toLowerCase()}:${domain}`,
+            domain: domain,
             objectName: 'Account',
             displayName: person.name,
             followersUrl: `https://${domain}/${person.preferredUsername}/followers`,
@@ -148,7 +148,7 @@ export class AccountService {
 
     async pinStatus(accountID: string, statusID: string): Promise<boolean> {
 
-        const status : Status = await statusRepository.getStatusById(statusID);
+        const status: Status = await statusRepository.getStatusById(statusID);
 
         if (!status) {
             return false;
@@ -158,9 +158,9 @@ export class AccountService {
         return true;
     }
 
-    async unpinStatus(accountID : string, statusID: string) : Promise<boolean> {
+    async unpinStatus(accountID: string, statusID: string): Promise<boolean> {
 
-        const status : Status = await statusRepository.getStatusById(statusID);
+        const status: Status = await statusRepository.getStatusById(statusID);
 
         if (!status) {
             return false;
@@ -170,13 +170,13 @@ export class AccountService {
         return true;
     }
 
-    async getById(accountID: string) : Promise<Account> {
+    async getById(accountID: string): Promise<Account> {
         return await accountRepository.byId(accountID);
     }
 
 
     async getFollowing(accountID: string) {
-        let follows : Array<Follow> = await followService.getFollowing(accountID);
+        let follows: Array<Follow> = await followService.getFollowing(accountID);
 
 
     }

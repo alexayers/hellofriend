@@ -9,8 +9,7 @@ import {
   unFollowAccount,
   updateAccount
 } from "@functions/account";
-import {exploreAccounts, explorePosts, exploreTags} from "@functions/explore";
-import {search} from "@functions/search";
+import {exploreAccounts, exploreStatuses, exploreTags} from "@functions/explore";
 import {
   bookmarkStatus,
   deleteStatus,
@@ -20,6 +19,7 @@ import {
   replyToStatus, unPinStatus,
   updateStatus
 } from "@functions/status";
+import {getStatusesByTag} from "@functions/tags";
 
 
 // We'll use this resourcePrefix for all our resources: dynamoDB, Cognito, etc
@@ -104,6 +104,7 @@ export const serverlessConfiguration: AWS = {
               "dynamodb:PutItem",
               "dynamodb:UpdateItem",
               "dynamodb:DeleteItem",
+              "dynamodb:BatchGetItem"
             ],
             Resource: [
               { "Fn::ImportValue": `${resourcePrefix}-AccountsTableArn` },
@@ -151,10 +152,9 @@ export const serverlessConfiguration: AWS = {
     unFollowAccount,
     getAccount,
     getStatuses,
-    explorePosts,
+    exploreStatuses,
     exploreTags,
     exploreAccounts,
-    search,
     postStatus,
     getStatus,
     updateStatus,
@@ -165,7 +165,8 @@ export const serverlessConfiguration: AWS = {
     bookmarkStatus,
     removeBookmark,
     pinStatus,
-    unPinStatus
+    unPinStatus,
+    getStatusesByTag
   },
   package: {individually: true},
   custom: {

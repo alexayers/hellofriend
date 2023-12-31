@@ -1,6 +1,6 @@
 import {GenericRepository} from "./genericRepository";
 import {Account} from "../model/account";
-import {BaseRepository, documentClient} from "./baseRepository";
+import {BaseRepository} from "./baseRepository";
 
 export class AccountRepository extends BaseRepository implements GenericRepository<Account> {
 
@@ -36,14 +36,14 @@ export class AccountRepository extends BaseRepository implements GenericReposito
     }
 
     async unpinStatus(accountID: string, statusID: string) {
-        await this.deleteItemByPkeyAndSkey(this._tableName,accountID,  `StatusPin#${statusID}`);
+        await this.deleteItemByPkeyAndSkey(this._tableName, accountID, `StatusPin#${statusID}`);
     }
 
 
-    async byId(accountID: string) : Promise<Account> {
+    async byId(accountID: string): Promise<Account> {
         let results = await this.byPkeyAndPartialSkey(this._tableName, accountID, "Account");
 
-        if (results.length == 1) {
+        if (results && results.length == 1) {
             return results[0];
         } else {
             return null;
