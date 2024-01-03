@@ -28,7 +28,7 @@ export const exploreStatuses = middyfy(async (event: APIGatewayProxyEvent): Prom
         }
     });
 
-    return successResponse({results});
+    return successResponse({statuses:results});
 });
 
 export const exploreTags = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -36,10 +36,13 @@ export const exploreTags = middyfy(async (event: APIGatewayProxyEvent): Promise<
 
     let results = await timeSeriesService.getRecent("Tag");
     results = results.map(item => {
-        return { tag: item.pkey };
+        return {
+            tag: item.pkey,
+            created: item.createdAt
+        };
     });
 
-    return successResponse({results});
+    return successResponse({tags:results});
 });
 
 export const exploreAccounts = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -55,9 +58,10 @@ export const exploreAccounts = middyfy(async (event: APIGatewayProxyEvent): Prom
            summary: item?.summary,
            uri: item.uri,
            avatarFilename: item?.avatarFilename,
-           username: item.username
+           username: item.username,
+           created: item.createdAt
        }
     });
 
-    return successResponse({results});
+    return successResponse({accounts:results});
 });

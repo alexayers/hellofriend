@@ -46,7 +46,7 @@ export const getBookmarks = middyfy(async (event: APIGatewayProxyEvent): Promise
         }
     });
 
-    return successResponse({statusDtos});
+    return successResponse({statuses: statusDtos});
 });
 
 export const getFavorites = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -79,7 +79,7 @@ export const getFavorites = middyfy(async (event: APIGatewayProxyEvent): Promise
         }
     });
 
-    return successResponse({statusDtos});
+    return successResponse({statuses: statusDtos});
 });
 
 export const followAccount = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -117,13 +117,16 @@ export const unFollowAccount = middyfy(async (event: APIGatewayProxyEvent): Prom
 export const getAccount = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     console.log(event);
     let accountID: string = event.pathParameters.accountID;
-    let account: Account = await accountService.getById(accountID);
+
+
+
+    let account: Account = await accountService.getByNormalizedUsernameDomain(accountID);
 
     if (!account) {
         return notFoundResponse(`Unable to find an account with ID ${accountID}`);
     } else {
         delete account.privateKey;
-        return successResponse({account});
+        return successResponse({account: account});
     }
 
 
@@ -165,6 +168,6 @@ export const getStatuses = middyfy(async (event: APIGatewayProxyEvent): Promise<
         }
     });
 
-    return successResponse({statusDtos});
+    return successResponse({statuses: statusDtos});
 });
 

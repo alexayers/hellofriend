@@ -1,0 +1,19 @@
+<div class="timeline-entry">
+  <div class="profile-header">
+    <img src="{{profile?.headerFilename ? profile?.headerFilename : 'assets/header.png'}}" alt="Profile Header">
+  </div>
+  <div class="entry-content">
+    <div class="entry-content-header">
+      <a href="&#64;{{profile?.username}}&#64;{{profile?.domain}}/">
+        <img class="profile-picture" src="{{profile?.avatarFilename ? profile?.avatarFilename : 'assets/avatar.png'}}"
+             alt="Profile Picture">
+        <span class="display-name"><a
+          href="&#64;{{profile?.username}}&#64;{{profile?.domain}}/">{{ profile?.displayName }}</a></span>
+        <span class="handle">&#64;{{ profile?.username }}&#64;{{ profile?.domain }} - {{ profile?.created }}</span>
+      </a>
+    </div>
+    <div class="status" [innerHTML]="sanitizedHtml"></div>
+  </div>
+
+</div>
+

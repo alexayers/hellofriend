@@ -1,0 +1,7 @@
+
+
+<form id="post-form" (ngSubmit)="postStatus()" #PostForm="ngForm">
+  <textarea id="status-input" [(ngModel)]="statusText" (input)="updateCharacterCount()" placeholder="What's on your mind?"></textarea>
+    <span id="character-count {{characterCount < 0 ? 'over-limit' : ''}}">{{ characterCount }}</span>/<span id="available-character-count">500</span>
+    <button id="submit-post" [disabled]="characterCount > 500 || !statusText">Post</button>
+</form>

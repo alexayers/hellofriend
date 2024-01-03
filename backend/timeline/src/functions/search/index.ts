@@ -9,6 +9,7 @@ export const searchTimeline = {
             http: {
                 method: 'post',
                 path: '/search',
+                cors: true,
                 authorizer: {
                     type: 'COGNITO_USER_POOLS',
                     authorizerId: {

@@ -1,0 +1,43 @@
+
+
+
+#character-count {
+  margin-left: 15px;
+  margin-right: 4px;
+  font-size: 0.9rem;
+  color: var(--secondaryTextColor);
+}
+
+#character-count.over-limit {
+  color: var(--warningColor);
+}
+
+#available-character-count {
+  margin-left: 4px;
+  font-size: 0.9rem;
+  color: var(--secondaryTextColor);
+}
+
+#status-input {
+  background-color: var(--secondaryBackgroundColor);
+  color: var(--primaryTextColor);
+  border-radius: 6px 0 0 6px;
+  padding: 10px;
+  border: none;
+  outline: none;
+}
+
+#status-input textarea:focus {
+  border: var(--primaryButtonColor) solid 2px;
+}
+
+#submit-post {
+  color: var(--primaryTextColor);
+  background-color: var(--primaryButtonColor);
+  border-radius: 4px;
+}
+
+#submit-post:hover {
+
+  background-color: var(--primaryButtonHoverColor);
+}

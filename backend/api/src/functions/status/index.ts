@@ -10,6 +10,7 @@ export const postStatus = {
             http: {
                 method: 'post',
                 path: '/status',
+                cors: true,
                 authorizer: {
                     type: 'COGNITO_USER_POOLS',
                     authorizerId: {
@@ -30,6 +31,7 @@ export const getStatus = {
             http: {
                 method: 'get',
                 path: '/statuses/{statusID}',
+                cors: true,
                 authorizer: {
                     type: 'COGNITO_USER_POOLS',
                     authorizerId: {
@@ -50,6 +52,7 @@ export const updateStatus = {
             http: {
                 method: 'put',
                 path: '/statuses/{statusID}',
+                cors: true,
                 authorizer: {
                     type: 'COGNITO_USER_POOLS',
                     authorizerId: {
@@ -70,6 +73,7 @@ export const deleteStatus = {
             http: {
                 method: 'delete',
                 path: '/statuses/{statusID}',
+                cors: true,
                 authorizer: {
                     type: 'COGNITO_USER_POOLS',
                     authorizerId: {
@@ -90,6 +94,7 @@ export const replyToStatus = {
             http: {
                 method: 'post',
                 path: '/statuses/{statusID}/reply',
+                cors: true,
                 authorizer: {
                     type: 'COGNITO_USER_POOLS',
                     authorizerId: {
@@ -110,6 +115,7 @@ export const favoriteStatus = {
             http: {
                 method: 'post',
                 path: '/statuses/{statusID}/favorite',
+                cors: true,
                 authorizer: {
                     type: 'COGNITO_USER_POOLS',
                     authorizerId: {
@@ -130,6 +136,7 @@ export const removeFavorite = {
             http: {
                 method: 'delete',
                 path: '/statuses/{statusID}/favorite',
+                cors: true,
                 authorizer: {
                     type: 'COGNITO_USER_POOLS',
                     authorizerId: {
@@ -150,6 +157,7 @@ export const bookmarkStatus = {
             http: {
                 method: 'post',
                 path: '/statuses/{statusID}/bookmark',
+                cors: true,
                 authorizer: {
                     type: 'COGNITO_USER_POOLS',
                     authorizerId: {
@@ -170,6 +178,7 @@ export const removeBookmark = {
             http: {
                 method: 'delete',
                 path: '/statuses/{statusID}/bookmark',
+                cors: true,
                 authorizer: {
                     type: 'COGNITO_USER_POOLS',
                     authorizerId: {
@@ -190,6 +199,7 @@ export const pinStatus = {
             http: {
                 method: 'post',
                 path: '/statuses/{statusID}/pin',
+                cors: true,
                 authorizer: {
                     type: 'COGNITO_USER_POOLS',
                     authorizerId: {
@@ -210,6 +220,7 @@ export const unPinStatus = {
             http: {
                 method: 'delete',
                 path: '/statuses/{statusID}/pin',
+                cors: true,
                 authorizer: {
                     type: 'COGNITO_USER_POOLS',
                     authorizerId: {

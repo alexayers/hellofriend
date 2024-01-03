@@ -1,0 +1,26 @@
+
+<div *ngIf="isLoading">
+
+  <div class="loader-container">
+    LOADING
+  </div>
+
+  <div *ngFor="let status of statuses">
+    <status-entry [status]="status"></status-entry>
+  </div>
+
+</div>
+
+<div *ngIf="!isLoading">
+  <div *ngIf="statuses && statuses.length > 0">
+    <div *ngFor="let status of statuses">
+      <status-entry [status]="status"></status-entry>
+    </div>
+  </div>
+  <div *ngIf="statuses && statuses.length == 0 && (type == 'bookmarks' || type =='favorites')" class="noContent">
+    <div class="noEntryText">You haven't created any {{type}}.</div>
+  </div>
+  <div *ngIf="statuses && statuses.length == 0 && type == 'profile'" class="noContent">
+    <div class="noEntryText">No posts found.</div>
+  </div>
+</div>

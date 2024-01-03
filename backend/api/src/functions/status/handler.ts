@@ -19,7 +19,7 @@ export const getStatus = middyfy(async (event: APIGatewayProxyEvent): Promise<AP
     let status : StatusDto = await statusService.getStatus(accountID,statusID);
 
     if (status) {
-        return successResponse({status});
+        return successResponse({status: status});
     } else {
         return notFoundResponse(`Unable to find a status for ${statusID}`);
     }

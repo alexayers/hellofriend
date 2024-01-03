@@ -1,0 +1,15 @@
+<div class="timeline-entry">
+  <a href="&#64;{{status?.account?.username}}&#64;{{status?.account?.domain}}/"><img class="profile-picture"
+                                                                                     src="{{status?.account?.avatarFilename}}"
+                                                                                     alt="Profile Picture"></a>
+
+  <div class="entry-content">
+    <span class="display-name"><a
+      href="&#64;{{status?.account?.username}}&#64;{{status?.account?.domain}}/">{{ status?.account?.displayName }}</a></span>
+    <span class="handle">&#64;{{ status?.account?.username }}&#64;{{ status?.account?.domain }}
+      · {{ status?.published }}</span>
+    <div class="status" [innerHTML]="sanitizedHtml"></div>
+  </div>
+
+</div>
+
