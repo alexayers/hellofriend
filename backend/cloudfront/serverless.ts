@@ -38,6 +38,7 @@ export const serverlessConfiguration: AWS = {
                 Type: 'AWS::CloudFront::Distribution',
                 Properties: {
                     DistributionConfig: {
+                        Comment: `files.${domain}`,
                         Origins: [{
                             DomainName: `files.${domain}.s3-website-us-east-1.amazonaws.com`,
                             Id: 'S3-Website-Origin',
@@ -86,6 +87,7 @@ export const serverlessConfiguration: AWS = {
                 Type: 'AWS::CloudFront::Distribution',
                 Properties: {
                     DistributionConfig: {
+                        Comment: `www.${domain}`,
                         Origins: [{
                             DomainName: `www.${domain}.s3-website-us-east-1.amazonaws.com`,
                             Id: 'S3-Website-Origin',
