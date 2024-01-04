@@ -29,3 +29,18 @@ export const login = {
         },
     ],
 };
+
+export const refreshToken = {
+    handler: `${handlerPath(__dirname)}/handler.refreshToken`,
+    memorySize: 512,
+    timeout: 30,
+    events: [
+        {
+            http: {
+                method: 'post',
+                path: '/auth/refresh',
+                cors: true
+            },
+        },
+    ],
+};

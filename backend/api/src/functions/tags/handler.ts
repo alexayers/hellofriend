@@ -6,9 +6,9 @@ import {notFoundResponse, successResponse} from "@libs/lambda/api-gateway";
 
 export const tags = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     console.log(event);
-    let tag : string = event.pathParameters.tag;
+    let tag: string = event.pathParameters.tag;
 
-    let accountID : string = event.requestContext.authorizer.claims.sub;
+    let accountID: string = event.requestContext.authorizer.claims.sub;
     let results = await statusService.getStatusByTag(accountID, tag);
 
     if (!results) {

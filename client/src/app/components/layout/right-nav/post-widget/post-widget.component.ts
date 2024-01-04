@@ -12,7 +12,7 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 })
 export class PostWidgetComponent {
   characterCount: number = 500;
-  statusText: any;
+  statusText: any = "";
 
   updateCharacterCount() {
     this.characterCount = 500 - this.statusText.length;

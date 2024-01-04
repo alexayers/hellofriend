@@ -86,6 +86,41 @@ export const serverlessConfiguration: AWS = {
                                         'location': { value: redirectUrl }
                                     }
                                 };
+                            } else if (uri.startsWith('/avatars')) {
+                                let pathTokens = uri.split("/");
+                                let redirectUrl = 'https://files.${domain}/avatars/' + pathTokens[pathTokens.length-1];
+                                
+                                return {
+                                    statusCode: 302,
+                                    statusDescription: 'Found',
+                                    headers: {
+                                        'location': { value: redirectUrl }
+                                    }
+                                };
+                                
+                            } else if (uri.startsWith('/headers')) {
+                                let pathTokens = uri.split("/");
+                                let redirectUrl = 'https://files.${domain}/headers/' + pathTokens[pathTokens.length-1];
+                                
+                                return {
+                                    statusCode: 302,
+                                    statusDescription: 'Found',
+                                    headers: {
+                                        'location': { value: redirectUrl }
+                                    }
+                                };
+                                
+                            } else if (uri.startsWith('/attachments')) {
+                                let pathTokens = uri.split("/");
+                                let redirectUrl = 'https://files.${domain}/attachments/' + pathTokens[pathTokens.length-1];
+                                
+                                return {
+                                    statusCode: 302,
+                                    statusDescription: 'Found',
+                                    headers: {
+                                        'location': { value: redirectUrl }
+                                    }
+                                };
                             }
                         
                             return request;

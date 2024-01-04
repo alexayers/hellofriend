@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {Router} from "@angular/router";
-import {BehaviorSubject, Observable} from "rxjs";
+import {BehaviorSubject, catchError, Observable, throwError} from "rxjs";
 import {environment} from "../../environments/environment";
 import {jwtDecode, JwtPayload} from "jwt-decode";
 
@@ -36,12 +36,13 @@ export class AuthenticationService {
         console.log(response);
         // @ts-ignore
         let idToken = response.idToken;
+        // @ts-ignore
+        let refreshToken = response.refreshToken;
         let decodedToken: JwtPayload  =jwtDecode(idToken);
-
-        console.log(decodedToken);
 
         localStorage.setItem('user', JSON.stringify(decodedToken));
         localStorage.setItem('idToken', idToken);
+        localStorage.setItem('refreshToken', refreshToken);
         this.isAuthenticated.next(true);
       },
       error => {
@@ -61,4 +62,17 @@ export class AuthenticationService {
     console.log("you are logged out");
   }
 
+  refreshToken(refreshToken: string): Observable<any> {
+
+    return this.http.post(`${this.baseUrl}/auth/refresh`, JSON.stringify({
+      refreshToken: refreshToken
+    }))
+      .pipe(
+        catchError(error => {
+
+          console.error('Error occurred while refreshing token', error);
+          return throwError(() => error);
+        })
+      );
+  }
 }

@@ -1,6 +1,6 @@
 import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
 import {middyfy} from "@libs/lambda/lambda";
-import {LoginUser, RegisterUser} from "@libs/model/authenticationDtos";
+import {LoginUser, RefreshToken, RegisterUser} from "@libs/model/authenticationDtos";
 import {accountService, authenticationService} from "@libs/services";
 import {Account} from "@libs/model/account";
 import {notAuthenticatedResponse, notValidResponse, successResponse} from "@libs/lambda/api-gateway";
@@ -39,6 +39,26 @@ export const login = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGat
             expiresIn: response.ExpiresIn
         });
     } catch (e) {
-       return notAuthenticatedResponse(`Not authorized`);
+        return notAuthenticatedResponse(`Not authorized`);
+    }
+});
+
+export const refreshToken = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+
+    let rt: RefreshToken = event.body as unknown as RefreshToken;
+
+    try {
+        let response: AuthenticationResultType = await authenticationService.refresh(rt.refresh);
+
+        return successResponse({
+            idToken: response.IdToken,
+            accessToken: response.AccessToken,
+            refreshToken: response.RefreshToken,
+            tokenType: response.IdToken,
+            expiresIn: response.ExpiresIn
+        });
+    } catch (e) {
+        console.log(e);
+        return notAuthenticatedResponse(`Not authorized`);
     }
 });

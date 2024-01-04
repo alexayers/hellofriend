@@ -6,7 +6,7 @@ import {bookmarkService, favoriteService, timeSeriesService} from "@libs/service
 export const exploreStatuses = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     console.log(event);
 
-    let accountID : string = event.requestContext.authorizer.claims.sub;
+    let accountID: string = event.requestContext.authorizer.claims.sub;
     let results = await timeSeriesService.getRecent("Status");
     const pkeys = results.map(item => item.pkey);
 
@@ -28,7 +28,7 @@ export const exploreStatuses = middyfy(async (event: APIGatewayProxyEvent): Prom
         }
     });
 
-    return successResponse({statuses:results});
+    return successResponse({statuses: results});
 });
 
 export const exploreTags = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -42,26 +42,26 @@ export const exploreTags = middyfy(async (event: APIGatewayProxyEvent): Promise<
         };
     });
 
-    return successResponse({tags:results});
+    return successResponse({tags: results});
 });
 
 export const exploreAccounts = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     console.log(event);
 
-    let results = await timeSeriesService.getRecent("Account" );
+    let results = await timeSeriesService.getRecent("Account");
 
-    results = results.map(item =>{
-       return {
-           displayName: item.displayName,
-           headerFilename: item?.headerFilename,
-           id: item.pkey,
-           summary: item?.summary,
-           uri: item.uri,
-           avatarFilename: item?.avatarFilename,
-           username: item.username,
-           created: item.createdAt
-       }
+    results = results.map(item => {
+        return {
+            displayName: item.displayName,
+            headerFilename: item?.headerFilename,
+            id: item.pkey,
+            summary: item?.summary,
+            uri: item.uri,
+            avatarFilename: item?.avatarFilename,
+            username: item.username,
+            created: item.createdAt
+        }
     });
 
-    return successResponse({accounts:results});
+    return successResponse({accounts: results});
 });

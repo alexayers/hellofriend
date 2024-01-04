@@ -27,17 +27,13 @@ export const getBookmarks = middyfy(async (event: APIGatewayProxyEvent): Promise
     }
 
     const pkeys = bookmarks.map(item => item.status.id);
-
-    const [bookmarkedResults, favoritedResults] = await Promise.all([
-        bookmarkService.areBookmarked(accountID, pkeys),
-        favoriteService.areFavorited(accountID, pkeys)
-    ]);
+    const favoritedResults = await favoriteService.areFavorited(accountID, pkeys);
 
     let statusDtos: Array<StatusDto> = bookmarks.map((item, index) => {
         return {
             account: item.status.account,
             id: item.status.id,
-            isBookmark: bookmarkedResults[index],
+            isBookmark: true,
             isFavorite: favoritedResults[index],
             published: item.status.published,
             text: item.status.text,
@@ -60,18 +56,14 @@ export const getFavorites = middyfy(async (event: APIGatewayProxyEvent): Promise
 
 
     const pkeys = favorites.map(item => item.status.id);
-
-    const [bookmarkedResults, favoritedResults] = await Promise.all([
-        bookmarkService.areBookmarked(accountID, pkeys),
-        favoriteService.areFavorited(accountID, pkeys)
-    ]);
+    const bookmarkedResults = await bookmarkService.areBookmarked(accountID, pkeys);
 
     let statusDtos: Array<StatusDto> = favorites.map((item, index) => {
         return {
             account: item.status.account,
             id: item.status.id,
             isBookmark: bookmarkedResults[index],
-            isFavorite: favoritedResults[index],
+            isFavorite: true,
             published: item.status.published,
             text: item.status.text,
             totalLikes: 0,
@@ -117,9 +109,6 @@ export const unFollowAccount = middyfy(async (event: APIGatewayProxyEvent): Prom
 export const getAccount = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     console.log(event);
     let accountID: string = event.pathParameters.accountID;
-
-
-
     let account: Account = await accountService.getByNormalizedUsernameDomain(accountID);
 
     if (!account) {
@@ -128,7 +117,6 @@ export const getAccount = middyfy(async (event: APIGatewayProxyEvent): Promise<A
         delete account.privateKey;
         return successResponse({account: account});
     }
-
 
 });
 

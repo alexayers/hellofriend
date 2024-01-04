@@ -7,6 +7,7 @@ import {
     SignUpCommand,
     SignUpCommandOutput
 } from "@aws-sdk/client-cognito-identity-provider";
+import {RefreshToken} from "../model/authenticationDtos";
 
 const client = new CognitoIdentityProviderClient({region: "us-east-1"});
 
@@ -52,6 +53,21 @@ export class AuthenticationService {
         };
 
         const command: InitiateAuthCommand = new InitiateAuthCommand(params);
+        const response: InitiateAuthCommandOutput = await client.send(command);
+        return response.AuthenticationResult;
+    }
+
+    async refresh(refreshToken: string) {
+        const command = new InitiateAuthCommand({
+            AuthFlow: AuthFlowType.REFRESH_TOKEN,
+            ClientId: this.cognitoUserPoolClientId,
+            AuthParameters: {
+                REFRESH_TOKEN: refreshToken
+            },
+        });
+
+
+
         const response: InitiateAuthCommandOutput = await client.send(command);
         return response.AuthenticationResult;
     }

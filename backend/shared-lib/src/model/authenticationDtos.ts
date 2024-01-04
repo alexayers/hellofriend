@@ -13,3 +13,6 @@ export interface LoginUser {
     password: string
 }
 
+export interface RefreshToken {
+    refreshToken: string
+}
