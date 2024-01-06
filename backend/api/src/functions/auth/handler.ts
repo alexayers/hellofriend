@@ -44,11 +44,12 @@ export const login = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGat
 });
 
 export const refreshToken = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-
+    console.log(event);
     let rt: RefreshToken = event.body as unknown as RefreshToken;
 
+
     try {
-        let response: AuthenticationResultType = await authenticationService.refresh(rt.refresh);
+        let response: AuthenticationResultType = await authenticationService.refresh(rt.refreshToken);
 
         return successResponse({
             idToken: response.IdToken,
@@ -58,7 +59,7 @@ export const refreshToken = middyfy(async (event: APIGatewayProxyEvent): Promise
             expiresIn: response.ExpiresIn
         });
     } catch (e) {
-        console.log(e);
+        console.error(e);
         return notAuthenticatedResponse(`Not authorized`);
     }
 });

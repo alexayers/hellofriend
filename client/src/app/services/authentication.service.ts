@@ -62,17 +62,5 @@ export class AuthenticationService {
     console.log("you are logged out");
   }
 
-  refreshToken(refreshToken: string): Observable<any> {
 
-    return this.http.post(`${this.baseUrl}/auth/refresh`, JSON.stringify({
-      refreshToken: refreshToken
-    }))
-      .pipe(
-        catchError(error => {
-
-          console.error('Error occurred while refreshing token', error);
-          return throwError(() => error);
-        })
-      );
-  }
 }

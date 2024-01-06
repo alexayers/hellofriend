@@ -12,7 +12,7 @@ import {StatusDto} from "@libs/dto/statusDto";
 export const updateAccount = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
 
     console.log(event);
-    //  let accountID : string = event.requestContext.authorizer.claims.sub;
+    //  let accountID : string = event.requestContext.authorizer.js.claims.sub;
 
     return successResponse({});
 });
