@@ -56,6 +56,7 @@ export const exploreAccounts = middyfy(async (event: APIGatewayProxyEvent): Prom
             headerFilename: item?.headerFilename,
             id: item.pkey,
             summary: item?.summary,
+            domain: item?.domain,
             uri: item.uri,
             avatarFilename: item?.avatarFilename,
             username: item.username,
