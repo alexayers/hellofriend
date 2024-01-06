@@ -1,0 +1,14 @@
+<div class="content-container" *ngIf="isAuthenticated">
+  <div class="section-header">
+    <h3>Home</h3>
+  </div>
+  <div class="section-body">
+      <status-list [type]="type"></status-list>
+  </div>
+</div>
+
+<ng-container class="container" *ngIf="!isAuthenticated">
+  <login-page></login-page>
+</ng-container>
+
+

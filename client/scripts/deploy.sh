@@ -1,6 +1,6 @@
 #!/bin/sh
 
-BUCKET_NAME=www.beseder.io
+BUCKET_NAME=www.hellofriend.social
 BUILD_DIRECTORY="dist/hellofriend/browser"
 
 # Check if AWS CLI is installed

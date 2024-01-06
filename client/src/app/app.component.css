@@ -1,0 +1,66 @@
+
+
+
+#development-warning {
+  background: var(--warningColor);
+  color: var(--primaryTextColor);
+  font-weight: normal;
+  text-align: center;
+  font-size: 0.5em;
+  width: 100%;
+  height: 10px;
+  position: fixed;
+  z-index: 900;
+}
+
+/*
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    MAIN LAYOUT
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+ */
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.left-nav, .right-nav {
+  flex: 1.2;
+  height: 100%;
+  overflow-y: hidden;
+}
+
+.center-nav {
+  flex: 3;
+  border-left: var(--sectionDividerColor) solid 2px;
+  border-right: var(--sectionDividerColor) solid 2px;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.content-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+.section-header {
+  padding-left: 20px;
+  padding-bottom: 3px;
+  border-bottom: 3px solid var(--sectionDividerColor);
+  background-color: var(--primaryBackgroundColor);
+  z-index: 2;
+  height: 60px;
+}
+
+.section-body {
+  flex: 1; /* Take up the remaining space */
+  overflow-y: auto; /* Add scroll to the content */
+  padding: 10px;
+}
+
+

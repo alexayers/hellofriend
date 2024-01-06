@@ -1,0 +1,31 @@
+<div class="sectionHeader">
+  <h3>Profile</h3>
+</div>
+<div class="profile">
+  <div id="profileImages">
+
+    <img src="{{profile?.image.url}}" alt="Header background" class="profile-header-img">
+    <img src="{{profile?.icon.url}}" alt="Header Avatar" class="profile-avatar-img" (click)="showProfilePicture()">
+
+    <div *ngIf="isShowingProfilePicture">
+      <img src="{{profile?.avatarImage}}" alt="Header Avatar" class="profile-avatar-img-big"
+           (click)="showProfilePicture()">
+    </div>
+
+  </div>
+  <div class="profile-info">
+    <div class="profile-name">{{ profile?.displayName }}
+      <span class="profile-handle"><button (click)="follow()"
+                                           class="{{profile?.isFollowing ? 'unfollow-button' : 'follow-button'}}">{{ profile?.isFollowing ? "Unfollow" : "Follow" }}</button></span>
+    </div>
+
+    <div class="profile-bio" [innerHTML]="sanitizedHtml"></div>
+
+  </div>
+  <div class="original-profile">
+    View original profile for <a href="{{profile.url}}" target="_blank"
+                                 class="u-url mention">&#64;{{ profile?.url.split("/@")[1] }}</a>
+  </div>
+</div>
+
+

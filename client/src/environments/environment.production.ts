@@ -1,6 +1,7 @@
 export const environment = {
   name: "production",
   production: true,
-  api: "https://api.beseder.io/",
-  files: "https://files.beseder.io"
+  activityPubApi: "https://api.hellofriend.social/activitypub",
+  api: "https://api.hellofriend.social/public",
+  files: "https://files.hellofriend.social"
 };

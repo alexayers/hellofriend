@@ -1,0 +1,45 @@
+.timeline-entry {
+  /* background-color: #1a1a1a; */
+  background-color: #1a1a1a;
+  border-bottom: 1px solid #222634;
+}
+
+
+.profile-header img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-bottom: 1px solid #222634;
+}
+
+.entry-content {
+
+}
+
+.entry-content-header {
+  background-color: #000;
+}
+
+.profile-picture {
+  width: 50px;
+  height: 50px;
+  vertical-align: middle;
+  border-radius: 50%;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.display-name {
+  font-weight: bold;
+  margin-left: 5px;
+}
+
+.handle {
+  color: #666;
+  font-size: 0.9em;
+  margin-left: 5px;
+}
+
+.status {
+  padding-left: 20px;
+}

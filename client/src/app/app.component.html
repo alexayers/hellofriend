@@ -1,4 +1,27 @@
+<div *ngIf="!environment.production" id="development-warning">
+  Development
+</div>
 
-Hello Friend!
+<div class="container" *ngIf="isAuthenticated">
+  <div class="left-nav">
+    <left-nav></left-nav>
+  </div>
+  <div class="center-nav">
+    <router-outlet></router-outlet>
+  </div>
+  <div class="right-nav">
+    <right-nav></right-nav>
+  </div>
+</div>
 
-<router-outlet></router-outlet>
+<div class="container" *ngIf="!isAuthenticated">
+  <div class="left-nav">
+    <unauth-left-nav></unauth-left-nav>
+  </div>
+  <div class="center-nav">
+    <router-outlet></router-outlet>
+  </div>
+  <div class="right-nav">
+    <unauth-right-nav></unauth-right-nav>
+  </div>
+</div>

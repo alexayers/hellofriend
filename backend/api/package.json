@@ -19,6 +19,7 @@
     "@aws-sdk/lib-dynamodb": "^3.473.0",
     "@aws-sdk/lib-storage": "^3.474.0",
     "@middy/core": "^3.4.0",
+    "@middy/http-cors": "^5.2.1",
     "@middy/http-json-body-parser": "^3.4.0",
     "aws-xray-sdk": "^3.5.3",
     "serverless-dynamodb-local": "^1.0.2"

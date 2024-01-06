@@ -9,6 +9,7 @@ export const getUser = {
             http: {
                 method: 'get',
                 path: '/users/{user}',
+                cors: true
             },
         },
     ],

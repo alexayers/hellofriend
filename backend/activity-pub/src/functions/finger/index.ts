@@ -10,6 +10,7 @@ export const webFinger = {
             http: {
                 method: 'get',
                 path: '/webfinger/{user}',
+                cors: true
             },
         }
     ],

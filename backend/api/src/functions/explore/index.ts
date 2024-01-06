@@ -10,6 +10,7 @@ export const exploreStatuses = {
             http: {
                 method: 'get',
                 path: '/explore/statuses',
+                cors: true,
                 authorizer: {
                     type: 'COGNITO_USER_POOLS',
                     authorizerId: {
@@ -31,6 +32,7 @@ export const exploreTags = {
             http: {
                 method: 'get',
                 path: '/explore/tags',
+                cors: true,
                 authorizer: {
                     type: 'COGNITO_USER_POOLS',
                     authorizerId: {
@@ -51,6 +53,7 @@ export const exploreAccounts = {
             http: {
                 method: 'get',
                 path: '/explore/accounts',
+                cors: true,
                 authorizer: {
                     type: 'COGNITO_USER_POOLS',
                     authorizerId: {

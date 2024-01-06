@@ -1,0 +1,56 @@
+
+
+#post-actions {
+  text-align: right;
+  margin-right: 25px;
+  font-size: 0.9rem;
+}
+
+
+#character-count {
+  margin-right: 4px;
+  color: var(--secondaryTextColor);
+}
+
+#character-count.over-limit {
+  color: var(--warningColor);
+}
+
+#available-character-count {
+  margin-left: 4px;
+  margin-right: 25px;
+
+  color: var(--secondaryTextColor);
+}
+
+#status-input {
+  background-color: var(--secondaryBackgroundColor);
+  color: var(--primaryTextColor);
+  border-radius: 6px 0 0 6px;
+  padding: 10px;
+  border: none;
+  outline: none;
+  width: 100%;
+  height: 100px;
+}
+
+#status-input textarea:focus {
+  border: var(--primaryButtonColor) solid 2px;
+}
+
+#post-form {
+  width: 100%;
+}
+
+#submit-post {
+  color: var(--primaryTextColor);
+  background-color: var(--primaryButtonColor);
+  border-radius: 4px;
+
+}
+
+#submit-post:hover {
+
+  background-color: var(--primaryButtonHoverColor);
+}
+

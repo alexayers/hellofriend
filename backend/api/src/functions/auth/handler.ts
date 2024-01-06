@@ -1,9 +1,10 @@
 import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
 import {middyfy} from "@libs/lambda/lambda";
-import {LoginUser, RegisterUser} from "@libs/model/authenticationDtos";
+import {LoginUser, RefreshToken, RegisterUser} from "@libs/model/authenticationDtos";
 import {accountService, authenticationService} from "@libs/services";
 import {Account} from "@libs/model/account";
 import {notAuthenticatedResponse, notValidResponse, successResponse} from "@libs/lambda/api-gateway";
+import {AuthenticationResultType} from "@aws-sdk/client-cognito-identity-provider";
 
 
 export const register = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -28,10 +29,37 @@ export const login = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGat
     let user: LoginUser = event.body as unknown as LoginUser;
 
     try {
-        let response = await authenticationService.login(user.email, user.password);
+        let response: AuthenticationResultType = await authenticationService.login(user.email, user.password);
 
-        return successResponse({response});
+        return successResponse({
+            idToken: response.IdToken,
+            accessToken: response.AccessToken,
+            refreshToken: response.RefreshToken,
+            tokenType: response.IdToken,
+            expiresIn: response.ExpiresIn
+        });
     } catch (e) {
-       return notAuthenticatedResponse(`Not authorized`);
+        return notAuthenticatedResponse(`Not authorized`);
+    }
+});
+
+export const refreshToken = middyfy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+    console.log(event);
+    let rt: RefreshToken = event.body as unknown as RefreshToken;
+
+
+    try {
+        let response: AuthenticationResultType = await authenticationService.refresh(rt.refreshToken);
+
+        return successResponse({
+            idToken: response.IdToken,
+            accessToken: response.AccessToken,
+            refreshToken: response.RefreshToken,
+            tokenType: response.IdToken,
+            expiresIn: response.ExpiresIn
+        });
+    } catch (e) {
+        console.error(e);
+        return notAuthenticatedResponse(`Not authorized`);
     }
 });

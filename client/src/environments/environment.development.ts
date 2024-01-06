@@ -1,6 +1,7 @@
 export const environment = {
   name: "development",
   production: false,
-  api: "http://127.0.01:8080",
-  files: "https://files.beseder.io"
+  activityPubApi: "https://api.hellofriend.social/activitypub",
+  api: "https://api.hellofriend.social/public",
+  files: "https://files.hellofriend.social"
 };

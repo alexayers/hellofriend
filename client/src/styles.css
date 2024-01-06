@@ -1,0 +1,95 @@
+:root {
+  --black: #000000;
+  --primaryBackgroundColor: #1f2028;
+  --secondaryBackgroundColor: #222634;
+  --sectionDividerColor: #2b2f3c;
+
+  --primaryTextColor: #ffffff;
+  --secondaryTextColor: #6c757d;
+
+  --veryDarkGray: #555555;
+
+  --primaryButtonColor: #6364ff;
+  --primaryButtonHoverColor: #8485fa;
+
+
+  --tabColor: #1da1f2;
+  --tabHoverColor: #74c9f9;
+
+  --warningColor: #ff0000;
+  --warningHoverColor: #fc5454;
+  --favoriteColor: #dfe618;
+  --favoriteHoverColor: #f6ff00;
+  --linkColor: #ff4081;
+}
+
+html, body {
+  background-color: var(--primaryBackgroundColor);
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  color: var(--primaryTextColor)
+}
+
+a, .u-url.mention, .mention.hashtag {
+  color: var(--linkColor);
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.invisible {
+  display: none;
+}
+
+.ellipsis {
+  color: var(--linkColor);
+  text-decoration: none;
+  font-weight: bold;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+button[type="submit"] {
+  background-color: var(--primaryButtonColor);
+  color: var(--primaryTextColor);
+  padding: 10px 15px;
+  font-size: 0.9rem;
+  border: none;
+  cursor: pointer;
+  width: auto;
+  border-radius: 6px;
+  display: block;
+  margin-left: 230px;
+}
+
+button[type="submit"]:hover {
+  background-color: var(--primaryButtonHoverColor);
+}
+
+
+
+h3 {
+  font-size: 20px;
+  font-weight: bolder;
+  color: var(--primaryTextColor);
+}
+
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  background: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+  background-size: 400% 400%;
+  animation: MoveBackground 4s linear infinite;
+  font-size: 0.8em;
+  font-weight: bold;
+}
+
+@keyframes MoveBackground {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}

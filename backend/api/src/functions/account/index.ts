@@ -9,6 +9,7 @@ export const updateAccount = {
             http: {
                 method: 'put',
                 path: '/account',
+                cors: true,
                 authorizer: {
                     type: 'COGNITO_USER_POOLS',
                     authorizerId: {
@@ -30,6 +31,7 @@ export const getBookmarks = {
             http: {
                 method: 'get',
                 path: '/account/bookmarks',
+                cors: true,
                 authorizer: {
                     type: 'COGNITO_USER_POOLS',
                     authorizerId: {
@@ -50,6 +52,7 @@ export const getFavorites = {
             http: {
                 method: 'get',
                 path: '/account/favorites',
+                cors: true,
                 authorizer: {
                     type: 'COGNITO_USER_POOLS',
                     authorizerId: {
@@ -70,6 +73,7 @@ export const followAccount = {
             http: {
                 method: 'post',
                 path: '/accounts/{accountID}/follow',
+                cors: true,
                 authorizer: {
                     type: 'COGNITO_USER_POOLS',
                     authorizerId: {
@@ -90,6 +94,7 @@ export const unFollowAccount = {
             http: {
                 method: 'delete',
                 path: '/accounts/{accountID}/follow',
+                cors: true,
                 authorizer: {
                     type: 'COGNITO_USER_POOLS',
                     authorizerId: {
@@ -110,6 +115,7 @@ export const getAccount = {
             http: {
                 method: 'get',
                 path: `/accounts/{accountID}`,
+                cors: true,
                 authorizer: {
                     type: 'COGNITO_USER_POOLS',
                     authorizerId: {
@@ -130,6 +136,7 @@ export const getStatuses = {
             http: {
                 method: 'get',
                 path: '/accounts/{accountID}/statuses',
+                cors: true,
                 authorizer: {
                     type: 'COGNITO_USER_POOLS',
                     authorizerId: {

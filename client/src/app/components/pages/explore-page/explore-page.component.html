@@ -1,0 +1,41 @@
+<div class="section-header">
+  <h3>Explore</h3>
+  <ul class="nav-tabs">
+    <li class="tab-item" [class.active]="currentType == 'posts'"><a (click)="selectTab('posts')">Posts</a></li>
+    <li class="tab-item" [class.active]="currentType == 'tags'"><a (click)="selectTab('tags')">Hashtags</a></li>
+    <li class="tab-item" [class.active]="currentType == 'accounts'"><a (click)="selectTab('accounts')">People</a></li>
+  </ul>
+</div>
+
+<div class="section-body">
+
+  <div *ngIf="isLoading" class="loader-container">
+    LOADING
+  </div>
+
+  <div *ngIf="!isLoading">
+    <div *ngIf="showStatusFeed">
+      <div *ngIf="statuses && statuses.length > 0">
+        <div *ngFor="let status of statuses">
+          <status-entry [status]="status"></status-entry>
+        </div>
+      </div>
+      <div *ngIf="statuses && statuses.length == 0 && (type == 'bookmarks' || type =='favorites')" class="noContent">
+        <div class="noEntryText">You haven't created any {{ type }}.</div>
+      </div>
+      <div *ngIf="statuses && statuses.length == 0 && type == 'profile'" class="noContent">
+        <div class="noEntryText">No posts found.</div>
+      </div>
+    </div>
+    <div *ngIf="showPeople">
+      <div id="profiles" *ngFor="let account of accounts">
+        <found-profiles [profile]="account"></found-profiles>
+      </div>
+    </div>
+    <div *ngIf="showTags">
+      <div id="tags" *ngFor="let tag of tags">
+        <found-tags [tag]="tag"></found-tags>
+      </div>
+    </div>
+  </div>
+</div>

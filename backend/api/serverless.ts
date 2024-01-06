@@ -1,5 +1,5 @@
 import type {AWS} from '@serverless/typescript';
-import {login, register} from "@functions/auth";
+import {login, refreshToken, register} from "@functions/auth";
 import configuration from "../configuration";
 import {
   followAccount,
@@ -166,7 +166,8 @@ export const serverlessConfiguration: AWS = {
     removeBookmark,
     pinStatus,
     unPinStatus,
-    getStatusesByTag
+    getStatusesByTag,
+    refreshToken
   },
   package: {individually: true},
   custom: {

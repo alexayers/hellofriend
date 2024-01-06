@@ -10,6 +10,7 @@ export const getStatusesByTag = {
             http: {
                 method: 'get',
                 path: '/tags/{tag}',
+                cors: true,
                 authorizer: {
                     type: 'COGNITO_USER_POOLS',
                     authorizerId: {
